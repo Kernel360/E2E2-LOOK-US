@@ -1,0 +1,8 @@
+/data
+/gradle
+/gradlew
+/gradlew.bat
+/.gradle
+/.idea
+/.gitignore
+/src/main/resources/application.yml

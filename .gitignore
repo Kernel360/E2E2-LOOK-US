@@ -4,5 +4,4 @@
 /gradlew.bat
 /.gradle
 /.idea
-/.gitignore
 /src/main/resources/application.yml

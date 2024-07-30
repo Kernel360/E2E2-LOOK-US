@@ -14,7 +14,7 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=1234
-      - MYSQL_DATABASE=look-us-db
+      - MYSQL_DATABASE=look_us_db
       - TZ=Asia/Seoul
     volumes:
       - ./data/mysql-data:/var/lib/mysql

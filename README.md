@@ -4,8 +4,11 @@ kernel360 E2E 프로젝트 / 패션 커뮤니티 서비스, LOOK:US 리포지토
 
 ### 팀 개발 환경 가이드
 
+#####  (0) 환경
+    - JDK : JAVA 17, JDK amazoncorretto:17
+
 #####  (1) 포매터 설정
-- JDK : JAVA 17, JDK
+
 - IntelliJ 설정
     - Code Formatter 설정
         - ./formatter 에 위치한 `naver-intellij-formatter.xml` 파일을 이용하여 설정

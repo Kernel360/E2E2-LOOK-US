@@ -1,0 +1,28 @@
+server:
+  servlet:
+    encoding:
+      force: 'true'
+      enabled: 'true'
+      charset: UTF-8
+
+    context-path: /
+  port: '8080'
+spring:
+  web:
+  application:
+    name: e2e2-look-us
+  jpa:
+    properties:
+      hibernate:
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    hibernate:
+      ddl-auto: update
+    show-sql: 'true'
+
+
+  datasource:
+    password: '1234'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    url: jdbc:mysql://127.0.0.1:3306/look-us-dev

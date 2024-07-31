@@ -3,9 +3,7 @@ package org.example.exception.post;
 import java.util.function.Supplier;
 
 import org.example.exception.common.ApiErrorCategory;
-import org.example.exception.common.ApiErrorSubCategory;
 import org.example.exception.common.ApiException;
-import org.example.exception.user.UserApiErrorSubCategory;
 
 import jakarta.annotation.Nullable;
 import lombok.Builder;

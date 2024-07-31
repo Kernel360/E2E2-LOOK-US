@@ -17,10 +17,10 @@ import lombok.Getter;
 public abstract class TimeTrackableEntity {
 
 	@CreatedDate
-	@Column(name = "createdAt", updatable = false, nullable = false)
+	@Column(name = "created_at", updatable = false, nullable = false)
 	protected LocalDateTime createdAt;
 
 	@LastModifiedDate
-	@Column(name = "modifiedAt", nullable = false)
+	@Column(name = "updated_at", nullable = false)
 	protected LocalDateTime updatedAt;
 }

@@ -1,4 +1,4 @@
-package org.example;
+package org.example.post.domain.enums;
 
 public enum PostStatus {
 	PUBLISHED("PUBLISHED"),

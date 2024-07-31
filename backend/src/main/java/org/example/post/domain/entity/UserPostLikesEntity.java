@@ -1,4 +1,4 @@
-package org.example;
+package org.example.post.domain.entity;
 
 import org.example.user.domain.entity.member.UserEntity;
 

@@ -1,8 +1,9 @@
-package org.example;
+package org.example.post.domain.entity;
 
 import java.util.List;
 
 import org.example.common.TimeTrackableEntity;
+import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
 

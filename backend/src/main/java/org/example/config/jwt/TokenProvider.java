@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
-import org.example.user.domain.entity.member.User;
+import org.example.user.domain.entity.member.UserEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,13 +23,13 @@ public class TokenProvider { // 계속해서 토큰을 생성하고 올바른 �
 
     private final JwtProperties jwtProperties;
 
-    public String generateToken(User user, Duration expiredAt) {
+    public String generateToken(UserEntity user, Duration expiredAt) {
         Date now = new Date();
         return makeToken(new Date(now.getTime() + expiredAt.toMillis()), user);
     }
 
     // JWT 토큰 생성 메서드
-    private String makeToken(Date expiry, User user) {
+    private String makeToken(Date expiry, UserEntity user) {
         Date now = new Date();
 
         return Jwts.builder()

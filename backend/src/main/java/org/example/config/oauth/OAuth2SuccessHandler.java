@@ -5,7 +5,7 @@ import java.time.Duration;
 
 import org.example.config.jwt.TokenProvider;
 import org.example.user.application.member.UserService;
-import org.example.user.domain.entity.member.User;
+import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.entity.token.RefreshToken;
 import org.example.user.repository.token.RefreshTokenRepository;
 import org.example.util.CookieUtil;
@@ -35,7 +35,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        User user = userService.findByUsername((String) oAuth2User.getAttributes().get("name"));
+        UserEntity user = userService.findByUsername((String) oAuth2User.getAttributes().get("name"));
 
         String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
         saveRefreshToken(user.getId(), refreshToken);

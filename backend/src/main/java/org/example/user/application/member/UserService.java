@@ -1,7 +1,7 @@
 package org.example.user.application.member;
 
 import org.example.user.domain.dto.request.member.AddUserRequest;
-import org.example.user.domain.entity.member.User;
+import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,21 +14,21 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public Long save(AddUserRequest dto) {
+    public Long saveUser(AddUserRequest addUserRequest) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        return userRepository.save(User.builder()
-                .username(dto.getUsername())
-                .password(encoder.encode(dto.getPassword()))
+        return userRepository.save(UserEntity.builder()
+                .username(addUserRequest.getUsername())
+                .password(encoder.encode(addUserRequest.getPassword()))
                 .build()).getId();
     }
 
-    public User findById(Long userId) {
+    public UserEntity findById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
     }
 
-    public User findByUsername(String username) {
+    public UserEntity findByUsername(String username) {
         System.out.println("Searching for user: " + username);
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("unexpected user"));

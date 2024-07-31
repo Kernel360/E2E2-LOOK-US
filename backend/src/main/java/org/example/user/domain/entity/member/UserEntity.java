@@ -20,12 +20,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Table(name = "users")
+@Table(name = "User")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
 @Entity
-public class User extends BaseEntity implements UserDetails{ // UserDetails를 상속받아 인증 객체로 사용
+public class UserEntity extends BaseEntity implements UserDetails{ // UserDetails를 상속받아 인증 객체로 사용
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,7 +52,7 @@ public class User extends BaseEntity implements UserDetails{ // UserDetails를 �
     private String providerId;
 
     @Builder
-    public User(String username,  String password, String email, String role, String provider, String providerId) {
+    public UserEntity(String username,  String password, String email, String role, String provider, String providerId) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -62,7 +62,7 @@ public class User extends BaseEntity implements UserDetails{ // UserDetails를 �
     }
 
     //사용자 이름 변경
-    public User update(String username) {
+    public UserEntity update(String username) {
         this.username = username;
         return this;
     }

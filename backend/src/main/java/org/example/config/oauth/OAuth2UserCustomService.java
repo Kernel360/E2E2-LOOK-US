@@ -1,8 +1,7 @@
 package org.example.config.oauth;
 
-import org.example.user.domain.entity.member.User;
+import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -29,7 +28,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
     }
 
     // ❷ 유저가 있으면 업데이트, 없으면 유저 생성
-    private User saveOrUpdate(OAuth2User oAuth2User) {
+    private UserEntity saveOrUpdate(OAuth2User oAuth2User) {
         System.out.println("getAttributes:" + oAuth2User.getAttributes());
         OAuth2UserInfo oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
 
@@ -39,9 +38,9 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
         String email = oAuth2UserInfo.getEmail();
         String password = passwordEncoder.encode("겟인데어");
 
-        User user = userRepository.findByUsername(username)
+        UserEntity user = userRepository.findByUsername(username)
                 .map(entity -> entity.update(username))
-                .orElse(User.builder()
+                .orElse(UserEntity.builder()
                         .username(username)
                         .password(password)
                         .email(email)

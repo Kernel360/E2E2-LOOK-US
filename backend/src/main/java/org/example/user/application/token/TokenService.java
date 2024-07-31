@@ -4,7 +4,7 @@ import java.time.Duration;
 
 import org.example.config.jwt.TokenProvider;
 import org.example.user.application.member.UserService;
-import org.example.user.domain.entity.member.User;
+import org.example.user.domain.entity.member.UserEntity;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class TokenService {
         }
 
         Long userId = refreshTokenService.findByRefreshToken(refreshToken).getUserId();
-        User user = userService.findById(userId);
+        UserEntity user = userService.findById(userId);
 
         return tokenProvider.generateToken(user, Duration.ofHours(2));
     }

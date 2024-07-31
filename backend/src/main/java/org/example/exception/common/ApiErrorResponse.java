@@ -1,4 +1,4 @@
-package org.example.common.exceptionCore;
+package org.example.exception.common;
 
 import org.springframework.http.ProblemDetail;
 
@@ -15,18 +15,32 @@ import lombok.Getter;
 @Getter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ApiErrorResponse extends ProblemDetail {
-	@JsonProperty(value = "error_data")
-	private final Object generatedErrorBody;
 
-	protected ApiErrorResponse(ApiException apiException) {
+	@JsonProperty(value = "error_data")
+	private final Object errorData;
+
+	protected ApiErrorResponse(
+		ApiException apiException
+	) {
 		super(ProblemDetail.forStatusAndDetail(
 			apiException.getHttpStatus(),
 			apiException.getMessage()
 		));
-		this.generatedErrorBody = apiException.generateErrorBody();
+		this.errorData = apiException.getErrorData();
 	}
 
 	public static ApiErrorResponse from(ApiException apiException) {
+
 		return new ApiErrorResponse(apiException);
+	}
+
+	public static ApiErrorResponse from(Exception exception) {
+
+		return new ApiErrorResponse(
+			ApiException.builder()
+				.category(ApiErrorCategory.UNIDENTIFIED_ERROR)
+
+				.build()
+		);
 	}
 }

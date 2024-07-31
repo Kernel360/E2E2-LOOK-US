@@ -9,13 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
 @Slf4j
-@Order(Ordered.LOWEST_PRECEDENCE)
 public class ApiExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ApiErrorResponse handleException(Exception error) {
 		log.error("handleException", error);
 
-		return ApiErrorResponse.from(error);
+		return ApiErrorResponse.UNIDENTIFIED();
 	}
 }

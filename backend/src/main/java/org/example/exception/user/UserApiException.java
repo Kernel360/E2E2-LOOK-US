@@ -16,17 +16,15 @@ import lombok.Getter;
 @Getter
 public class UserApiException extends ApiException {
 
-	@Override
-	public UserApiErrorSubCategory getSubCategory() {
-		return (UserApiErrorSubCategory)super.getSubCategory();
-	}
+	private final UserApiErrorSubCategory subCategory;
 
 	@Builder
 	protected UserApiException(
 		ApiErrorCategory category,
-		ApiErrorSubCategory subCategory,
+		UserApiErrorSubCategory subCategory,
 		@Nullable Supplier<?> setErrorData
 	) {
-		super(category, subCategory, setErrorData);
+		super(category, setErrorData);
+		this.subCategory = subCategory;
 	}
 }

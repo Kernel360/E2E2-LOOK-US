@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.common.ApiErrorSubCategory;
 import org.example.exception.common.ApiException;
+import org.example.exception.user.UserApiErrorSubCategory;
 
 import jakarta.annotation.Nullable;
 import lombok.Builder;
@@ -16,17 +17,15 @@ import lombok.Getter;
 @Getter
 public class PostApiException extends ApiException {
 
-	@Override
-	public PostApiErrorSubCategory getSubCategory() {
-		return (PostApiErrorSubCategory)super.getSubCategory();
-	}
+	private final PostApiErrorSubCategory subCategory;
 
 	@Builder
 	protected PostApiException(
 		ApiErrorCategory category,
-		ApiErrorSubCategory subCategory,
+		PostApiErrorSubCategory subCategory,
 		@Nullable Supplier<?> setErrorData
 	) {
-		super(category, subCategory, setErrorData);
+		super(category, setErrorData);
+		this.subCategory = subCategory;
 	}
 }

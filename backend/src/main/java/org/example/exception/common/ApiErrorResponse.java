@@ -34,12 +34,11 @@ public class ApiErrorResponse extends ProblemDetail {
 		return new ApiErrorResponse(apiException);
 	}
 
-	public static ApiErrorResponse from(Exception exception) {
+	public static ApiErrorResponse UNIDENTIFIED() {
 
 		return new ApiErrorResponse(
 			ApiException.builder()
 				.category(ApiErrorCategory.UNIDENTIFIED_ERROR)
-
 				.build()
 		);
 	}

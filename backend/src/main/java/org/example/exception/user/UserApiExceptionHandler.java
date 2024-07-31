@@ -24,16 +24,12 @@ public class UserApiExceptionHandler {
 
 		switch (userApiError.getSubCategory()) {
 			case USER_NOT_FOUND:
-				// ...
 				break;
 			case USER_ALREADY_EXISTS:
-				// ...
 				break;
 			case USER_ALREADY_LOGGED_IN:
-				// ...
 				break;
 			default:
-				// ...
 				break;
 		}
 

@@ -12,7 +12,9 @@ import lombok.Getter;
 public enum ApiErrorCategory {
 
 	UNIDENTIFIED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "미확인 예외"),
+
 	RESOURCE_INACCESSIBLE(HttpStatus.NOT_FOUND, "리소스 조회 불가"),
+
 	RESOURCE_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "리소스 사용 권한 제한"),
 	;
 

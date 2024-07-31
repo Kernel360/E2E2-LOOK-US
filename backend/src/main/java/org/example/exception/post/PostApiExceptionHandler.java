@@ -24,10 +24,10 @@ public class PostApiExceptionHandler {
 
 		switch (postApiError.getSubCategory()) {
 			case POST_NOT_FOUND:
-				// ...
+				break;
+			case POST_DISABLED:
 				break;
 			default:
-				// ...
 				break;
 		}
 

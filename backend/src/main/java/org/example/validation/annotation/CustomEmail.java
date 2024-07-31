@@ -4,7 +4,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.example.user.domain.validation.validator.CustomEmailValidator;
+import org.example.validation.validator.CustomEmailValidator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

@@ -1,6 +1,6 @@
 package org.example.exception.post;
 
-public enum PostApiErrorSubCategory {
+public enum ApiPostErrorSubCategory {
 
 	POST_NOT_FOUND("존재하지 않는 포스트입니다."),
 	// ...
@@ -9,7 +9,7 @@ public enum PostApiErrorSubCategory {
 
 	private final String userApiErrorSubCategory;
 
-	PostApiErrorSubCategory(String userApiErrorSubCategory) {
+	ApiPostErrorSubCategory(String userApiErrorSubCategory) {
 		this.userApiErrorSubCategory = userApiErrorSubCategory;
 	}
 

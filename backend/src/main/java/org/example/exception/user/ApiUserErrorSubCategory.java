@@ -1,6 +1,6 @@
 package org.example.exception.user;
 
-public enum UserApiErrorSubCategory {
+public enum ApiUserErrorSubCategory {
 
 	USER_NOT_FOUND("존재하지 않는 사용자입니다."),
 
@@ -11,7 +11,7 @@ public enum UserApiErrorSubCategory {
 
 	private final String userApiErrorSubCategory;
 
-	UserApiErrorSubCategory(String userApiErrorSubCategory) {
+	ApiUserErrorSubCategory(String userApiErrorSubCategory) {
 		this.userApiErrorSubCategory = userApiErrorSubCategory;
 	}
 

@@ -3,7 +3,6 @@ package org.example.exception.common;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.example.exception.user.UserApiErrorSubCategory;
 import org.springframework.http.HttpStatus;
 
 import jakarta.annotation.Nullable;

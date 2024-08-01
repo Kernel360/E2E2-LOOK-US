@@ -1,4 +1,4 @@
-package org.example.exception.post;
+package org.example.exception.user;
 
 import java.util.function.Supplier;
 
@@ -10,17 +10,17 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * 게시글 기능에 대한 비즈니스 로직 예외 입니다.
+ * 사용자 기능에 대한 비즈니스 로직 예외 입니다.
  */
 @Getter
-public class PostApiException extends ApiException {
+public class ApiUserException extends ApiException {
 
-	private final PostApiErrorSubCategory subCategory;
+	private final ApiUserErrorSubCategory subCategory;
 
 	@Builder
-	protected PostApiException(
+	protected ApiUserException(
 		ApiErrorCategory category,
-		PostApiErrorSubCategory subCategory,
+		ApiUserErrorSubCategory subCategory,
 		@Nullable Supplier<?> setErrorData
 	) {
 		super(category, setErrorData);

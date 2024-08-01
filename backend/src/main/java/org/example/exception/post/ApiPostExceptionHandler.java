@@ -12,11 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 @Order(1)
-public class PostApiExceptionHandler {
+public class ApiPostExceptionHandler {
 
-	@ExceptionHandler(PostApiException.class)
+	@ExceptionHandler(ApiPostException.class)
 	public ApiErrorResponse handleApiException(
-		PostApiException postApiError,
+		ApiPostException postApiError,
 		HttpServletRequest request,
 		HttpServletResponse response
 	) {

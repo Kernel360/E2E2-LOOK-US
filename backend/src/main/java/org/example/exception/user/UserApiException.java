@@ -3,7 +3,6 @@ package org.example.exception.user;
 import java.util.function.Supplier;
 
 import org.example.exception.common.ApiErrorCategory;
-import org.example.exception.common.ApiErrorSubCategory;
 import org.example.exception.common.ApiException;
 
 import jakarta.annotation.Nullable;

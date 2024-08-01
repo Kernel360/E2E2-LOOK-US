@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 public enum ApiErrorCategory {
 
-	UNIDENTIFIED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "미확인 예외"),
+	UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "미확인 예외"),
 
 	RESOURCE_INACCESSIBLE(HttpStatus.NOT_FOUND, "리소스 조회 불가"),
 

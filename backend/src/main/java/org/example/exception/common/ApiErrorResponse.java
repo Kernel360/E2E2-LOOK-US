@@ -30,16 +30,10 @@ public class ApiErrorResponse extends ProblemDetail {
 	}
 
 	public static ApiErrorResponse from(ApiException apiException) {
-
 		return new ApiErrorResponse(apiException);
 	}
 
 	public static ApiErrorResponse UNIDENTIFIED() {
-
-		return new ApiErrorResponse(
-			ApiException.builder()
-				.category(ApiErrorCategory.UNIDENTIFIED_ERROR)
-				.build()
-		);
+		return new ApiErrorResponse(ApiException.UNKNOWN_EXCEPTION());
 	}
 }

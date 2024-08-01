@@ -8,12 +8,15 @@ import org.springframework.http.HttpStatus;
 import jakarta.annotation.Nullable;
 import lombok.Builder;
 
-public abstract class ApiException extends RuntimeException {
+public class ApiException extends RuntimeException {
 	private final ApiErrorCategory category;
 	private final Supplier<?> errorDataSupplier;
 
-	@Builder
-	protected ApiException(
+	public static ApiException UNKNOWN_EXCEPTION() {
+		return new ApiException(ApiErrorCategory.UNKNOWN_ERROR, null);
+	}
+
+	public ApiException(
 		ApiErrorCategory category,
 		@Nullable Supplier<?> setErrorData
 	) {

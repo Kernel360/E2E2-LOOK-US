@@ -1,0 +1,121 @@
+package org.example.image.storage;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.storage.ApiStorageErrorSubCategory;
+import org.example.exception.storage.ApiStorageException;
+import org.example.image.storage.core.StorageService;
+import org.example.image.storage.core.StoragePacket;
+import org.example.image.storage.core.StorageProperties;
+import org.example.image.storage.core.StorageSaveResult;
+import org.example.image.storage.core.StorageType;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Service;
+
+import lombok.Builder;
+import lombok.NonNull;
+
+/**
+ * - https://www.baeldung.com/java-images
+ * - https://spring.io/guides/gs/uploading-files
+ */
+@Service
+public class FileSystemStorage implements StorageService {
+
+	private final Path rootLocation;
+	private final StorageProperties properties;
+
+	@Builder
+	public FileSystemStorage(
+		@NonNull StorageProperties properties
+	) {
+		if (properties.getLocation().trim().isEmpty()) {
+			throw ApiStorageException.builder()
+				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+				.subCategory(ApiStorageErrorSubCategory.STORAGE_INVALID_PROPERTIES)
+				.build();
+		}
+
+		this.rootLocation = Paths.get(properties.getLocation());
+		this.properties = properties;
+	}
+
+	@Override
+	public StorageSaveResult save(StoragePacket packet) {
+
+		if ( packet.isPayloadEmpty() ) {
+			throw ApiStorageException.builder()
+				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+				.subCategory(ApiStorageErrorSubCategory.FILE_IS_EMPTY)
+				.build();
+		}
+
+		if ( Files.notExists(this.rootLocation) ) {
+			throw ApiStorageException.builder()
+				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+				.subCategory(ApiStorageErrorSubCategory.DIRECTORY_NOT_ACCESSIBLE)
+				.build();
+		}
+
+		try {
+			Path destination = this.rootLocation
+				.resolve(packet.getDestinationPath())
+				.normalize()
+				.toAbsolutePath();
+
+			if (Files.notExists(destination.getParent())) {
+				this.createDirectory(destination.getParent());
+			}
+
+			Files.copy(packet.getFileData().getInputStream(), destination);
+			return new StorageSaveResult(destination, StorageType.LOCAL_FILE_SYSTEM);
+
+		} catch (IOException e) {
+			throw ApiStorageException.builder()
+				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+				.subCategory(ApiStorageErrorSubCategory.FILE_SAVE_PROCESS_FAILURE)
+				.setErrorData(e::getMessage)
+				.build();
+		}
+	}
+
+	@Override
+	public Resource load(String filePath) {
+		try {
+			Path fullPath = this.rootLocation.resolve(filePath).normalize().toAbsolutePath();
+			Resource resource = new UrlResource(fullPath.toUri());
+
+			if ((false == resource.exists()) || (false == resource.isReadable())) {
+				throw ApiStorageException.builder()
+					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+					.subCategory(ApiStorageErrorSubCategory.FILE_NOT_READABLE)
+					.build();
+			}
+			return resource;
+		}
+		catch (MalformedURLException e) {
+			throw ApiStorageException.builder()
+				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+				.subCategory(ApiStorageErrorSubCategory.FILE_READ_IO_FAILURE)
+				.build();
+		}
+	}
+
+	private void createDirectory(Path path) {
+		try {
+			Files.createDirectories(path);
+		}
+		catch (IOException e) {
+			throw ApiStorageException.builder()
+				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+				.subCategory(ApiStorageErrorSubCategory.DIRECTORY_NOT_ACCESSIBLE)
+				.build();
+		}
+	}
+}

@@ -1,6 +1,7 @@
 package org.example.post.domain.entity;
 
 import org.example.common.TimeTrackableEntity;
+import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -35,9 +36,9 @@ public class PostEntity extends TimeTrackableEntity {
 	@Column(name = "post_content", columnDefinition = "VARCHAR(255)")
 	private String postContent;
 
-	// @Column(name = "post_status")
-	// @ColumnDefault("0")
-	// private PostStatus postStatus = PostStatus.PUBLISHED;
+	@Column(name = "post_status")
+	@ColumnDefault("0")
+	private PostStatus postStatus = PostStatus.PUBLISHED;
 
 	@Column(name = "like_count", columnDefinition = "INT")
 	@ColumnDefault("0")

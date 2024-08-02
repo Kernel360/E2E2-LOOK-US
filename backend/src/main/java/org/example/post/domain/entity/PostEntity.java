@@ -1,5 +1,7 @@
 package org.example.post.domain.entity;
 
+import java.util.List;
+
 import org.example.common.TimeTrackableEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
@@ -13,13 +15,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "post")
@@ -32,7 +32,7 @@ public class PostEntity extends TimeTrackableEntity {
 	@Column(name = "post_id")
 	private Long postId;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
@@ -50,8 +50,8 @@ public class PostEntity extends TimeTrackableEntity {
 	@ColumnDefault("0")
 	private Integer likeCount = 0;
 
-	// @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-	// private List<UserPostLikesEntity> likesList;
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	private List<UserPostLikesEntity> likesList;
 
 	public PostEntity(UserEntity user, String postContent, String imageSrc, Integer likeCount, PostStatus postStatus) {
 		this.user = user;

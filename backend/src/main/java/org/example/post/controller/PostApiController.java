@@ -1,20 +1,17 @@
 package org.example.post.controller;
 
-import org.example.post.domain.dto.PostCreateRequestDto;
-import org.example.post.domain.dto.PostResponseDto;
+import org.example.post.domain.dto.request.PostCreateRequestDto;
+import org.example.post.domain.dto.request.PaginationRequestDto;
+import org.example.post.domain.dto.response.PaginationResponseDto;
+import org.example.post.domain.dto.response.PostResponseDto;
 import org.example.post.repository.PostRepository;
 import org.example.post.service.PostService;
-import org.example.user.domain.entity.member.UserEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.Errors;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -37,5 +34,23 @@ public class PostApiController {
 		PostResponseDto postResponseDto = postService.createPost(postCreateRequestDto);
 		return ResponseEntity.ok(postResponseDto);
 	}
+  
+	// TODO: 전체 게시글 조회, 비로그인 유저
+	// TODO: 게시글 검색, PostStatus 확인 조건 필요
+	@GetMapping("/posts")
+	public ResponseEntity<PaginationResponseDto> getAllPosts(
+		@RequestParam(value = "searchHashtag", required = false) String searchHashtag,
+		@RequestParam(value = "searchString", required = false) String searchString,
+		@RequestParam(value = "sortField", defaultValue = "createdAt") String sortField,
+		@RequestParam(value = "sortDirection", defaultValue = "DESC") String sortDirection,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size
+	) {
 
+		PaginationRequestDto paginationRequestDto = new PaginationRequestDto(page, size, sortField, sortDirection,
+			searchHashtag, searchString
+		);
+
+		return postService.getAllPostsOrderedBySortStrategy(paginationRequestDto);
+	}
 }

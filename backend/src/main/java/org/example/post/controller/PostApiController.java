@@ -1,7 +1,7 @@
 package org.example.post.controller;
 
-import org.example.post.domain.dto.reqeust.PostCreateRequestDto;
-import org.example.post.domain.dto.reqeust.PaginationRequestDto;
+import org.example.post.domain.dto.request.PostCreateRequestDto;
+import org.example.post.domain.dto.request.PaginationRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
 import org.example.post.domain.dto.response.PostResponseDto;
 import org.example.post.repository.PostRepository;

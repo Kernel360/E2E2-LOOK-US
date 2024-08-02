@@ -1,6 +1,4 @@
-package org.example.post.domain.dto.reqeust;
-
-import java.util.List;
+package org.example.post.domain.dto.request;
 
 import org.example.post.common.SortProperty;
 

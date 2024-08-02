@@ -1,10 +1,6 @@
-package org.example.post.domain.dto.reqeust;
-
-import java.util.Optional;
+package org.example.post.domain.dto.request;
 
 import org.example.common.TimeTrackableDto;
-import org.example.common.TimeTrackableEntity;
-import org.example.post.domain.enums.PostStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

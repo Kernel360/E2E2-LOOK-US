@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import org.example.post.domain.dto.reqeust.PaginationRequestDto;
+import org.example.post.domain.dto.request.PaginationRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;

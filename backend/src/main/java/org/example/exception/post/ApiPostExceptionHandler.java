@@ -16,13 +16,13 @@ public class ApiPostExceptionHandler {
 
 	@ExceptionHandler(ApiPostException.class)
 	public ApiErrorResponse handleApiException(
-		ApiPostException postApiError,
+		ApiPostException apiPostError,
 		HttpServletRequest request,
 		HttpServletResponse response
 	) {
-		log.error("handlePostApiException", postApiError);
+		log.error("handlePostApiException", apiPostError);
 
-		switch (postApiError.getSubCategory()) {
+		switch (apiPostError.getSubCategory()) {
 			case POST_NOT_FOUND:
 				break;
 			case POST_DISABLED:
@@ -31,7 +31,7 @@ public class ApiPostExceptionHandler {
 				break;
 		}
 
-		return ApiErrorResponse.from(postApiError);
+		return ApiErrorResponse.from(apiPostError);
 	}
 }
 

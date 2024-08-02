@@ -33,7 +33,7 @@ public class ApiErrorResponse extends ProblemDetail {
 		return new ApiErrorResponse(apiException);
 	}
 
-	public static ApiErrorResponse UNIDENTIFIED() {
+	public static ApiErrorResponse UNKNOWN_ERROR() {
 		return new ApiErrorResponse(ApiException.UNKNOWN_EXCEPTION());
 	}
 }

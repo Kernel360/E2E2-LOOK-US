@@ -20,7 +20,7 @@ public class ApiUserExceptionHandler {
 		HttpServletRequest request,
 		HttpServletResponse response
 	) {
-		log.error("handleUserApiException", userApiError);
+		log.error("handleApiUserException", userApiError);
 
 		switch (userApiError.getSubCategory()) {
 			case USER_NOT_FOUND:

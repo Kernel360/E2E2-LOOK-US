@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
 	Page<PostEntity> findAllByPostContentContainingAndPostStatus(String postContent, PostStatus postStatus, Pageable pageable);
 	Page<PostEntity> findAllByPostStatus(PostStatus postStatus, Pageable pageable);
+
+
 }

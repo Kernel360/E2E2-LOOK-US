@@ -29,18 +29,21 @@ public class PostEntity extends TimeTrackableEntity {
 	@Column(name = "post_id")
 	private Long postId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
-	@Column(name = "post_content", columnDefinition = "VARCHAR(255)")
+	@Column(nullable = false)
+	private String imageUrl;
+
+	@Column(name = "post_content", nullable = true, columnDefinition = "VARCHAR(255)")
 	private String postContent;
 
-	@Column(name = "post_status")
+	@Column(name = "post_status", nullable = false)
 	@ColumnDefault("0")
-	private PostStatus postStatus = PostStatus.PUBLISHED;
+	private PostStatus postStatus = PostStatus.PUBLISHED; //TODO: build() 에서 제외
 
-	@Column(name = "like_count", columnDefinition = "INT")
+	@Column(name = "like_count", nullable = false, columnDefinition = "INT")
 	@ColumnDefault("0")
 	private Integer likeCount = 0;
 

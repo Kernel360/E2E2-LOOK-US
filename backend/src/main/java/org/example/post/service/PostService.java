@@ -3,9 +3,10 @@ package org.example.post.service;
 import java.util.stream.Collectors;
 
 import org.example.post.domain.dto.request.PostCreateRequestDto;
-import org.example.post.domain.dto.response.PostResponseDto;
+import org.example.post.domain.dto.response.PostCreateResponseDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
+import org.example.post.domain.dto.response.PostGetInfoResponseDto;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
@@ -30,8 +31,9 @@ public class PostService {
 	private final UserRepository userRepository;
 
 
+
 	@Transactional
-	public PostResponseDto createPost(PostCreateRequestDto postDto) {
+	public PostCreateResponseDto createPost(PostCreateRequestDto postDto) {
 		UserEntity user = userRepository.findByUsername(postDto.getUserId())
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -44,9 +46,9 @@ public class PostService {
 		);
 
 		PostEntity savedPost = postRepository.save(postEntity);
-		PostResponseDto postResponseDto = new PostResponseDto();
-		postResponseDto.setPostId(savedPost.getPostId());
-		return postResponseDto;
+		PostCreateResponseDto postCreateResponseDto = new PostCreateResponseDto();
+		postCreateResponseDto.setPostId(savedPost.getPostId());
+		return postCreateResponseDto;
 	}
 
 	public ResponseEntity<PaginationResponseDto> getAllPostsOrderedBySortStrategy(
@@ -82,17 +84,32 @@ public class PostService {
 		paginationResponseDto.setSize(size);
 		paginationResponseDto.setTotalElements(postPage.getTotalElements());
 		paginationResponseDto.setTotalPages(postPage.getTotalPages());
-		paginationResponseDto.setPostResponseDtoList(postPage.stream()
+		paginationResponseDto.setPostCreateResponseDtoList(postPage.stream()
 			.map(postEntity -> {
-				PostResponseDto postResponseDto = new PostResponseDto();
-				postResponseDto.setPostId(postEntity.getPostId());
-				postResponseDto.setPostContent(postEntity.getPostContent());
-				postResponseDto.setLikeCount(postEntity.getLikeCount());
-				return postResponseDto;
+				PostGetInfoResponseDto postGetInfoResponseDto = new PostGetInfoResponseDto();
+				postGetInfoResponseDto.setPostId(postEntity.getPostId());
+				postGetInfoResponseDto.setPostContent(postEntity.getPostContent());
+				postGetInfoResponseDto.setLikeCount(postEntity.getLikeCount());
+				return postGetInfoResponseDto;
 			}).collect(Collectors.toList()));
 
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(paginationResponseDto);
+	}
+
+	public ResponseEntity<PostGetInfoResponseDto> getPostById(Long postId) {
+		PostEntity post = postRepository.findById(postId)
+			.orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
+
+		PostGetInfoResponseDto postGetInfoResponseDto = new PostGetInfoResponseDto();
+		postGetInfoResponseDto.setUserId(post.getUser().getUserId());
+		postGetInfoResponseDto.setPostId(post.getPostId());
+		postGetInfoResponseDto.setPostContent(post.getPostContent());
+		postGetInfoResponseDto.setPostCreatedAt(post.getCreatedAt());
+		postGetInfoResponseDto.setPostUpdatedAt(post.getUpdatedAt());
+		postGetInfoResponseDto.setLikeCount(post.getLikeCount());
+
+		return ResponseEntity.status(HttpStatus.OK).body(postGetInfoResponseDto);
 	}
 
 }

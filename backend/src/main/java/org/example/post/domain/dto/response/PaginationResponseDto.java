@@ -2,8 +2,6 @@ package org.example.post.domain.dto.response;
 
 import java.util.List;
 
-import org.example.common.TimeTrackableDto;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +12,6 @@ public class PaginationResponseDto {
 	private int size;
 	private long totalElements;
 	private int totalPages;
-	private List<PostResponseDto> postResponseDtoList;
+	private List<PostGetInfoResponseDto> postCreateResponseDtoList;
 
 }

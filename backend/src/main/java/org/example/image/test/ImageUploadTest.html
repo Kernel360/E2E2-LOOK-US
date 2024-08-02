@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Display</title>
+</head>
+<body>
+<h1>Upload and Display Image</h1>
+<form id="imageForm" enctype="multipart/form-data">
+    <input type="file" name="image" id="imageInput" accept="image/*" required>
+    <button type="submit">Upload Image</button>
+</form>
+<div id="imageDisplay" style="margin-top: 20px;">
+    <!-- The uploaded image will be displayed here -->
+</div>
+
+<script>
+    document.getElementById('imageForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        const imageFile = document.getElementById('imageInput').files[0];
+        formData.append('image', imageFile);
+
+        fetch('http://localhost:8080/image', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                const imageId = data.image_id;
+                return fetch(`http://localhost:8080/image/${imageId}`);
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Uploaded Image';
+                document.getElementById('imageDisplay').innerHTML = '';
+                document.getElementById('imageDisplay').appendChild(img);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+</script>
+</body>
+</html>

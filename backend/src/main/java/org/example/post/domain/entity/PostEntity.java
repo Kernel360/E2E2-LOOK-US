@@ -1,9 +1,6 @@
 package org.example.post.domain.entity;
 
-import java.util.List;
-
 import org.example.common.TimeTrackableEntity;
-import org.example.post.domain.dto.PostCreateRequestDto;
 import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
@@ -16,19 +13,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "post")
 @Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostEntity extends TimeTrackableEntity {
 
 	@Id
@@ -54,16 +50,14 @@ public class PostEntity extends TimeTrackableEntity {
 	@ColumnDefault("0")
 	private Integer likeCount = 0;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-	private List<UserPostLikesEntity> likesList;
+	// @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	// private List<UserPostLikesEntity> likesList;
 
-	@Builder
-	public PostEntity(Long postId, UserEntity user, String imageUrl, String postContent, Integer likeCount, List<UserPostLikesEntity> likesList) {
-		this.postId = postId;
+	public PostEntity(UserEntity user, String postContent, String imageSrc, Integer likeCount, PostStatus postStatus) {
 		this.user = user;
-		this.imageUrl = imageUrl;
 		this.postContent = postContent;
+		this.imageUrl = imageSrc;
 		this.likeCount = likeCount;
-		this.likesList = likesList;
+		this.postStatus = postStatus;
 	}
 }

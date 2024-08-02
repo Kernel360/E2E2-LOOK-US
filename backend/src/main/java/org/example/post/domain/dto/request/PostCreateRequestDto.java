@@ -1,4 +1,4 @@
-package org.example.post.domain.dto;
+package org.example.post.domain.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

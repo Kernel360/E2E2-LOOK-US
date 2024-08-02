@@ -15,13 +15,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "post")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostEntity extends TimeTrackableEntity {
 
 	@Id
@@ -49,4 +52,12 @@ public class PostEntity extends TimeTrackableEntity {
 
 	// @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	// private List<UserPostLikesEntity> likesList;
+
+	public PostEntity(UserEntity user, String postContent, String imageSrc, Integer likeCount, PostStatus postStatus) {
+		this.user = user;
+		this.postContent = postContent;
+		this.imageUrl = imageSrc;
+		this.likeCount = likeCount;
+		this.postStatus = postStatus;
+	}
 }

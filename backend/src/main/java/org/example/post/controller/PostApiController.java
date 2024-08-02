@@ -1,20 +1,17 @@
 package org.example.post.controller;
 
-import org.example.post.domain.dto.PostCreateRequestDto;
-import org.example.post.domain.dto.PostResponseDto;
+import org.example.post.domain.dto.reqeust.PostCreateRequestDto;
+import org.example.post.domain.dto.reqeust.PaginationRequestDto;
+import org.example.post.domain.dto.response.PaginationResponseDto;
+import org.example.post.domain.dto.response.PostResponseDto;
 import org.example.post.repository.PostRepository;
 import org.example.post.service.PostService;
-import org.example.user.domain.entity.member.UserEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.Errors;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;

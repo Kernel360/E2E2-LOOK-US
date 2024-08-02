@@ -1,16 +1,22 @@
 package org.example.post.service;
 
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.apache.catalina.security.SecurityUtil;
-import org.example.post.domain.dto.PostCreateRequestDto;
-import org.example.post.domain.dto.PostResponseDto;
+import org.example.post.domain.dto.reqeust.PostCreateRequestDto;
+import org.example.post.domain.dto.response.PostResponseDto;
+import org.example.post.domain.dto.reqeust.PaginationRequestDto;
+import org.example.post.domain.dto.response.PaginationResponseDto;
 import org.example.post.domain.entity.PostEntity;
+import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -29,18 +35,22 @@ public class PostService {
 		UserEntity user = userRepository.findByUsername(postDto.getUserId())
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-		PostEntity post = PostEntity.builder()
-			.user(user)
-			.imageUrl(postDto.getImageSrc())
-			.postContent(postDto.getPostContent())
-			.likeCount(0)
-			.build();
+		PostEntity postEntity = new PostEntity(
+			user,
+			postDto.getPostContent(),
+			postDto.getImageSrc(),
+			0, // Initialize likeCount
+			PostStatus.PUBLISHED // Set default status
+		);
 
-		PostEntity savedPost = postRepository.save(post);
-		return PostResponseDto.fromEntity(savedPost);
+		PostEntity savedPost = postRepository.save(postEntity);
+		PostResponseDto postResponseDto = new PostResponseDto();
+		postResponseDto.setPostId(savedPost.getPostId());
+		return postResponseDto;
 	}
 
-	public ResponseEntity<PaginationResponseDto> getAllPostsOrderedBySortStrategy(PaginationRequestDto paginationRequestDto) {
+	public ResponseEntity<PaginationResponseDto> getAllPostsOrderedBySortStrategy(
+		PaginationRequestDto paginationRequestDto) {
 		int page = paginationRequestDto.getPage();
 		int size = paginationRequestDto.getSize();
 		String hashtag = paginationRequestDto.getSearchHashtag();

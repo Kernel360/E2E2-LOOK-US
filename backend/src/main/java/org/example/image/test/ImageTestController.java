@@ -1,6 +1,6 @@
 package org.example.image.test;
 
-import org.example.image.service.ImageService;
+import org.example.image.service.ImageStorageManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +23,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ImageTestController {
 
-	private final ImageService imageService;
+	private final ImageStorageManager imageStorageManager;
 
 	@PostMapping("/image")
 	public ResponseEntity<Long> handleImageUpload(
 		@RequestParam("image") MultipartFile file
 	) {
-		Long imageId = this.imageService.saveImageFile(file);
+		Long imageId = this.imageStorageManager.saveImageFile(file);
 		return ResponseEntity.status(HttpStatus.CREATED).body(imageId);
 	}
 
@@ -38,7 +38,7 @@ public class ImageTestController {
 	public ResponseEntity<Resource> serveFile(
 		@PathVariable Long imageId
 	) {
-		Resource file = this.imageService.getImageResourceById(imageId);
+		Resource file = this.imageStorageManager.getImageResourceById(imageId);
 
 		if (file == null)
 			return ResponseEntity.notFound().build();

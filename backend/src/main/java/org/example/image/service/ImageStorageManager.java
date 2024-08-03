@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class ImageService {
+public class ImageStorageManager {
 
 	private final ImageRepository imageRepository;
 	private final StorageService storageService;
 
-	public ImageService(
+	public ImageStorageManager(
 		ImageRepository imageRepository,
 		StorageService storageService
 	) {

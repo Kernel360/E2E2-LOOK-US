@@ -1,5 +1,7 @@
 package org.example.post.domain.dto.request;
 
+import java.util.List;
+
 import org.example.common.TimeTrackableDto;
 
 import lombok.AllArgsConstructor;
@@ -18,6 +20,6 @@ public class PaginationRequestDto extends TimeTrackableDto {
 	private int size;
 	private String sortField;
 	private String sortDirection;
-	private String searchHashtag;
+	private List<String> searchHashtagList;
 	private String searchString;
 }

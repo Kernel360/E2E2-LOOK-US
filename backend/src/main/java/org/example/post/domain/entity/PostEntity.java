@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "post")
@@ -50,6 +51,9 @@ public class PostEntity extends TimeTrackableEntity {
 	@ColumnDefault("0")
 	private Integer likeCount = 0;
 
+	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY)
+	private List<HashtagEntity> hashtags;
+
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	private List<UserPostLikesEntity> likesList;
 
@@ -60,4 +64,12 @@ public class PostEntity extends TimeTrackableEntity {
 		this.likeCount = likeCount;
 		this.postStatus = postStatus;
 	}
+
+	// convert List<HashtagEntity> to List<String>
+	public List<String> getHashtagContents() {
+		return hashtags.stream()
+			.map(HashtagEntity::getHashtagContent)
+			.toList();
+	}
+
 }

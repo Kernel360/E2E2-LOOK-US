@@ -1,6 +1,8 @@
 package org.example.post.controller;
 
-import org.example.post.domain.dto.request.PostCreateRequestDto;
+import java.util.List;
+
+import org.example.post.domain.dto.request.PostRequestDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
 import org.example.post.domain.dto.response.PostResponseDto;
@@ -19,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * The type Post api controller.
+ */
 @RestController
 // @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -30,19 +35,30 @@ public class PostApiController {
 
 	@PostMapping("/api/v1/posts")
 	public ResponseEntity<PostResponseDto> createPost(
+
 		@Valid @RequestBody PostCreateRequestDto postCreateRequestDto
 	) {
 		String name = SecurityContextHolder.getContext().getAuthentication().getName();
 		System.out.println("name: " + name);
 		PostResponseDto postResponseDto = postService.createPost(postCreateRequestDto, name);
 		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
+
 	}
-  
-	// TODO: 전체 게시글 조회, 비로그인 유저
-	// TODO: 게시글 검색, PostStatus 확인 조건 필요
-	@GetMapping("/posts")
+
+	/**
+	 * Gets all posts.
+	 *
+	 * @param searchHashtags 해시태그 검색어 목록
+	 * @param searchString 게시글 내용 검색어
+	 * @param sortField 정렬 기준 - 기본값 createdAt
+	 * @param sortDirection 정렬 방식 - 기본값 DESC
+	 * @param page 현재 페이지 - 기본값 0
+	 * @param size 전체 페이지 사이즈 - 기본값 10
+	 * @return 검색 결과에 대한 정렬, 페이지네이션을 포함한 게시물 리스트
+	 */
+	@GetMapping("/posts")		// TODO: searchHashtag 와 searchString 은 POST Method 바꿔서 @RequestBody로 받기
 	public ResponseEntity<PaginationResponseDto> getAllPosts(
-		@RequestParam(value = "searchHashtag", required = false) String searchHashtag,
+		@RequestParam(value = "searchHashtags", required = false) List<String> searchHashtags,
 		@RequestParam(value = "searchString", required = false) String searchString,
 		@RequestParam(value = "sortField", defaultValue = "createdAt") String sortField,
 		@RequestParam(value = "sortDirection", defaultValue = "DESC") String sortDirection,
@@ -51,7 +67,8 @@ public class PostApiController {
 	) {
 
 		PaginationRequestDto paginationRequestDto = new PaginationRequestDto(page, size, sortField, sortDirection,
-			searchHashtag, searchString
+			searchHashtags
+			, searchString
 		);
 
 		return postService.getAllPostsOrderedBySortStrategy(paginationRequestDto);

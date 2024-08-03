@@ -1,8 +1,5 @@
 package org.example.post.domain.dto.request;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
@@ -11,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class PostRequestDto {
+public class PostCreateRequestDto {
 
 	@NotBlank(message = "사용자 닉네임은 필수입니다.")
 	@JsonProperty("user_id")
@@ -24,16 +21,9 @@ public class PostRequestDto {
 	@JsonProperty("post_content")
 	private String postContent;
 
-	private List<String> hashtagContents;
-
-	public PostRequestDto(String userId, String imageSrc, String postContent, List<String> hashtagContents) {
+	public PostCreateRequestDto(String userId, String imageSrc, String postContent) {
 		this.userId = userId;
 		this.imageSrc = imageSrc;
 		this.postContent = postContent;
-		this.hashtagContents = hashtagContents;
-	}
-
-	public List<String> getHashtagList() {
-		return	hashtagContents;
 	}
 }

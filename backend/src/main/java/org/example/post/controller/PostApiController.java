@@ -1,6 +1,8 @@
 package org.example.post.controller;
 
-import org.example.post.domain.dto.request.PostCreateRequestDto;
+import java.util.List;
+
+import org.example.post.domain.dto.request.PostRequestDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
 import org.example.post.domain.dto.response.PostResponseDto;
@@ -30,19 +32,17 @@ public class PostApiController {
 
 	@PostMapping("/api/v1/posts")
 	public ResponseEntity<PostResponseDto> createPost(
-		@Valid @RequestBody PostCreateRequestDto postCreateRequestDto
+		@Valid @RequestBody PostRequestDto postCreateRequestDto
 	) {
 		String name = SecurityContextHolder.getContext().getAuthentication().getName();
 		System.out.println("name: " + name);
 		PostResponseDto postResponseDto = postService.createPost(postCreateRequestDto, name);
 		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
 	}
-  
-	// TODO: 전체 게시글 조회, 비로그인 유저
-	// TODO: 게시글 검색, PostStatus 확인 조건 필요
+
 	@GetMapping("/posts")
 	public ResponseEntity<PaginationResponseDto> getAllPosts(
-		@RequestParam(value = "searchHashtag", required = false) String searchHashtag,
+		@RequestParam(value = "searchHashtags", required = false) List<String> searchHashtags,
 		@RequestParam(value = "searchString", required = false) String searchString,
 		@RequestParam(value = "sortField", defaultValue = "createdAt") String sortField,
 		@RequestParam(value = "sortDirection", defaultValue = "DESC") String sortDirection,
@@ -51,7 +51,7 @@ public class PostApiController {
 	) {
 
 		PaginationRequestDto paginationRequestDto = new PaginationRequestDto(page, size, sortField, sortDirection,
-			searchHashtag, searchString
+			searchHashtags, searchString
 		);
 
 		return postService.getAllPostsOrderedBySortStrategy(paginationRequestDto);

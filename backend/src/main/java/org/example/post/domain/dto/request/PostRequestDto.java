@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class PostCreateRequestDto {
+public class PostRequestDto {
 
 	@NotBlank(message = "사용자 닉네임은 필수입니다.")
 	@JsonProperty("user_id")
@@ -21,7 +21,7 @@ public class PostCreateRequestDto {
 	@JsonProperty("post_content")
 	private String postContent;
 
-	public PostCreateRequestDto(String userId, String imageSrc, String postContent) {
+	public PostRequestDto(String userId, String imageSrc, String postContent) {
 		this.userId = userId;
 		this.imageSrc = imageSrc;
 		this.postContent = postContent;

@@ -2,10 +2,11 @@ package org.example.post.service;
 
 import java.util.stream.Collectors;
 
+import org.example.post.common.PostMapper;
 import org.example.post.domain.dto.request.PostCreateRequestDto;
-import org.example.post.domain.dto.response.PostResponseDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
+import org.example.post.domain.dto.response.PostResponseDto;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
@@ -30,9 +31,10 @@ public class PostService {
 	private final UserRepository userRepository;
 
 
+
 	@Transactional
-	public PostResponseDto createPost(PostCreateRequestDto postDto) {
-		UserEntity user = userRepository.findByUsername(postDto.getUserId())
+	public PostResponseDto createPost(PostCreateRequestDto postDto, String name) {
+		UserEntity user = userRepository.findByUsername(name)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
 		PostEntity postEntity = new PostEntity(
@@ -44,9 +46,7 @@ public class PostService {
 		);
 
 		PostEntity savedPost = postRepository.save(postEntity);
-		PostResponseDto postResponseDto = new PostResponseDto();
-		postResponseDto.setPostId(savedPost.getPostId());
-		return postResponseDto;
+		return PostMapper.toDto(savedPost);
 	}
 
 	public ResponseEntity<PaginationResponseDto> getAllPostsOrderedBySortStrategy(
@@ -82,17 +82,21 @@ public class PostService {
 		paginationResponseDto.setSize(size);
 		paginationResponseDto.setTotalElements(postPage.getTotalElements());
 		paginationResponseDto.setTotalPages(postPage.getTotalPages());
-		paginationResponseDto.setPostResponseDtoList(postPage.stream()
-			.map(postEntity -> {
-				PostResponseDto postResponseDto = new PostResponseDto();
-				postResponseDto.setPostId(postEntity.getPostId());
-				postResponseDto.setPostContent(postEntity.getPostContent());
-				postResponseDto.setLikeCount(postEntity.getLikeCount());
-				return postResponseDto;
-			}).collect(Collectors.toList()));
+		paginationResponseDto.setPostCreateResponseDtoList(postPage.stream()
+			.map(postEntity -> PostMapper.toDto(postEntity))
+			.collect(Collectors.toList()));
 
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(paginationResponseDto);
+	}
+
+	public ResponseEntity<PostResponseDto> getPostById(Long postId) {
+		PostEntity post = postRepository.findById(postId)
+			.orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
+
+		PostResponseDto postResponseDto = PostMapper.toDto(post);
+
+		return ResponseEntity.status(HttpStatus.OK).body(postResponseDto);
 	}
 
 }

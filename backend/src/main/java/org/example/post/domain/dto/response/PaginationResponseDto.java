@@ -12,6 +12,6 @@ public class PaginationResponseDto {
 	private int size;
 	private long totalElements;
 	private int totalPages;
-	private List<PostGetInfoResponseDto> postCreateResponseDtoList;
+	private List<PostResponseDto> postCreateResponseDtoList;
 
 }

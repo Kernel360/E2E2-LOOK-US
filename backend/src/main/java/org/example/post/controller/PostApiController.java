@@ -3,10 +3,10 @@ package org.example.post.controller;
 import org.example.post.domain.dto.request.PostCreateRequestDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
-import org.example.post.domain.dto.response.PostCreateResponseDto;
-import org.example.post.domain.dto.response.PostGetInfoResponseDto;
+import org.example.post.domain.dto.response.PostResponseDto;
 import org.example.post.repository.PostRepository;
 import org.example.post.service.PostService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,13 +29,13 @@ public class PostApiController {
 	//TODO: 로그인된 유저인지 확인하는 로직 필요, User가 아니여야 하는 거 아닌가...
 
 	@PostMapping("/api/v1/posts")
-	public ResponseEntity<PostCreateResponseDto> createPost(
+	public ResponseEntity<PostResponseDto> createPost(
 		@Valid @RequestBody PostCreateRequestDto postCreateRequestDto
 	) {
 		String name = SecurityContextHolder.getContext().getAuthentication().getName();
 		System.out.println("name: " + name);
-		PostCreateResponseDto postCreateResponseDto = postService.createPost(postCreateRequestDto);
-		return ResponseEntity.ok(postCreateResponseDto);
+		PostResponseDto postResponseDto = postService.createPost(postCreateRequestDto, name);
+		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
 	}
   
 	// TODO: 전체 게시글 조회, 비로그인 유저
@@ -57,9 +57,9 @@ public class PostApiController {
 		return postService.getAllPostsOrderedBySortStrategy(paginationRequestDto);
 	}
 
-	//TODO: 게시글 상세 조회 -> 로그인한 유저만 가능하도록
+
 	@GetMapping("/api/v1/posts/{post_id}")
-	public ResponseEntity<PostGetInfoResponseDto> getPostById(
+	public ResponseEntity<PostResponseDto> getPostById(
 		@PathVariable Long post_id
 	) {
 		return postService.getPostById(post_id);

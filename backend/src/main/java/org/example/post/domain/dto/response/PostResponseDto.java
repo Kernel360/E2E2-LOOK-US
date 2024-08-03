@@ -1,13 +1,8 @@
 package org.example.post.domain.dto.response;
 
-
 import java.time.LocalDateTime;
 
 import org.example.common.TimeTrackableDto;
-
-import java.util.List;
-
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +12,6 @@ public class PostResponseDto extends TimeTrackableDto {
 	private Long userId;
 	private Long postId;
 	private String postContent;
-	private List<String> hashtagContents;
 	private Integer likeCount;
 
 

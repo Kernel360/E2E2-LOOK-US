@@ -82,7 +82,7 @@ public class PostServiceTest {
 		PaginationResponseDto paginationResponseDto = response.getBody();
 		assertThat(paginationResponseDto).isNotNull();
 		assertThat(paginationResponseDto.getTotalElements()).isEqualTo(3);
-		assertThat(paginationResponseDto.getPostResponseDtoList().size()).isEqualTo(3);
+		assertThat(paginationResponseDto.getPostCreateResponseDtoList().size()).isEqualTo(3);
 	}
 
 }

@@ -1,9 +1,7 @@
 package org.example.post.domain.dto.response;
 
-import org.example.common.TimeTrackableDto;
-import org.example.post.domain.enums.PostStatus;
+import java.util.List;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +10,7 @@ import lombok.Setter;
 public class PostResponseDto {
 	private Long postId;
 	private String postContent;
+	private List<String> hashtagContents;
 	private Integer likeCount;
 
 

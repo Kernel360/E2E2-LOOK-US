@@ -30,7 +30,7 @@ public class HashtagEntity {
 	@Column(name = "hashtag_content", nullable = false)
 	private String hashtagContent;
 
-	public HashtagEntity(PostEntity postEntity, String hashtagContent) {
+	public void updateHashtagEntity(PostEntity postEntity, String hashtagContent) {
 		this.postEntity = postEntity;
 		this.hashtagContent = hashtagContent;
 	}

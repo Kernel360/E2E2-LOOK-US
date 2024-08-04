@@ -7,6 +7,7 @@ import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -20,7 +21,6 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Entity
 @Table(name = "post")
@@ -51,18 +51,21 @@ public class PostEntity extends TimeTrackableEntity {
 	@ColumnDefault("0")
 	private Integer likeCount = 0;
 
-	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "postId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<HashtagEntity> hashtags;
 
 	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY)
 	private List<UserPostLikesEntity> likesList;
 
-	public PostEntity(UserEntity user, String postContent, String imageSrc, Integer likeCount, PostStatus postStatus) {
+	// TODO: getImageFile(url, image 분리 필요)
+	public PostEntity(UserEntity user, String postContent, String imageSrc, Integer likeCount, PostStatus postStatus,
+		List<HashtagEntity> hashtags) {
 		this.user = user;
 		this.postContent = postContent;
 		this.imageUrl = imageSrc;
 		this.likeCount = likeCount;
 		this.postStatus = postStatus;
+		this.hashtags = hashtags;
 	}
 
 	// convert List<HashtagEntity> to List<String>

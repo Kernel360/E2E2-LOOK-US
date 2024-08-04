@@ -21,14 +21,14 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
 		Pageable pageable
 	);
 
-	@Query("SELECT p FROM PostEntity p JOIN p.hashtags h WHERE h.hashtagContent IN :hashtagList AND p.postStatus = :postStatus")
+	@Query("SELECT p FROM PostEntity p JOIN HashtagEntity h ON p.postId = h.postId WHERE h.hashtagContent IN :hashtagList AND p.postStatus = :postStatus")
 	Page<PostEntity> findAllByHashtagsContainingAndPostStatus(
 		@Param("hashtagList") List<String> hashtagList,
 		@Param("postStatus") PostStatus postStatus,
 		Pageable pageable
 	);
 
-	@Query("SELECT DISTINCT p FROM PostEntity p JOIN p.hashtags h WHERE p.postContent LIKE %:postContent% AND h.hashtagContent IN :hashtagList AND p.postStatus = :postStatus")
+	@Query("SELECT DISTINCT p FROM PostEntity p JOIN HashtagEntity h ON p.postId = h.postId WHERE p.postContent LIKE %:postContent% AND h.hashtagContent IN :hashtagList AND p.postStatus = :postStatus")
 	Page<PostEntity> findAllByPostContentContainingAndHashtagsContainingAndPostStatus(
 		@Param("postContent") String postContent,
 		@Param("hashtagList") List<String> hashtagList,

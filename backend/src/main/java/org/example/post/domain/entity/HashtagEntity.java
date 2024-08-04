@@ -2,17 +2,13 @@ package org.example.post.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Entity
 @Table(name = "hashtag")
@@ -24,16 +20,18 @@ public class HashtagEntity {
 	@Column(name = "hashtag_id")
 	private Long hashtagId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id")
-	private PostEntity postEntity;
+	// @ManyToOne(fetch = FetchType.LAZY)
+	// @JoinColumn(name = "post_id", nullable = false)
+	// private PostEntity postEntity;
 
+	@Column(name = "post_id", nullable = false)
+	private Long postId;
+
+	@Getter
 	@Column(name = "hashtag_content", nullable = false)
 	private String hashtagContent;
 
-	public HashtagEntity(PostEntity postEntity, String hashtagContent) {
-		this.postEntity = postEntity;
+	public HashtagEntity(String hashtagContent) {
 		this.hashtagContent = hashtagContent;
 	}
-
 }

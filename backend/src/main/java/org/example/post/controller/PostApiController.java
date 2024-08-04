@@ -30,7 +30,7 @@ public class PostApiController {
 	private final PostService postService;
 	//TODO: 로그인된 유저인지 확인하는 로직 필요, User가 아니여야 하는 거 아닌가...
 
-	@PostMapping("/api/v1/posts")
+	@PostMapping("/posts")
 	public ResponseEntity<PostResponseDto> createPost(
 		@Valid @RequestBody PostRequestDto postCreateRequestDto
 	) {
@@ -40,7 +40,7 @@ public class PostApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
 	}
 
-	@GetMapping("/api/v1/posts")
+	@GetMapping("/posts")
 	public ResponseEntity<PaginationResponseDto> getAllPosts(
 		@RequestParam(value = "searchHashtags", required = false) List<String> searchHashtags,
 		@RequestParam(value = "searchString", required = false) String searchString,

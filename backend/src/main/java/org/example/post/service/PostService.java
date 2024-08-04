@@ -36,12 +36,13 @@ public class PostService {
 		UserEntity user = userRepository.findByUsername(name)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-		PostEntity postEntity = new PostEntity(
+		PostEntity postEntity = new PostEntity(    // TODO: getImageFile(url, image 분리 필요)
 			user,
 			postDto.getPostContent(),
-			postDto.getImageSrc(),
+			postDto.getImageFile().toString(),
 			0, // Initialize likeCount
-			PostStatus.PUBLISHED // Set default status
+			PostStatus.PUBLISHED, // Set default status
+			postDto.convertStringsToHashtags(postDto.getHashtagContents())
 		);
 
 		PostEntity savedPost = postRepository.save(postEntity);

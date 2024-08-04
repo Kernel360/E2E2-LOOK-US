@@ -53,7 +53,7 @@ public class PostEntity extends TimeTrackableEntity {
 	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY)
 	private List<HashtagEntity> hashtags;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY)
 	private List<UserPostLikesEntity> likesList;
 
 	public PostEntity(UserEntity user, String postContent, String imageSrc, Integer likeCount, PostStatus postStatus) {

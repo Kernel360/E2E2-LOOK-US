@@ -3,11 +3,11 @@ package org.example.post.domain.entity;
 import java.util.List;
 
 import org.example.common.TimeTrackableEntity;
-import org.example.post.domain.dto.PostCreateRequestDto;
 import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,15 +19,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "post")
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostEntity extends TimeTrackableEntity {
 
@@ -36,7 +33,7 @@ public class PostEntity extends TimeTrackableEntity {
 	@Column(name = "post_id")
 	private Long postId;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
@@ -54,16 +51,28 @@ public class PostEntity extends TimeTrackableEntity {
 	@ColumnDefault("0")
 	private Integer likeCount = 0;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "postId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<HashtagEntity> hashtags;
+
+	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY)
 	private List<UserPostLikesEntity> likesList;
 
-	@Builder
-	public PostEntity(Long postId, UserEntity user, String imageUrl, String postContent, Integer likeCount, List<UserPostLikesEntity> likesList) {
-		this.postId = postId;
+	// TODO: getImageFile(url, image 분리 필요)
+	public PostEntity(UserEntity user, String postContent, String imageSrc, Integer likeCount, PostStatus postStatus,
+		List<HashtagEntity> hashtags) {
 		this.user = user;
-		this.imageUrl = imageUrl;
 		this.postContent = postContent;
+		this.imageUrl = imageSrc;
 		this.likeCount = likeCount;
-		this.likesList = likesList;
+		this.postStatus = postStatus;
+		this.hashtags = hashtags;
 	}
+
+	// convert List<HashtagEntity> to List<String>
+	public List<String> getHashtagContents() {
+		return hashtags.stream()
+			.map(HashtagEntity::getHashtagContent)
+			.toList();
+	}
+
 }

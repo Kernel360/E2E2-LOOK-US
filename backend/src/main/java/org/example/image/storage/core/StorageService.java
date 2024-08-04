@@ -1,10 +1,10 @@
 package org.example.image.storage.core;
 
-import org.springframework.core.io.Resource;
+import org.example.image.storageManager.core.StorageFindResult;
 
 public interface StorageService {
 
-	StorageSaveResult save(StoragePacket packet);
+	StorageSaveResultInternal save(StoragePacket packet);
 
-	Resource load(String fileUrl);
+	StorageFindResult load(String fileUrl);
 }

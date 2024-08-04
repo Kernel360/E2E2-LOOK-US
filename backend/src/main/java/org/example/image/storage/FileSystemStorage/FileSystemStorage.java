@@ -1,4 +1,4 @@
-package org.example.image.storage;
+package org.example.image.storage.FileSystemStorage;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -9,10 +9,11 @@ import java.nio.file.Paths;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.storage.ApiStorageErrorSubCategory;
 import org.example.exception.storage.ApiStorageException;
+import org.example.image.storageManager.core.StorageFindResult;
+import org.example.image.storage.core.StorageSaveResultInternal;
 import org.example.image.storage.core.StorageService;
 import org.example.image.storage.core.StoragePacket;
 import org.example.image.storage.core.StorageProperties;
-import org.example.image.storage.core.StorageSaveResult;
 import org.example.image.storage.core.StorageType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -32,9 +33,8 @@ public class FileSystemStorage implements StorageService {
 	private final StorageProperties properties;
 
 	@Builder
-	public FileSystemStorage(
-		@NonNull StorageProperties properties
-	) {
+	public FileSystemStorage(@NonNull StorageProperties properties) {
+
 		if (properties.getLocation().trim().isEmpty()) {
 			throw ApiStorageException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
@@ -47,7 +47,7 @@ public class FileSystemStorage implements StorageService {
 	}
 
 	@Override
-	public StorageSaveResult save(StoragePacket packet) {
+	public StorageSaveResultInternal save(@NonNull StoragePacket packet) {
 
 		if ( packet.isPayloadEmpty() ) {
 			throw ApiStorageException.builder()
@@ -74,8 +74,11 @@ public class FileSystemStorage implements StorageService {
 			}
 
 			Files.copy(packet.getFileData().getInputStream(), destination);
-			return new StorageSaveResult(destination, StorageType.LOCAL_FILE_SYSTEM);
 
+			return new StorageSaveResultInternal(
+				StorageType.LOCAL_FILE_SYSTEM,
+				destination
+			);
 		} catch (IOException e) {
 			throw ApiStorageException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
@@ -86,7 +89,7 @@ public class FileSystemStorage implements StorageService {
 	}
 
 	@Override
-	public Resource load(String filePath) {
+	public StorageFindResult load(@NonNull String filePath) {
 		try {
 			Path fullPath = this.rootLocation.resolve(filePath).normalize().toAbsolutePath();
 			Resource resource = new UrlResource(fullPath.toUri());
@@ -97,9 +100,12 @@ public class FileSystemStorage implements StorageService {
 					.subCategory(ApiStorageErrorSubCategory.FILE_NOT_READABLE)
 					.build();
 			}
-			return resource;
-		}
-		catch (MalformedURLException e) {
+
+			return new StorageFindResult(
+				StorageType.LOCAL_FILE_SYSTEM,
+				resource
+			);
+		} catch (MalformedURLException e) {
 			throw ApiStorageException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiStorageErrorSubCategory.FILE_READ_IO_FAILURE)
@@ -107,11 +113,10 @@ public class FileSystemStorage implements StorageService {
 		}
 	}
 
-	private void createDirectory(Path path) {
+	private void createDirectory(@NonNull Path path) {
 		try {
 			Files.createDirectories(path);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw ApiStorageException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiStorageErrorSubCategory.DIRECTORY_NOT_ACCESSIBLE)

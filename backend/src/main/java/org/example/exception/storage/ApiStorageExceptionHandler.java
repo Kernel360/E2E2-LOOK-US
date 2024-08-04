@@ -1,4 +1,4 @@
-package org.example.exception.user;
+package org.example.exception.storage;
 
 import org.example.exception.common.ApiErrorResponse;
 import org.springframework.core.annotation.Order;
@@ -12,28 +12,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 @Order(1)
-public class ApiUserExceptionHandler {
+public class ApiStorageExceptionHandler {
 
-	@ExceptionHandler(ApiUserException.class)
+	@ExceptionHandler(ApiStorageException.class)
 	public ApiErrorResponse handleApiException(
-		ApiUserException userApiError,
+		ApiStorageException ApiStorageError,
 		HttpServletRequest request,
 		HttpServletResponse response
 	) {
-		log.error("handleApiUserException", userApiError);
+		log.error("handleStorageApiException", ApiStorageError);
 
-		switch (userApiError.getSubCategory()) {
-			case USER_NOT_FOUND:
-				break;
-			case USER_ALREADY_EXISTS:
-				break;
-			case USER_ALREADY_LOGGED_IN:
+		switch (ApiStorageError.getSubCategory()) {
+			case FILE_NOT_FOUND:
 				break;
 			default:
 				break;
 		}
 
-		return ApiErrorResponse.from(userApiError);
+		return ApiErrorResponse.from(ApiStorageError);
 	}
 }
 

@@ -13,6 +13,6 @@ public class ApiExceptionHandler {
 	public ApiErrorResponse handleException(Exception error) {
 		log.error("handleException", error);
 
-		return ApiErrorResponse.UNIDENTIFIED();
+		return ApiErrorResponse.UNKNOWN_ERROR();
 	}
 }

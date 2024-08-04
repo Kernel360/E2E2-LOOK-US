@@ -1,10 +1,11 @@
 package org.example.post.service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.example.post.common.PostMapper;
-import org.example.post.domain.dto.request.PostCreateRequestDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;
+import org.example.post.domain.dto.request.PostRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
 import org.example.post.domain.dto.response.PostResponseDto;
 import org.example.post.domain.entity.PostEntity;
@@ -30,19 +31,18 @@ public class PostService {
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
 
-
-
 	@Transactional
-	public PostResponseDto createPost(PostCreateRequestDto postDto, String name) {
+	public PostResponseDto createPost(PostRequestDto postDto, String name) {
 		UserEntity user = userRepository.findByUsername(name)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-		PostEntity postEntity = new PostEntity(
+		PostEntity postEntity = new PostEntity(    // TODO: getImageFile(url, image 분리 필요)
 			user,
 			postDto.getPostContent(),
-			postDto.getImageSrc(),
+			postDto.getImageFile().toString(),
 			0, // Initialize likeCount
-			PostStatus.PUBLISHED // Set default status
+			PostStatus.PUBLISHED, // Set default status
+			postDto.convertStringsToHashtags(postDto.getHashtagContents())
 		);
 
 		PostEntity savedPost = postRepository.save(postEntity);
@@ -51,40 +51,73 @@ public class PostService {
 
 	public ResponseEntity<PaginationResponseDto> getAllPostsOrderedBySortStrategy(
 		PaginationRequestDto paginationRequestDto) {
+
+		// get information for pagination by DTO
 		int page = paginationRequestDto.getPage();
 		int size = paginationRequestDto.getSize();
-		String hashtag = paginationRequestDto.getSearchHashtag();
+		List<String> hashtagList = paginationRequestDto.getSearchHashtagList();
 		String searchString = paginationRequestDto.getSearchString();
-
-
 		String direction = paginationRequestDto.getSortDirection();
 		String field = paginationRequestDto.getSortField();
+
+		// sort by field ordered by descending
 		Sort sort = Sort.by(field).descending();
 		if (direction.equalsIgnoreCase("ASC")) {
+			// sort by field ordered by ascending
 			sort = Sort.by(field).ascending();
 		}
 
+		// pagination
 		Pageable pageable = PageRequest.of(page, size, sort);
-
 		Page<PostEntity> postPage;
-		if (!searchString.isBlank()) {
-			postPage = postRepository.findAllByPostContentContainingAndPostStatus(searchString, PostStatus.PUBLISHED, pageable);
-		} else {
-			postPage = postRepository.findAllByPostStatus(PostStatus.PUBLISHED, pageable);
+
+		// search all posts
+		// searchString null and hashtagList null
+		postPage = postRepository.findAllByPostStatus(PostStatus.PUBLISHED, pageable);
+
+		// search posts containing searchString(post content)
+		// searchString not null
+		if (searchString != null && !searchString.isBlank()) {
+			postPage = postRepository.findAllByPostContentContainingAndPostStatus(searchString, PostStatus.PUBLISHED,
+				pageable);
 		}
 
+		// search posts containing hashtag content
+		// hashtagList not null
+		if (hashtagList != null && !hashtagList.isEmpty()) {
+			postPage = postRepository.findAllByHashtagsContainingAndPostStatus(hashtagList, PostStatus.PUBLISHED,
+				pageable);
+		}
+
+		// search posts containing both searchString and hashtag content
+		// get only some posts which must have both elements
+		if (hashtagList != null && searchString != null && !hashtagList.isEmpty() && !searchString.isBlank()) {
+			postPage = postRepository.findAllByPostContentContainingAndHashtagsContainingAndPostStatus(searchString,
+				hashtagList, PostStatus.PUBLISHED, pageable);
+		}
+
+		// find no post about search condition
+		// TODO: 수정 예정
 		if (postPage == null) {
 			throw new NullPointerException("No posts found");
 		}
 
+		// DTO for return data
 		PaginationResponseDto paginationResponseDto = new PaginationResponseDto();
 		paginationResponseDto.setPage(page);
 		paginationResponseDto.setSize(size);
 		paginationResponseDto.setTotalElements(postPage.getTotalElements());
 		paginationResponseDto.setTotalPages(postPage.getTotalPages());
-		paginationResponseDto.setPostCreateResponseDtoList(postPage.stream()
-			.map(postEntity -> PostMapper.toDto(postEntity))
-			.collect(Collectors.toList()));
+
+		paginationResponseDto.setPostResponseDtoList(postPage.stream()
+			.map(postEntity -> {
+				PostResponseDto postResponseDto = new PostResponseDto();
+				postResponseDto.setPostId(postEntity.getPostId());
+				postResponseDto.setPostContent(postEntity.getPostContent());
+				postResponseDto.setLikeCount(postEntity.getLikeCount());
+				postResponseDto.setHashtagContents(postEntity.getHashtagContents());
+				return postResponseDto;
+			}).collect(Collectors.toList()));
 
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(paginationResponseDto);

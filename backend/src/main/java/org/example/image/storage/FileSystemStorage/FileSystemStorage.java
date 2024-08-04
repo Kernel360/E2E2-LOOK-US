@@ -17,13 +17,11 @@ import org.example.image.storage.core.StorageType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-
-import lombok.Builder;
 import lombok.NonNull;
 
 /**
- * @link https://www.baeldung.com/java-images
- * @link https://spring.io/guides/gs/uploading-files
+ * @link <a href="https://www.baeldung.com/java-images">How to read Images</a>
+ * @link <a href="https://spring.io/guides/gs/uploading-files">How to upload files</a>
  */
 @Service
 public class FileSystemStorage implements StorageService {

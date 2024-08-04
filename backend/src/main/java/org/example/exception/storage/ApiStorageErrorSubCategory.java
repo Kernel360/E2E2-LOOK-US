@@ -2,7 +2,7 @@ package org.example.exception.storage;
 
 public enum ApiStorageErrorSubCategory {
 
-	STORAGE_INVALID_PROPERTIES("스토리지 설정이 잘못되었습니다"),
+	RESOURCE_LOCATION_NOT_FOUND("[ResourceLocationRepository] 리소스의 위치 정보가 존재하지 않습니다."),
 
 	DIRECTORY_NOT_ACCESSIBLE("디렉토리가 존재하지 않습니다."),
 

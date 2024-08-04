@@ -7,4 +7,4 @@ import lombok.NonNull;
 public record StorageSaveResultInternal(
 	@NonNull StorageType storageType,
 	@NonNull Path savedPath
-	) {}
+) {}

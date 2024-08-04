@@ -1,5 +1,6 @@
 package org.example.image.test;
 
+import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.ImageStorageManager;
 import org.example.image.storageManager.core.StorageFindResult;
 import org.example.image.storageManager.core.StorageSaveResult;
@@ -32,7 +33,7 @@ public class ImageTestController {
 	public ResponseEntity<Long> handleImageUpload(
 		@RequestParam("image") MultipartFile file
 	) {
-		StorageSaveResult result = this.imageStorageManager.saveResource(file);
+		StorageSaveResult result = this.imageStorageManager.saveResource(file, StorageType.LOCAL_FILE_SYSTEM);
 
 		return ResponseEntity.status( HttpStatus.CREATED )
 							 .body( result.resourceLocationId() );

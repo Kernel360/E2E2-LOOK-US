@@ -26,7 +26,7 @@ public class ResourceLocationEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "resource_location_id")
-	private Long imageLocationId;
+	private Long resourceLocationId;
 
 	@Column(name = "storage_type", nullable = false)
 	@Enumerated(EnumType.STRING)

@@ -51,7 +51,7 @@ public class ImageStorageManager implements StorageManager {
 
 		return new StorageSaveResult(
 			storageSaveResult.storageType(),
-			savedImageLocation.getImageLocationId()
+			savedImageLocation.getResourceLocationId()
 		);
 	}
 

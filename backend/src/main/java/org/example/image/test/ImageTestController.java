@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 
-import lombok.RequiredArgsConstructor;
-
 // https://spring.io/guides/gs/uploading-files
 // https://www.baeldung.com/java-thymeleaf-image
 // NOTE: 테스트용 컨트롤러입니다. 추후 삭제 예정입니다.

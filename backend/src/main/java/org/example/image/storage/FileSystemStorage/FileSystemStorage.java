@@ -13,7 +13,6 @@ import org.example.image.storageManager.core.StorageFindResult;
 import org.example.image.storage.core.StorageSaveResultInternal;
 import org.example.image.storage.core.StorageService;
 import org.example.image.storage.core.StoragePacket;
-import org.example.image.storage.core.StorageProperties;
 import org.example.image.storage.core.StorageType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -23,28 +22,13 @@ import lombok.Builder;
 import lombok.NonNull;
 
 /**
- * - https://www.baeldung.com/java-images
- * - https://spring.io/guides/gs/uploading-files
+ * @link https://www.baeldung.com/java-images
+ * @link https://spring.io/guides/gs/uploading-files
  */
 @Service
 public class FileSystemStorage implements StorageService {
 
-	private final Path rootLocation;
-	private final StorageProperties properties;
-
-	@Builder
-	public FileSystemStorage(@NonNull StorageProperties properties) {
-
-		if (properties.getLocation().trim().isEmpty()) {
-			throw ApiStorageException.builder()
-				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
-				.subCategory(ApiStorageErrorSubCategory.STORAGE_INVALID_PROPERTIES)
-				.build();
-		}
-
-		this.rootLocation = Paths.get(properties.getLocation());
-		this.properties = properties;
-	}
+	private final Path rootLocation = Paths.get("data/images");
 
 	@Override
 	public StorageSaveResultInternal save(@NonNull StoragePacket packet) {

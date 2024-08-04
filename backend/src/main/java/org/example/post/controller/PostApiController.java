@@ -40,7 +40,7 @@ public class PostApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
 	}
 
-	@GetMapping("/posts")
+	@GetMapping("/api/v1/posts")
 	public ResponseEntity<PaginationResponseDto> getAllPosts(
 		@RequestParam(value = "searchHashtags", required = false) List<String> searchHashtags,
 		@RequestParam(value = "searchString", required = false) String searchString,

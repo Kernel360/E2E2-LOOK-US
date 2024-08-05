@@ -1,7 +1,8 @@
-package org.example.image.storageManager.core;
+package org.example.image.storageManager.common;
 
 import org.example.image.storage.core.StorageType;
 import org.springframework.core.io.Resource;
+
 import lombok.NonNull;
 
 /**
@@ -11,4 +12,5 @@ import lombok.NonNull;
 public record StorageFindResult(
 	@NonNull StorageType storageType,
 	@NonNull Resource resource
-) {}
+) {
+}

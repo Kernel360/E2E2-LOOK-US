@@ -16,7 +16,5 @@ public class PostMapper {
 			postEntity.getLikeCount(),
 			postEntity.getCreatedAt(),
 			postEntity.getUpdatedAt());
-
-
 	}
 }

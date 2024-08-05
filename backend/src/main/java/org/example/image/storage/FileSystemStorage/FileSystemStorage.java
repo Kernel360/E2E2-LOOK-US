@@ -9,14 +9,15 @@ import java.nio.file.Paths;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.storage.ApiStorageErrorSubCategory;
 import org.example.exception.storage.ApiStorageException;
-import org.example.image.storageManager.core.StorageFindResult;
+import org.example.image.storage.core.StoragePacket;
 import org.example.image.storage.core.StorageSaveResultInternal;
 import org.example.image.storage.core.StorageService;
-import org.example.image.storage.core.StoragePacket;
 import org.example.image.storage.core.StorageType;
+import org.example.image.storageManager.core.StorageFindResult;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+
 import lombok.NonNull;
 
 /**
@@ -26,19 +27,19 @@ import lombok.NonNull;
 @Service
 public class FileSystemStorage implements StorageService {
 
-	private final Path rootLocation = Paths.get("data/images");
+	private final Path rootLocation = Paths.get("backend/data/images");
 
 	@Override
 	public StorageSaveResultInternal save(@NonNull StoragePacket packet) {
 
-		if ( packet.isPayloadEmpty() ) {
+		if (packet.isPayloadEmpty()) {
 			throw ApiStorageException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiStorageErrorSubCategory.FILE_IS_EMPTY)
 				.build();
 		}
 
-		if ( Files.notExists(this.rootLocation) ) {
+		if (Files.notExists(this.rootLocation)) {
 			throw ApiStorageException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiStorageErrorSubCategory.DIRECTORY_NOT_ACCESSIBLE)

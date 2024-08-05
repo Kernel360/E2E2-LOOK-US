@@ -2,19 +2,20 @@ package org.example.post.controller;
 
 import java.util.List;
 
+import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;
-import org.example.post.domain.dto.request.PostRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
 import org.example.post.domain.dto.response.PostResponseDto;
 import org.example.post.repository.PostRepository;
 import org.example.post.service.PostService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,14 +40,14 @@ public class PostApiController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-	@PostMapping("/posts")
-	public ResponseEntity<PostResponseDto> createPost(
-		@Valid @RequestBody PostRequestDto postCreateRequestDto
-	) {
+	@PostMapping(value = "/posts", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<PostDto.CreatePostDtoResponse> createPost(
+		@Valid @ModelAttribute PostDto.CreatePostDtoRequest request) {
+
 		String name = SecurityContextHolder.getContext().getAuthentication().getName();
-		System.out.println("name: " + name);
-		PostResponseDto postResponseDto = postService.createPost(postCreateRequestDto, name);
-		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
+		PostDto.CreatePostDtoResponse post = postService.createPost(request, name);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(post);
 	}
 
 	@Operation(summary = "게시글 조회 API", description = "모든 게시글 조회 및 해시태그, 검색 키워드로 조회 가능하다.")

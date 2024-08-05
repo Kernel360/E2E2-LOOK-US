@@ -1,6 +1,6 @@
 package org.example.image.storage.core;
 
-import org.example.image.storageManager.core.StorageFindResult;
+import org.example.image.storageManager.common.StorageFindResult;
 
 public interface StorageService {
 

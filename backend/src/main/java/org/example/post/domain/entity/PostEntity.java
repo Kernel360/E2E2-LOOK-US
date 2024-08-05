@@ -38,7 +38,7 @@ public class PostEntity extends TimeTrackableEntity {
 	private UserEntity user;
 
 	@Column(nullable = false)
-	private String imageUrl;
+	private Long imageId;
 
 	@Column(name = "post_content", nullable = true, columnDefinition = "VARCHAR(255)")
 	private String postContent;
@@ -58,14 +58,12 @@ public class PostEntity extends TimeTrackableEntity {
 	private List<UserPostLikesEntity> likesList;
 
 	// TODO: getImageFile(url, image 분리 필요)
-	public PostEntity(UserEntity user, String postContent, String imageSrc, Integer likeCount, PostStatus postStatus,
-		List<HashtagEntity> hashtags) {
+	public PostEntity(UserEntity user, String postContent, Long imageId, Integer likeCount, PostStatus postStatus) {
 		this.user = user;
 		this.postContent = postContent;
-		this.imageUrl = imageSrc;
+		this.imageId = imageId;
 		this.likeCount = likeCount;
 		this.postStatus = postStatus;
-		this.hashtags = hashtags;
 	}
 
 	// convert List<HashtagEntity> to List<String>

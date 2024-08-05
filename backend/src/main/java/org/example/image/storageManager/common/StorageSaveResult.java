@@ -1,6 +1,7 @@
-package org.example.image.storageManager.core;
+package org.example.image.storageManager.common;
 
 import org.example.image.storage.core.StorageType;
+
 import lombok.NonNull;
 
 /**
@@ -11,4 +12,5 @@ import lombok.NonNull;
 public record StorageSaveResult(
 	@NonNull StorageType storageType,
 	@NonNull Long resourceLocationId
-) {}
+) {
+}

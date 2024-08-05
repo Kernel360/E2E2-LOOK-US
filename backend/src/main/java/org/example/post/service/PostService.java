@@ -3,12 +3,9 @@ package org.example.post.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.example.image.storage.core.StorageType;
-import org.example.image.storageManager.common.StorageSaveResult;
-import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
 import org.example.post.common.PostMapper;
-import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;
+import org.example.post.domain.dto.request.PostRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
 import org.example.post.domain.dto.response.PostResponseDto;
 import org.example.post.domain.entity.PostEntity;
@@ -23,7 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,45 +30,23 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
-	private final ImageStorageManager imageStorageManager;
-	// @Transactional
-	// public PostResponseDto createPost(PostRequestDto postDto, String name) {
-	// 	UserEntity user = userRepository.findByUsername(name)
-	// 		.orElseThrow(() -> new IllegalArgumentException("User not found"));
-	//
-	// 	PostEntity postEntity = new PostEntity(    // TODO: getImageFile(url, image 분리 필요)
-	// 		user,
-	// 		postDto.getPostContent(),
-	// 		postDto.getImageFile().toString(),
-	// 		0, // Initialize likeCount
-	// 		PostStatus.PUBLISHED, // Set default status
-	// 		postDto.convertStringsToHashtags(postDto.getHashtagContents())
-	// 	);
-	//
-	// 	PostEntity savedPost = postRepository.save(postEntity);
-	// 	return PostMapper.toDto(savedPost);
-	// }
 
 	@Transactional
-	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
-		String name) {
+	public PostResponseDto createPost(PostRequestDto postDto, String name) {
 		UserEntity user = userRepository.findByUsername(name)
-										.orElseThrow(() -> new IllegalArgumentException("User not found"));
+			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-		MultipartFile profileImage = postDto.image();
-		StorageSaveResult storageSaveResult = imageStorageManager.saveResource(profileImage,
-			StorageType.LOCAL_FILE_SYSTEM);
-
-		PostEntity postEntity = new PostEntity(
+		PostEntity postEntity = new PostEntity(    // TODO: getImageFile(url, image 분리 필요)
 			user,
-			postDto.postContent(),
-			storageSaveResult.resourceLocationId(),
+			postDto.getPostContent(),
+			postDto.getImageFile().toString(),
 			0, // Initialize likeCount
-			PostStatus.PUBLISHED
+			PostStatus.PUBLISHED, // Set default status
+			postDto.convertStringsToHashtags(postDto.getHashtagContents())
 		);
 
 		PostEntity savedPost = postRepository.save(postEntity);
-		return PostDto.CreatePostDtoResponse.toDto(savedPost);
+		return PostMapper.toDto(savedPost);
 	}
 
 	public ResponseEntity<PaginationResponseDto> getAllPostsOrderedBySortStrategy(
@@ -136,26 +110,22 @@ public class PostService {
 		paginationResponseDto.setTotalPages(postPage.getTotalPages());
 
 		paginationResponseDto.setPostResponseDtoList(postPage.stream()
-															 .map(postEntity -> {
-																 PostResponseDto postResponseDto = new PostResponseDto();
-																 postResponseDto.setPostId(postEntity.getPostId());
-																 postResponseDto.setPostContent(
-																	 postEntity.getPostContent());
-																 postResponseDto.setLikeCount(
-																	 postEntity.getLikeCount());
-																 postResponseDto.setHashtagContents(
-																	 postEntity.getHashtagContents());
-																 return postResponseDto;
-															 }).collect(Collectors.toList()));
+			.map(postEntity -> {
+				PostResponseDto postResponseDto = new PostResponseDto();
+				postResponseDto.setPostId(postEntity.getPostId());
+				postResponseDto.setPostContent(postEntity.getPostContent());
+				postResponseDto.setLikeCount(postEntity.getLikeCount());
+				postResponseDto.setHashtagContents(postEntity.getHashtagContents());
+				return postResponseDto;
+			}).collect(Collectors.toList()));
 
 		return ResponseEntity.status(HttpStatus.OK)
-							 .body(paginationResponseDto);
+			.body(paginationResponseDto);
 	}
 
 	public ResponseEntity<PostResponseDto> getPostById(Long postId) {
 		PostEntity post = postRepository.findById(postId)
-										.orElseThrow(() -> new IllegalArgumentException(
-											"게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
+			.orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
 
 		PostResponseDto postResponseDto = PostMapper.toDto(post);
 

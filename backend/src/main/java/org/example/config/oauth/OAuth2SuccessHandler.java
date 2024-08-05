@@ -24,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
 	public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
+	public static final String ACCESS_TOKEN_COOKIE_NAME = "token";
+
 	public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
 	public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(1);
 	public static final String REDIRECT_PATH = "/articles"; //redirect 경로
@@ -44,6 +46,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		addRefreshTokenToCookie(request, response, refreshToken);
 
 		String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
+		addAccessTokenToCookie(request, response, accessToken);
 		String targetUrl = getTargetUrl(accessToken);
 
 		clearAuthenticationAttributes(request, response);
@@ -65,6 +68,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 		CookieUtil.deleteCookie(request, response, REFRESH_TOKEN_COOKIE_NAME);
 		CookieUtil.addCookie(response, REFRESH_TOKEN_COOKIE_NAME, refreshToken, cookieMaxAge);
+	}
+
+	private void addAccessTokenToCookie(HttpServletRequest request, HttpServletResponse response,
+		String accessToken) {
+		int cookieMaxAge = (int)ACCESS_TOKEN_DURATION.toSeconds();
+
+		CookieUtil.deleteCookie(request, response, ACCESS_TOKEN_COOKIE_NAME);
+		CookieUtil.addCookie(response, ACCESS_TOKEN_COOKIE_NAME, accessToken, cookieMaxAge);
 	}
 
 	private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

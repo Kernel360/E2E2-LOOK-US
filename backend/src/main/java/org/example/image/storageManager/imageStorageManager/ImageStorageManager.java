@@ -1,19 +1,19 @@
-package org.example.image.storageManager;
+package org.example.image.storageManager.imageStorageManager;
 
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.storage.ApiStorageErrorSubCategory;
 import org.example.exception.storage.ApiStorageException;
 import org.example.image.resourceLocation.entity.ResourceLocationEntity;
 import org.example.image.resourceLocation.repository.ResourceLocationRepository;
+import org.example.image.storage.core.StoragePacket;
 import org.example.image.storage.core.StorageSaveResultInternal;
+import org.example.image.storage.core.StorageService;
 import org.example.image.storage.core.StorageType;
 import org.example.image.storage.strategy.LocalDateDirectoryNamingStrategy;
-import org.example.image.storage.core.StorageService;
-import org.example.image.storage.core.StoragePacket;
 import org.example.image.storage.strategy.UuidV4FileNamingStrategy;
-import org.example.image.storageManager.core.StorageFindResult;
-import org.example.image.storageManager.core.StorageManager;
-import org.example.image.storageManager.core.StorageSaveResult;
+import org.example.image.storageManager.StorageManager;
+import org.example.image.storageManager.common.StorageFindResult;
+import org.example.image.storageManager.common.StorageSaveResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,10 +39,11 @@ public class ImageStorageManager implements StorageManager {
 		@NonNull MultipartFile file,
 		StorageType storageType
 	) {
-		StoragePacket packet = StoragePacket.builder()
+		StoragePacket packet = StoragePacket
+			.builder()
 			.fileData(file)
-			.fileNamingStrategy( new UuidV4FileNamingStrategy() )
-			.directoryNamingStrategy( new LocalDateDirectoryNamingStrategy() )
+			.fileNamingStrategy(new UuidV4FileNamingStrategy())
+			.directoryNamingStrategy(new LocalDateDirectoryNamingStrategy())
 			.build();
 
 		StorageSaveResultInternal storageSaveResult = switch (storageType) {
@@ -54,9 +55,10 @@ public class ImageStorageManager implements StorageManager {
 		};
 
 		ResourceLocationEntity savedImageLocation = this.imageRepository.save(
-			ResourceLocationEntity.builder()
-				.storageType( storageSaveResult.storageType() )
-				.savedPath( storageSaveResult.savedPath().toString() )
+			ResourceLocationEntity
+				.builder()
+				.storageType(storageSaveResult.storageType())
+				.savedPath(storageSaveResult.savedPath().toString())
 				.build()
 		);
 
@@ -70,7 +72,7 @@ public class ImageStorageManager implements StorageManager {
 	public StorageFindResult findResourceById(Long imageId) {
 		return this.imageRepository.findById(imageId)
 								   .map(
-									   image -> this.storageService.load( image.getSavedPath() )
+									   image -> this.storageService.load(image.getSavedPath())
 								   )
 								   .orElseThrow(() ->
 									   ApiStorageException

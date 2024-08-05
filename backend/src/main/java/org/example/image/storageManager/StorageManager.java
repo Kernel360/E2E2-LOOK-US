@@ -1,6 +1,8 @@
-package org.example.image.storageManager.core;
+package org.example.image.storageManager;
 
 import org.example.image.storage.core.StorageType;
+import org.example.image.storageManager.common.StorageFindResult;
+import org.example.image.storageManager.common.StorageSaveResult;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface StorageManager {

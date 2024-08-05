@@ -11,7 +11,6 @@ import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;
 import org.example.post.domain.dto.response.PaginationResponseDto;
 import org.example.post.domain.dto.response.PostResponseDto;
-import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
@@ -55,11 +54,12 @@ public class PostService {
 	// }
 
 	@Transactional
-	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto, MultipartFile profileImage,
+	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
 		String name) {
 		UserEntity user = userRepository.findByUsername(name)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+		MultipartFile profileImage = postDto.image();
 		StorageSaveResult storageSaveResult = imageStorageManager.saveResource(profileImage,
 			StorageType.LOCAL_FILE_SYSTEM);
 
@@ -68,20 +68,11 @@ public class PostService {
 			postDto.postContent(),
 			storageSaveResult.resourceLocationId(),
 			0, // Initialize likeCount
-			PostStatus.PUBLISHED, // Set default status
-			convertStringsToHashtags(postDto.hashtagContents())
+			PostStatus.PUBLISHED
 		);
 
 		PostEntity savedPost = postRepository.save(postEntity);
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
-	}
-
-	private List<HashtagEntity> convertStringsToHashtags(List<String> hashtagContents) {
-		// Implement the conversion logic here
-		return hashtagContents.stream()
-			.map(hashtagContent -> new HashtagEntity(
-				hashtagContent)) // Assuming Hashtag has a constructor that accepts a string
-			.collect(Collectors.toList());
 	}
 
 	public ResponseEntity<PaginationResponseDto> getAllPostsOrderedBySortStrategy(

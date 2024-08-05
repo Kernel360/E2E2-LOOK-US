@@ -1,10 +1,15 @@
 package org.example.user.service.member;
 
+import org.example.image.storage.core.StorageType;
+import org.example.image.storageManager.ImageStorageManager;
+import org.example.image.storageManager.core.StorageSaveResult;
+import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.dto.request.member.AddUserRequest;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,6 +18,26 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
 	private final UserRepository userRepository;
+	private final ImageStorageManager imageStorageManager;
+
+	public UserDto.UserUpdateResponse updateUser(UserDto.UserUpdateRequest updateRequest, String name,
+		MultipartFile profileImage) {
+		UserEntity user = userRepository.findByUsername(name)
+			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+		if (profileImage != null && !profileImage.isEmpty()) {
+			StorageSaveResult storageSaveResult = imageStorageManager.saveResource(profileImage,
+				StorageType.LOCAL_FILE_SYSTEM);
+			user.updateProfileImage(storageSaveResult.resourceLocationId());
+		}
+
+		user.updateDetails(updateRequest.birth(), updateRequest.instaId(), updateRequest.nickName(),
+			updateRequest.gender());
+
+		UserEntity savedUser = userRepository.save(user);
+		return UserDto.UserUpdateResponse.toDto(savedUser);
+
+	}
 
 	public Long saveUser(AddUserRequest addUserRequest) {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

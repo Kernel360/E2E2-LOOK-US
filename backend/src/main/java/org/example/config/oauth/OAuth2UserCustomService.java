@@ -38,7 +38,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
         String email = oAuth2UserInfo.getEmail();
         String password = passwordEncoder.encode("겟인데어");
 
-        UserEntity user = userRepository.findByUsername(username)
+        UserEntity user = userRepository.findByEmail(email)
                 .map(entity -> entity.update(username))
                 .orElse(UserEntity.builder()
                         .username(username)

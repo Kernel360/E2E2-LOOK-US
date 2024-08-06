@@ -55,8 +55,8 @@ public class PostService {
 
 	@Transactional
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
-		String name, MultipartFile image) {
-		UserEntity user = userRepository.findByUsername(name)
+		String email, MultipartFile image) {
+		UserEntity user = userRepository.findByEmail(email)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
 		StorageSaveResult storageSaveResult = imageStorageManager.saveResource(image,

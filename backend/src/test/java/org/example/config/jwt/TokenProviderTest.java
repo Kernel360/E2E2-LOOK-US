@@ -34,7 +34,7 @@ class TokenProviderTest {
 	void generateToken() {
 		// given
 		UserEntity testUser = userRepository.save(UserEntity.builder()
-			.username("user@gmail.com")
+			.email("user@gmail.com")
 			.password("test")
 			.build());
 

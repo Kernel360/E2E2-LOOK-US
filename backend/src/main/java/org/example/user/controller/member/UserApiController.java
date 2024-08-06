@@ -31,9 +31,9 @@ public class UserApiController {
 	public ResponseEntity<UserDto.UserUpdateResponse> userUpdate(
 		@RequestPart("updateRequest") UserDto.UserUpdateRequest updateRequest,
 		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
-		String name = SecurityContextHolder.getContext().getAuthentication().getName();
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(userService.updateUser(updateRequest, name, profileImage));
+			.body(userService.updateUser(updateRequest, email, profileImage));
 	}
 
 	@PostMapping("/user")

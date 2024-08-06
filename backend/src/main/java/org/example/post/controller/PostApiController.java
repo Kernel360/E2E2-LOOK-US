@@ -46,8 +46,8 @@ public class PostApiController {
 		@Valid @RequestPart("userRequest") PostDto.CreatePostDtoRequest userRequest,
 		@RequestPart(value = "image", required = false) MultipartFile image) {
 
-		String name = SecurityContextHolder.getContext().getAuthentication().getName();
-		PostDto.CreatePostDtoResponse post = postService.createPost(userRequest, name, image);
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		PostDto.CreatePostDtoResponse post = postService.createPost(userRequest, email, image);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(post);
 	}

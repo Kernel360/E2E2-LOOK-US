@@ -10,6 +10,8 @@ import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +23,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "post")
@@ -44,27 +47,29 @@ public class PostEntity extends TimeTrackableEntity {
 	private String postContent;
 
 	@Column(name = "post_status", nullable = false)
-	@ColumnDefault("0")
-	private PostStatus postStatus = PostStatus.PUBLISHED; //TODO: build() 에서 제외
+	@Enumerated(EnumType.STRING)
+	private PostStatus postStatus; //TODO: build() 에서 제외
 
 	@Column(name = "like_count", nullable = false, columnDefinition = "INT")
 	@ColumnDefault("0")
 	private Integer likeCount = 0;
 
-	@OneToMany(mappedBy = "postId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@Setter
+	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<HashtagEntity> hashtags;
 
-	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY)
-	private List<UserPostLikesEntity> likesList;
+/*	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY)
+	private List<UserPostLikesEntity> likesList;*/
 
-	// TODO: getImageFile(url, image 분리 필요)
-	public PostEntity(UserEntity user, String postContent, Long imageId, Integer likeCount, PostStatus postStatus) {
+	public PostEntity(UserEntity user, String postContent, Long imageId, List<HashtagEntity> hashtags) {
 		this.user = user;
 		this.postContent = postContent;
 		this.imageId = imageId;
-		this.likeCount = likeCount;
-		this.postStatus = postStatus;
+		this.hashtags = hashtags;
+		this.likeCount = 0;
+		this.postStatus = PostStatus.PUBLISHED;
 	}
+
 
 	// convert List<HashtagEntity> to List<String>
 	public List<String> getHashtagContents() {

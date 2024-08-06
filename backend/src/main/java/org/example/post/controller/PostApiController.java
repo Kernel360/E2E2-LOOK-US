@@ -1,12 +1,6 @@
 package org.example.post.controller;
 
-import java.util.List;
-
 import org.example.post.domain.dto.PostDto;
-import org.example.post.domain.dto.request.PaginationRequestDto;
-import org.example.post.domain.dto.response.PaginationResponseDto;
-import org.example.post.domain.dto.response.PostResponseDto;
-import org.example.post.repository.PostRepository;
 import org.example.post.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,10 +25,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostApiController {
 
-	private final PostRepository postRepository;
 	private final PostService postService;
 
-	//TODO: 로그인된 유저인지 확인하는 로직 필요, User가 아니여야 하는 거 아닌가...
 	@Operation(summary = "게시글 작성 API", description = "사용자가 게시글을 작성할 수 있다.")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "ok!!"),
@@ -47,38 +38,16 @@ public class PostApiController {
 		@RequestPart(value = "image", required = false) MultipartFile image) {
 
 		String name = SecurityContextHolder.getContext().getAuthentication().getName();
-		PostDto.CreatePostDtoResponse post = postService.createPost(userRequest, name, image);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(post);
-	}
-
-	@Operation(summary = "게시글 조회 API", description = "모든 게시글 조회 및 해시태그, 검색 키워드로 조회 가능하다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "ok!!"),
-		@ApiResponse(responseCode = "404", description = "Resource not found!!")
-	})
-	@GetMapping("/posts")
-	public ResponseEntity<PaginationResponseDto> getAllPosts(
-		@RequestParam(value = "searchHashtags", required = false) List<String> searchHashtags,
-		@RequestParam(value = "searchString", required = false) String searchString,
-		@RequestParam(value = "sortField", defaultValue = "createdAt") String sortField,
-		@RequestParam(value = "sortDirection", defaultValue = "DESC") String sortDirection,
-		@RequestParam(value = "page", defaultValue = "0") int page,
-		@RequestParam(value = "size", defaultValue = "10") int size
-	) {
-
-		PaginationRequestDto paginationRequestDto = new PaginationRequestDto(page, size, sortField, sortDirection,
-			searchHashtags, searchString
-		);
-
-		return postService.getAllPostsOrderedBySortStrategy(paginationRequestDto);
+		PostDto.CreatePostDtoResponse postResponseDto = postService.createPost(userRequest, name, image);
+		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
 	}
 
 	@GetMapping("/posts/{post_id}")
-	public ResponseEntity<PostResponseDto> getPostById(
+	public ResponseEntity<PostDto.GetPostDtoResponse> getPostById(
 		@PathVariable Long post_id
 	) {
-		return postService.getPostById(post_id);
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(postService.getPostById(post_id));
 	}
 
 }

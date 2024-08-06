@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.example.image.storage.core.StorageType;
-import org.example.image.storageManager.ImageStorageManager;
-import org.example.image.storageManager.core.StorageSaveResult;
+import org.example.image.storageManager.common.StorageSaveResult;
+import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
 import org.example.post.common.PostMapper;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.dto.request.PaginationRequestDto;

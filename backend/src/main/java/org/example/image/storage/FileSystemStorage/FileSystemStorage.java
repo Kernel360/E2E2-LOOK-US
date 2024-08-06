@@ -13,7 +13,7 @@ import org.example.image.storage.core.StoragePacket;
 import org.example.image.storage.core.StorageSaveResultInternal;
 import org.example.image.storage.core.StorageService;
 import org.example.image.storage.core.StorageType;
-import org.example.image.storageManager.core.StorageFindResult;
+import org.example.image.storageManager.common.StorageFindResult;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -27,20 +27,22 @@ import lombok.NonNull;
 @Service
 public class FileSystemStorage implements StorageService {
 
-	private final Path rootLocation = Paths.get("backend/data/images");
+	private final Path rootLocation = Paths.get("data/images");
 
 	@Override
 	public StorageSaveResultInternal save(@NonNull StoragePacket packet) {
 
 		if (packet.isPayloadEmpty()) {
-			throw ApiStorageException.builder()
+			throw ApiStorageException
+				.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiStorageErrorSubCategory.FILE_IS_EMPTY)
 				.build();
 		}
 
 		if (Files.notExists(this.rootLocation)) {
-			throw ApiStorageException.builder()
+			throw ApiStorageException
+				.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiStorageErrorSubCategory.DIRECTORY_NOT_ACCESSIBLE)
 				.build();
@@ -63,7 +65,8 @@ public class FileSystemStorage implements StorageService {
 				destination
 			);
 		} catch (IOException e) {
-			throw ApiStorageException.builder()
+			throw ApiStorageException
+				.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiStorageErrorSubCategory.FILE_SAVE_PROCESS_FAILURE)
 				.setErrorData(e::getMessage)
@@ -78,7 +81,8 @@ public class FileSystemStorage implements StorageService {
 			Resource resource = new UrlResource(fullPath.toUri());
 
 			if ((false == resource.exists()) || (false == resource.isReadable())) {
-				throw ApiStorageException.builder()
+				throw ApiStorageException
+					.builder()
 					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 					.subCategory(ApiStorageErrorSubCategory.FILE_NOT_READABLE)
 					.build();
@@ -89,7 +93,8 @@ public class FileSystemStorage implements StorageService {
 				resource
 			);
 		} catch (MalformedURLException e) {
-			throw ApiStorageException.builder()
+			throw ApiStorageException
+				.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiStorageErrorSubCategory.FILE_READ_IO_FAILURE)
 				.build();
@@ -100,7 +105,8 @@ public class FileSystemStorage implements StorageService {
 		try {
 			Files.createDirectories(path);
 		} catch (IOException e) {
-			throw ApiStorageException.builder()
+			throw ApiStorageException
+				.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiStorageErrorSubCategory.DIRECTORY_NOT_ACCESSIBLE)
 				.build();

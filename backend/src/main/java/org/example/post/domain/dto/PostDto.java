@@ -2,6 +2,7 @@ package org.example.post.domain.dto;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,7 +79,7 @@ public class PostDto {
 				postEntity.getPostId(),
 				postEntity.getImageId(),
 				postEntity.getPostContent(),
-				postEntity.getHashtagContents(),
+				postEntity.getHashtagContents() != null ? postEntity.getHashtagContents() : Collections.emptyList(),
 				postEntity.getLikeCount(),
 				postEntity.getCreatedAt(),
 				postEntity.getUpdatedAt()

@@ -1,10 +1,11 @@
 package org.example.post.domain.dto;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Setter;
 
 public class PaginationDto{
 	public record PaginationDtoRequest(
@@ -31,8 +32,10 @@ public class PaginationDto{
 		List<PostDto.GetPostDtoResponse> postResponseDtoList
 	) {
 
-		public void postResponseDtoList(List<PostDto.GetPostDtoResponse> list) {
-			postResponseDtoList.addAll(list);
+		public PaginationDtoResponse withAdditionalPosts(List<PostDto.GetPostDtoResponse> additionalPosts) {
+			List<PostDto.GetPostDtoResponse> newList = new ArrayList<>(this.postResponseDtoList != null ? this.postResponseDtoList : Collections.emptyList());
+			newList.addAll(additionalPosts);
+			return new PaginationDtoResponse(page, size, totalElements, totalPages, searchString, newList);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package org.example.post.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.example.image.storage.core.StorageType;
@@ -36,7 +37,8 @@ public class PostService {
 
 	@Transactional
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
-		String name, MultipartFile image) {
+		String name, MultipartFile image
+	) {
 		UserEntity user = userRepository.findByUsername(name)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -68,7 +70,8 @@ public class PostService {
 	}
 
 	public PaginationDto.PaginationDtoResponse getAllPostsOrderedBySortStrategy(
-		PaginationDto.PaginationDtoRequest paginationRequestDto) {
+		PaginationDto.PaginationDtoRequest paginationRequestDto
+	) {
 
 		// get information for pagination by DTO
 		int page = paginationRequestDto.page();
@@ -76,8 +79,11 @@ public class PostService {
 		String searchString = paginationRequestDto.searchString();
 		String direction = paginationRequestDto.sortDirection();
 		String field = paginationRequestDto.sortField();
-		List<String> searchHashtagList = paginationRequestDto.convertHashtagContents(
-			paginationRequestDto.searchHashtagList(), "#");
+		List<String> searchHashtagList = new ArrayList<>();
+		if(paginationRequestDto.searchHashtagList() != null){
+			searchHashtagList = paginationRequestDto.convertHashtagContents(
+				paginationRequestDto.searchHashtagList(), "#");
+		}
 
 		// sort by field ordered by descending
 		Sort sort = Sort.by(field).descending();
@@ -97,23 +103,26 @@ public class PostService {
 		// search posts containing searchString(post content)
 		// searchString not null
 		if (searchString != null && !searchString.isBlank()) {
-			postPage = postRepository.findAllByPostContentContainingAndPostStatus(searchString, PostStatus.PUBLISHED,
-				pageable);
+			postPage = postRepository.findAllByPostContentContainingAndPostStatus(
+				searchString, PostStatus.PUBLISHED, pageable
+			);
 		}
 
 		// search posts containing hashtag content
 		// hashtagList not null
 		if (searchHashtagList != null && !searchHashtagList.isEmpty()) {
-			postPage = postRepository.findAllByHashtagsContainingAndPostStatus(searchHashtagList, PostStatus.PUBLISHED,
-				pageable);
+			postPage = postRepository.findAllByPostStatusAndHashtags_HashtagContentIn(
+				PostStatus.PUBLISHED, searchHashtagList, pageable
+			);
 		}
 
 		// search posts containing both searchString and hashtag content
 		// get only some posts which must have both elements
 		if (searchHashtagList != null && searchString != null && !searchHashtagList.isEmpty()
 			&& !searchString.isBlank()) {
-			postPage = postRepository.findAllByPostContentContainingAndHashtagsContainingAndPostStatus(searchString,
-				searchHashtagList, PostStatus.PUBLISHED, pageable);
+			postPage = postRepository.findAllByPostContentContainingAndHashtagsContainingAndPostStatus(
+				searchString, searchHashtagList, PostStatus.PUBLISHED, pageable
+			);
 		}
 
 		// find no post about search condition
@@ -131,10 +140,9 @@ public class PostService {
 			null
 		);
 
-		paginationResponseDto.postResponseDtoList(postPage.stream()
-			.map(PostDto.GetPostDtoResponse::toDto).toList());
-
-		return paginationResponseDto;
+		List<PostDto.GetPostDtoResponse> postResponseDtos = postPage.stream()
+			.map(PostDto.GetPostDtoResponse::toDto).toList();
+		return paginationResponseDto.withAdditionalPosts(postResponseDtos);
 	}
 
 	public PostDto.GetPostDtoResponse getPostById(Long postId) {

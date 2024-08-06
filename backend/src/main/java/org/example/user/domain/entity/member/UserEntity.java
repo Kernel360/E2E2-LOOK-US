@@ -38,7 +38,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "user_id")
+	@Column(name = "user_id", updatable = false)
 	private Long userId;
 
 	// 사용자 이름
@@ -48,6 +48,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	@Column(name = "password")
 	private String password;
 
+	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 
 	@Enumerated(EnumType.STRING)
@@ -77,6 +78,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<UserPostLikesEntity> postLikesEntities = new ArrayList<>();
+
 
 	@Builder
 	public UserEntity(String username, String password, String email, Gender gender, String birth, String nickname,
@@ -126,7 +128,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	// 사용자의 id를 반환(고유한 값)
 	@Override
 	public String getUsername() {
-		return username;
+		return email;
 	}
 
 	public String getEmail() {

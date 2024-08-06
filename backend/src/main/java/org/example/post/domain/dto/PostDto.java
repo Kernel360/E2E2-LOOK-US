@@ -18,13 +18,7 @@ public class PostDto {
 		String postContent,
 
 		@JsonProperty("hashtag_content")
-		String hashtagContents,
-
-		@JsonProperty("created_at")
-		LocalDateTime createdAt,
-
-		@JsonProperty("updated_at")
-		LocalDateTime updatedAt
+		String hashtagContents
 	) {
 
 		public List<HashtagEntity> getHashtagEntityFromString(String hashtagContent, String regex) {

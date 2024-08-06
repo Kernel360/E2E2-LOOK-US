@@ -9,20 +9,23 @@ import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class UserService {
 
 	private final UserRepository userRepository;
 	private final ImageStorageManager imageStorageManager;
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-	public UserDto.UserUpdateResponse updateUser(UserDto.UserUpdateRequest updateRequest, String name,
+	public UserDto.UserUpdateResponse updateUser(UserDto.UserUpdateRequest updateRequest, String email,
 		MultipartFile profileImage) {
-		UserEntity user = userRepository.findByUsername(name)
+		UserEntity user = userRepository.findByEmail(email)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
 		if (profileImage != null && !profileImage.isEmpty()) {
@@ -34,8 +37,8 @@ public class UserService {
 		user.updateDetails(updateRequest.birth(), updateRequest.instaId(), updateRequest.nickName(),
 			updateRequest.gender());
 
-		UserEntity savedUser = userRepository.save(user);
-		return UserDto.UserUpdateResponse.toDto(savedUser);
+		// UserEntity savedUser = userRepository.save(user);
+		return UserDto.UserUpdateResponse.toDto(user);
 
 	}
 
@@ -43,19 +46,27 @@ public class UserService {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
 		return userRepository.save(UserEntity.builder()
-			.username(addUserRequest.getUsername())
-			.password(encoder.encode(addUserRequest.getPassword()))
+			.email(addUserRequest.getEmail())
+			.password(bCryptPasswordEncoder.encode(addUserRequest.getPassword()))
 			.build()).getUserId();
 	}
 
+	@Transactional(readOnly = true)
 	public UserEntity findById(Long userId) {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
 	}
 
+	@Transactional(readOnly = true)
 	public UserEntity findByUsername(String username) {
 		System.out.println("Searching for user: " + username);
 		return userRepository.findByUsername(username)
+			.orElseThrow(() -> new IllegalArgumentException("unexpected user"));
+	}
+
+	@Transactional(readOnly = true)
+	public UserEntity findByEmail(String email) {
+		return userRepository.findByEmail(email)
 			.orElseThrow(() -> new IllegalArgumentException("unexpected user"));
 	}
 

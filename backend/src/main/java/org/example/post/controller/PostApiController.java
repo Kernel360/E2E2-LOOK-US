@@ -1,5 +1,7 @@
 package org.example.post.controller;
 
+import java.util.List;
+
 import org.example.post.domain.dto.PostDto;
 import org.example.post.service.PostService;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,10 +40,12 @@ public class PostApiController {
 		@Valid @RequestPart("userRequest") PostDto.CreatePostDtoRequest userRequest,
 		@RequestPart(value = "image", required = false) MultipartFile image) {
 
-		String name = SecurityContextHolder.getContext().getAuthentication().getName();
-		PostDto.CreatePostDtoResponse postResponseDto = postService.createPost(userRequest, name, image);
-		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		PostDto.CreatePostDtoResponse post = postService.createPost(userRequest, email, image);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(post);
 	}
+
 
 	@GetMapping("/posts/{post_id}")
 	public ResponseEntity<PostDto.GetPostDtoResponse> getPostById(

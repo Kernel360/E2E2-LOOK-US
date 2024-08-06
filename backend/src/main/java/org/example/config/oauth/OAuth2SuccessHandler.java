@@ -39,7 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 		Authentication authentication) throws IOException {
 		OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
-		UserEntity user = userService.findByUsername((String)oAuth2User.getAttributes().get("name"));
+		UserEntity user = userService.findByEmail((String)oAuth2User.getAttributes().get("email"));
 
 		String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
 		saveRefreshToken(user.getUserId(), refreshToken);

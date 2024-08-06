@@ -68,8 +68,6 @@ public class PostEntity extends TimeTrackableEntity {
 		this.hashtags = hashtags;
 		this.likeCount = 0;
 		this.postStatus = PostStatus.PUBLISHED;
-		// this.createdAt = createdAt;
-		// this.updatedAt = updatedAt;
 	}
 
 

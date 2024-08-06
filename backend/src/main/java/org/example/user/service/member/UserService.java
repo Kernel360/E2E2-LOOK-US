@@ -1,8 +1,8 @@
 package org.example.user.service.member;
 
 import org.example.image.storage.core.StorageType;
-import org.example.image.storageManager.ImageStorageManager;
-import org.example.image.storageManager.core.StorageSaveResult;
+import org.example.image.storageManager.common.StorageSaveResult;
+import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.dto.request.member.AddUserRequest;
 import org.example.user.domain.entity.member.UserEntity;

@@ -120,7 +120,7 @@ public class PostService {
 		// get only some posts which must have both elements
 		if (searchHashtagList != null && searchString != null && !searchHashtagList.isEmpty()
 			&& !searchString.isBlank()) {
-			postPage = postRepository.findAllByPostContentContainingAndHashtagsContainingAndPostStatus(
+			postPage = postRepository.findAllByPostContentContainingAndHashtags_HashtagContentInAndPostStatus(
 				searchString, searchHashtagList, PostStatus.PUBLISHED, pageable
 			);
 		}

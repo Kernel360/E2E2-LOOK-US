@@ -21,33 +21,19 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
 		Pageable pageable
 	);
 
-	@Query("SELECT p FROM PostEntity p JOIN p.hashtags h WHERE p.postStatus = :postStatus AND h.hashtagContent IN :hashtags")
+	// @Query("SELECT p FROM PostEntity p JOIN p.hashtags h WHERE p.postStatus = :postStatus AND h.hashtagContent IN :hashtags")
 	Page<PostEntity> findAllByPostStatusAndHashtags_HashtagContentIn(
 		@Param("postStatus") PostStatus postStatus,
 		@Param("hashtags") List<String> hashtags,
 		Pageable pageable
 	);
 
-	// @Query("SELECT p FROM PostEntity p JOIN p.HashtagEntity h WHERE p.postStatus = :postStatus AND h.hashtagContent IN :hashtagContents")
-	// Page<PostEntity> findAllByPostStatusAndHashtagEntity_HashtagContentContaining(
-	// 	@Param("postStatus") PostStatus postStatus,
-	// 	@Param("hashtagContents") List<String> hashtagContents,
-	// 	Pageable pageable
-	// );
-/*
 
-	@Query("SELECT p FROM PostEntity p JOIN p.hashtags h WHERE h.hashtagContent IN :hashtagList AND p.postStatus = :postStatus")
-	Page<PostEntity> findAllByHashtagsContainingAndPostStatus(
-		@Param("hashtagList") List<HashtagEntity> hashtagList,
-		@Param("postStatus") PostStatus postStatus,
-		Pageable pageable
-	);
-*/
 
-	@Query("SELECT DISTINCT p FROM PostEntity p JOIN p.hashtags h WHERE p.postContent LIKE %:postContent% AND h.hashtagContent IN :hashtagList AND p.postStatus = :postStatus")
-	Page<PostEntity> findAllByPostContentContainingAndHashtagsContainingAndPostStatus(
+	// @Query("SELECT DISTINCT p FROM PostEntity p JOIN p.hashtags h WHERE p.postContent LIKE %:postContent% AND h.hashtagContent IN :hashtags AND p.postStatus = :postStatus")
+	Page<PostEntity> findAllByPostContentContainingAndHashtags_HashtagContentInAndPostStatus(
 		@Param("postContent") String postContent,
-		@Param("hashtagList") List<String> hashtagList,
+		@Param("hashtags") List<String> hashtagList,
 		@Param("postStatus") PostStatus postStatus,
 		Pageable pageable
 	);

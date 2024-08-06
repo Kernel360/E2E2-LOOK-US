@@ -2,7 +2,6 @@ package org.example.post.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageSaveResult;
@@ -20,8 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -79,7 +76,8 @@ public class PostService {
 		String searchString = paginationRequestDto.searchString();
 		String direction = paginationRequestDto.sortDirection();
 		String field = paginationRequestDto.sortField();
-		List<String> searchHashtagList = paginationRequestDto.convertHashtagContents(paginationRequestDto.searchHashtagList(), "#");
+		List<String> searchHashtagList = paginationRequestDto.convertHashtagContents(
+			paginationRequestDto.searchHashtagList(), "#");
 
 		// sort by field ordered by descending
 		Sort sort = Sort.by(field).descending();

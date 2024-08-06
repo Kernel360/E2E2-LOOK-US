@@ -33,9 +33,8 @@ public class PostController {
 		@RequestParam(value = "size", defaultValue = "10") int size
 	) {
 
-		PaginationDto.PaginationDtoRequest paginationDto = new PaginationDto.PaginationDtoRequest(page, size, sortField,
-			sortDirection,
-			searchHashtags, searchString
+		PaginationDto.PaginationDtoRequest paginationDto = new PaginationDto.PaginationDtoRequest(
+			page, size, sortField, sortDirection, searchHashtags, searchString
 		);
 
 		// return postService.getAllPostsOrderedBySortStrategy(paginationDto);

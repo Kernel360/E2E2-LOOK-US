@@ -1,6 +1,7 @@
 package org.example.config.oauth;
 
 import org.example.user.domain.entity.member.UserEntity;
+import org.example.user.domain.enums.Role;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -46,6 +47,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
                         .email(email)
                         .provider(provider)
                         .providerId(providerId)
+						.role(Role.ROLE_USER)
                         .build());
 
         return userRepository.save(user);

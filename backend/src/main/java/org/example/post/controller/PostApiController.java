@@ -35,11 +35,11 @@ public class PostApiController {
 	@PostMapping(value = "/posts", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<PostDto.CreatePostDtoResponse> createPost(
 		@Valid @RequestPart("userRequest") PostDto.CreatePostDtoRequest userRequest,
-		@RequestPart(value = "image", required = false) MultipartFile image) {
+		@RequestPart(value = "image") MultipartFile image) {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		PostDto.CreatePostDtoResponse post = postService.createPost(userRequest, email, image);
 
-		String name = SecurityContextHolder.getContext().getAuthentication().getName();
-		PostDto.CreatePostDtoResponse postResponseDto = postService.createPost(userRequest, name, image);
-		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(post);
 	}
 
 	@GetMapping("/posts/{post_id}")

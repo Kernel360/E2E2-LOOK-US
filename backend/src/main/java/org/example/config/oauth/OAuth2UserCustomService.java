@@ -16,40 +16,41 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
-	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-	@Override
-	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-		OAuth2User user = super.loadUser(userRequest); // ❶ 요청을 바탕으로 유저 정보를 담은 객체 반환
-		saveOrUpdate(user);
 
-		return user; //사용자 객체는 식별자, 이름, 이메일, 프로필 사진 링크 등의 정보를 담고 있다
-	}
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        OAuth2User user = super.loadUser(userRequest); // ❶ 요청을 바탕으로 유저 정보를 담은 객체 반환
+        saveOrUpdate(user);
 
-	// ❷ 유저가 있으면 업데이트, 없으면 유저 생성
-	private UserEntity saveOrUpdate(OAuth2User oAuth2User) {
-		System.out.println("getAttributes:" + oAuth2User.getAttributes());
-		OAuth2UserInfo oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
+        return user; //사용자 객체는 식별자, 이름, 이메일, 프로필 사진 링크 등의 정보를 담고 있다
+    }
 
-		String provider = oAuth2UserInfo.getProvider(); //google
-		String providerId = oAuth2UserInfo.getProviderId(); //googleId
-		String username = oAuth2UserInfo.getUsername();
-		String email = oAuth2UserInfo.getEmail();
-		String password = passwordEncoder.encode("겟인데어");
+    // ❷ 유저가 있으면 업데이트, 없으면 유저 생성
+    private UserEntity saveOrUpdate(OAuth2User oAuth2User) {
+        System.out.println("getAttributes:" + oAuth2User.getAttributes());
+        OAuth2UserInfo oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
 
-		UserEntity user = userRepository.findByUsername(username)
-			.map(entity -> entity.update(username))
-			.orElse(UserEntity.builder()
-				.username(username)
-				.password(password)
-				.email(email)
-				.provider(provider)
-				.providerId(providerId)
-				.role(Role.ROLE_USER)
-				.build());
+        String provider = oAuth2UserInfo.getProvider(); //google
+        String providerId = oAuth2UserInfo.getProviderId(); //googleId
+        String username = oAuth2UserInfo.getUsername();
+        String email = oAuth2UserInfo.getEmail();
+        String password = passwordEncoder.encode("겟인데어");
 
-		return userRepository.save(user);
-	}
+        UserEntity user = userRepository.findByEmail(email)
+                .map(entity -> entity.update(username))
+                .orElse(UserEntity.builder()
+                        .username(username)
+                        .password(password)
+                        .email(email)
+                        .provider(provider)
+                        .providerId(providerId)
+						.role(Role.ROLE_USER)
+                        .build());
+
+        return userRepository.save(user);
+    }
 
 }

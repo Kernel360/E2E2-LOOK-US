@@ -42,7 +42,9 @@ public class WebOAuthSecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		// 토큰 방식으로 인증을 하기 때문에 기존에 사용하던 폼로그인, 세션 비활성화
-		http.csrf(csrf -> csrf.disable())
+		http
+			.csrf(csrf -> csrf.disable())
+			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.httpBasic(httpBasic -> httpBasic.disable())
 			.formLogin(formLogin -> formLogin.disable())
 			.logout(logout -> logout.disable());
@@ -56,6 +58,7 @@ public class WebOAuthSecurityConfig {
 		http.authorizeHttpRequests(authorize -> authorize
 			.requestMatchers("/api/token").permitAll()
 			.requestMatchers("/posts/**").permitAll()
+			.requestMatchers("/api/v1/image/*").permitAll() // TODO: 나중에 GET만 permit 되도록 꼭!!! 수정 필요.
 			.requestMatchers("/api/**").authenticated()
 			.anyRequest().permitAll()
 		);
@@ -114,6 +117,7 @@ public class WebOAuthSecurityConfig {
 		corsConfiguration.addAllowedMethod("*");
 		corsConfiguration.addAllowedOrigin("http://localhost:8080");
 		corsConfiguration.addAllowedOrigin("http://localhost:8081");
+		corsConfiguration.addAllowedOrigin("http://localhost:3000");
 		corsConfiguration.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

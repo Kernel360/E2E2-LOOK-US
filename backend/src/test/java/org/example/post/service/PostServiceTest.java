@@ -11,15 +11,14 @@ import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
-import org.example.post.repository.HashtagRepository;
 import org.example.post.repository.PostRepository;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.enums.Gender;
 import org.example.user.domain.enums.Role;
-import org.example.user.repository.member.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -55,12 +54,12 @@ class PostServiceTest {
 			.build();
 
 		post = new PostEntity(user, "Test post content", 1L, List.of(
-			new HashtagEntity(post, "test1"),
-			new HashtagEntity(post, "test2")
+			new HashtagEntity(post, "#test1"),
+			new HashtagEntity(post, "#test2")
 		));
 		post.setHashtags(List.of(
-			new HashtagEntity(post, "test1"),
-			new HashtagEntity(post, "test2")
+			new HashtagEntity(post, "#test1"),
+			new HashtagEntity(post, "#test2")
 		));
 	}
 
@@ -72,7 +71,7 @@ class PostServiceTest {
 		);
 
 		Sort sort = Sort.by("createdAt").descending();
-		if(paginationRequestDto.sortDirection().equalsIgnoreCase("ASC")){
+		if (paginationRequestDto.sortDirection().equalsIgnoreCase("ASC")) {
 			sort = Sort.by("createdAt").ascending();
 		}
 		Pageable pageable = PageRequest.of(0, 10, sort);
@@ -80,7 +79,7 @@ class PostServiceTest {
 		Page<PostEntity> postPage = new PageImpl<>(postList, pageable, postList.size());
 
 		when(postRepository.findAllByPostContentContainingAndHashtags_HashtagContentInAndPostStatus(
-			any(String.class), any(List.class), any(PostStatus.class), any(Pageable.class)
+			any(String.class), ArgumentMatchers.any(), any(PostStatus.class), any(Pageable.class)
 		)).thenReturn(postPage);
 
 		PaginationDto.PaginationDtoResponse response = postService.getAllPostsOrderedBySortStrategy(
@@ -89,7 +88,6 @@ class PostServiceTest {
 		assertEquals(1, response.totalPages());
 		assertEquals("Test", response.searchString());
 		assertEquals(1, response.postResponseDtoList().size());
-
 
 		PostDto.GetPostDtoResponse postResponse = response.postResponseDtoList().get(0);
 		assertEquals(user.getNickname(), postResponse.nickname());
@@ -114,7 +112,5 @@ class PostServiceTest {
 			postService.getAllPostsOrderedBySortStrategy(paginationRequestDto);
 		});
 	}
-
-
 
 }

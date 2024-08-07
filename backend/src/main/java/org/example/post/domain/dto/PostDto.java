@@ -58,7 +58,7 @@ public class PostDto {
 	// TODO: 원래 ID를 받는게 맞지만, 프론트 테스트를 위해서 Resource를 바로 던지는 것으로 변경될 예정입니다.
 	//       이후 프론트 개발이 진행될 때는 image_id를 사용합니다.
 	public record GetPostDtoResponse(
-		Long userId,
+		String nickname,
 		Long postId,
 		Long imageId,
 		String postContent,
@@ -69,7 +69,7 @@ public class PostDto {
 	) {
 		public static GetPostDtoResponse toDto(PostEntity postEntity) {
 			return new GetPostDtoResponse(
-				postEntity.getUser().getUserId(),
+				postEntity.getUser().getNickname(),
 				postEntity.getPostId(),
 				postEntity.getImageId(),
 				postEntity.getPostContent(),

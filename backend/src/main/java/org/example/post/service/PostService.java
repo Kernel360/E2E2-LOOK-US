@@ -36,23 +36,6 @@ public class PostService {
 	private final UserRepository userRepository;
 	private final HashtagRepository hashtagRepository;
 	private final ImageStorageManager imageStorageManager;
-	// @Transactional
-	// public PostResponseDto createPost(PostRequestDto postDto, String name) {
-	// 	UserEntity user = userRepository.findByUsername(name)
-	// 		.orElseThrow(() -> new IllegalArgumentException("User not found"));
-	//
-	// 	PostEntity postEntity = new PostEntity(    // TODO: getImageFile(url, image 분리 필요)
-	// 		user,
-	// 		postDto.getPostContent(),
-	// 		postDto.getImageFile().toString(),
-	// 		0, // Initialize likeCount
-	// 		PostStatus.PUBLISHED, // Set default status
-	// 		postDto.convertStringsToHashtags(postDto.getHashtagContents())
-	// 	);
-	//
-	// 	PostEntity savedPost = postRepository.save(postEntity);
-	// 	return PostMapper.toDto(savedPost);
-	// }
 
 	@Transactional
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,

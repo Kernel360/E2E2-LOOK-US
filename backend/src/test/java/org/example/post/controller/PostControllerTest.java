@@ -48,7 +48,7 @@ class PostControllerTest {
 		);
 
 		// Call service method test
-		when(postService.getAllPostsOrderedBySortStrategy(argThat(request ->
+		when(postService.searchAllPostsBySearchCriteria(argThat(request ->
 			request.page() == 0 &&
 				request.size() == 10 &&
 				"createdAt".equals(request.sortField()) &&

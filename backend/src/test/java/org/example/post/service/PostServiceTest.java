@@ -62,7 +62,7 @@ class PostServiceTest {
 
 	@Test
 	@DisplayName("게시물 조회 테스트")
-	void testGetAllPostsOrderedBySortStrategy_WithSearchStringAndHashtags() {
+	void testSearchAllPostsBySearchCriteria_WithSearchStringAndHashtags() {
 		PaginationDto.PaginationDtoRequest paginationRequestDto = new PaginationDto.PaginationDtoRequest(
 			0, 10, "postId", "ASC", "#test1", "Test"
 		);
@@ -79,7 +79,7 @@ class PostServiceTest {
 			any(String.class), ArgumentMatchers.any(), any(PostStatus.class), any(Pageable.class)
 		)).thenReturn(postPage);
 
-		PaginationDto.PaginationDtoResponse response = postService.getAllPostsOrderedBySortStrategy(
+		PaginationDto.PaginationDtoResponse response = postService.searchAllPostsBySearchCriteria(
 			paginationRequestDto);
 		assertEquals(1, response.totalElements());
 		assertEquals(1, response.totalPages());
@@ -96,7 +96,7 @@ class PostServiceTest {
 
 	@Test
 	@DisplayName("게시물 조회 실패 테스틑")
-	void testGetAllPostsOrderedBySortStrategy_NoPostsFound() {
+	void testSearchAllPostsBySearchCriteria_NoPostsFound() {
 		PaginationDto.PaginationDtoRequest paginationRequestDto = new PaginationDto.PaginationDtoRequest(
 			0, 10, "postId", "DESC", "#test1", "Test"
 		);
@@ -106,7 +106,7 @@ class PostServiceTest {
 		)).thenReturn(null);
 
 		assertThrows(NullPointerException.class, () -> {
-			postService.getAllPostsOrderedBySortStrategy(paginationRequestDto);
+			postService.searchAllPostsBySearchCriteria(paginationRequestDto);
 		});
 	}
 

@@ -57,10 +57,7 @@ class PostServiceTest {
 			new HashtagEntity(post, "#test1"),
 			new HashtagEntity(post, "#test2")
 		));
-		post.setHashtags(List.of(
-			new HashtagEntity(post, "#test1"),
-			new HashtagEntity(post, "#test2")
-		));
+
 	}
 
 	@Test

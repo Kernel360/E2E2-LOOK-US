@@ -33,10 +33,6 @@ export async function getAllPostPreviews(
     const res = await fetch(requestUrl, {
         cache: "no-store",
         method: "GET",
-        // headers: {
-        //     'Content-Type': 'application/json',
-        // },
-        // body: JSON.stringify(request),
     })
 
     if (false === res.ok) {

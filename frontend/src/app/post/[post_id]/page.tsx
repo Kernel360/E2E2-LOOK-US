@@ -1,6 +1,6 @@
 'use client'
 
-import { getPost, getPostImage} from '@/app/_api/post';
+import { getPost } from '@/app/_api/post';
 import { API_PRIVATE_URL } from '@/app/_common/constants';
 import { Metadata, ResolvingMetadata } from 'next'
 import Image from 'next/image';

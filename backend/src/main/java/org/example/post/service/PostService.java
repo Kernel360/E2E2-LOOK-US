@@ -1,7 +1,6 @@
 package org.example.post.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.example.image.storage.core.StorageType;
@@ -20,8 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,23 +33,6 @@ public class PostService {
 	private final UserRepository userRepository;
 	private final HashtagRepository hashtagRepository;
 	private final ImageStorageManager imageStorageManager;
-	// @Transactional
-	// public PostResponseDto createPost(PostRequestDto postDto, String name) {
-	// 	UserEntity user = userRepository.findByUsername(name)
-	// 		.orElseThrow(() -> new IllegalArgumentException("User not found"));
-	//
-	// 	PostEntity postEntity = new PostEntity(    // TODO: getImageFile(url, image 분리 필요)
-	// 		user,
-	// 		postDto.getPostContent(),
-	// 		postDto.getImageFile().toString(),
-	// 		0, // Initialize likeCount
-	// 		PostStatus.PUBLISHED, // Set default status
-	// 		postDto.convertStringsToHashtags(postDto.getHashtagContents())
-	// 	);
-	//
-	// 	PostEntity savedPost = postRepository.save(postEntity);
-	// 	return PostMapper.toDto(savedPost);
-	// }
 
 	@Transactional
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
@@ -87,7 +67,7 @@ public class PostService {
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
 	}
 
-	public PaginationDto.PaginationDtoResponse getAllPostsOrderedBySortStrategy(
+	public PaginationDto.PaginationDtoResponse searchAllPostsBySearchCriteria(
 		PaginationDto.PaginationDtoRequest paginationRequestDto
 	) {
 
@@ -98,7 +78,7 @@ public class PostService {
 		String direction = paginationRequestDto.sortDirection();
 		String field = paginationRequestDto.sortField();
 		List<String> searchHashtagList = new ArrayList<>();
-		if(paginationRequestDto.searchHashtagList() != null){
+		if (paginationRequestDto.searchHashtagList() != null) {
 			searchHashtagList = paginationRequestDto.convertHashtagContents(
 				paginationRequestDto.searchHashtagList(), "#");
 		}
@@ -112,15 +92,17 @@ public class PostService {
 
 		// pagination
 		Pageable pageable = PageRequest.of(page, size, sort);
-		Page<PostEntity> postPage;
+		Page<PostEntity> postPage = null;
 
 		// search all posts
 		// searchString null and hashtagList null
-		postPage = postRepository.findAllByPostStatus(PostStatus.PUBLISHED, pageable);
+		if (searchString == null && searchHashtagList.isEmpty()) {
+			postPage = postRepository.findAllByPostStatus(PostStatus.PUBLISHED, pageable);
+		}
 
 		// search posts containing searchString(post content)
 		// searchString not null
-		if (searchString != null && !searchString.isBlank()) {
+		if (searchString != null && searchHashtagList.isEmpty()) {
 			postPage = postRepository.findAllByPostContentContainingAndPostStatus(
 				searchString, PostStatus.PUBLISHED, pageable
 			);
@@ -128,7 +110,7 @@ public class PostService {
 
 		// search posts containing hashtag content
 		// hashtagList not null
-		if (searchHashtagList != null && !searchHashtagList.isEmpty()) {
+		if (!searchHashtagList.isEmpty() && searchString == null) {
 			postPage = postRepository.findAllByPostStatusAndHashtags_HashtagContentIn(
 				PostStatus.PUBLISHED, searchHashtagList, pageable
 			);
@@ -136,8 +118,7 @@ public class PostService {
 
 		// search posts containing both searchString and hashtag content
 		// get only some posts which must have both elements
-		if (searchHashtagList != null && searchString != null && !searchHashtagList.isEmpty()
-			&& !searchString.isBlank()) {
+		if (searchString != null && !searchHashtagList.isEmpty()) {
 			postPage = postRepository.findAllByPostContentContainingAndHashtags_HashtagContentInAndPostStatus(
 				searchString, searchHashtagList, PostStatus.PUBLISHED, pageable
 			);

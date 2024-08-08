@@ -10,38 +10,39 @@ import {
 } from "@/components/page-header"
 
 import { buttonVariants } from "@/components/ui/button"
+import { Separator } from "@radix-ui/react-select"
 
 export const metadata: Metadata = {
-  title: "Examples",
-  description: "Check out some examples app built using the components.",
+  title: "Forms",
+  description: "Advanced form example using react-hook-form and Zod.",
 }
 
 interface ExamplesLayoutProps {
   children: React.ReactNode
 }
 
-export default function ExamplesLayout({ children }: ExamplesLayoutProps) {
+export default function SignUpLayout({ children }: ExamplesLayoutProps) {
   return (
     <html>
-      <body>
-        <div className="container relative">
-          <PageHeader>
-            <PageHeaderHeading className="hidden md:block">
-              Check out some examples
-            </PageHeaderHeading>
-            <PageHeaderHeading className="md:hidden">Examples</PageHeaderHeading>
-            <PageHeaderDescription>
-              Dashboard, cards, authentication. Some examples built using the
-              components. Use this as a guide to build your own.
-            </PageHeaderDescription>
-          </PageHeader>
-          <section>
-            <div className="overflow-hidden rounded-[0.5rem] border bg-background shadow-md md:shadow-xl">
-              {children}
-            </div>
-          </section>
-        </div>
-      </body>
-    </html>
+    <body>
+      <div className="container relative">
+        <PageHeader>
+          <PageHeaderHeading className="hidden md:block">
+            Check out some examples
+          </PageHeaderHeading>
+          <PageHeaderHeading className="md:hidden">Examples</PageHeaderHeading>
+          <PageHeaderDescription>
+            Dashboard, cards, authentication. Some examples built using the
+            components. Use this as a guide to build your own.
+          </PageHeaderDescription>
+        </PageHeader>
+        <section>
+          <div className="overflow-hidden rounded-[0.5rem] border bg-background shadow-md md:shadow-xl">
+            {children}
+          </div>
+        </section>
+      </div>
+    </body>
+  </html>
   )
 }

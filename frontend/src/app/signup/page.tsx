@@ -1,51 +1,25 @@
 import * as React from "react"
  
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-
-import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/Icons"
+import { Separator } from "@/components/ui/separator";
+import { AccountForm } from "@/components/user-account-form";
  
 export default function LoginForm() {
   return (
-      <Card>
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>
-            Enter your email below to create your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-            </div>
+    <>
+      <div className="hidden space-y-6 p-10 pb-16 md:block">
+        <div className="space-y-0.5">
+          <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
+          <p className="text-muted-foreground">
+            Manage your account settings and set e-mail preferences.
+          </p>
+        </div>
+        <Separator className="my-6" />
+        <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+          <div className="flex-1 lg:max-w-2xl">
+          <AccountForm />
           </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" />
-          </div>
-
-        </CardContent>
-        <CardFooter>
-          <Button className="w-full">Create account</Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
+    </>
   )
 }

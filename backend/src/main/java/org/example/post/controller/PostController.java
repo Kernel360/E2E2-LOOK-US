@@ -38,7 +38,7 @@ public class PostController {
 		);
 
 		// return postService.getAllPostsOrderedBySortStrategy(paginationDto);
-		PaginationDto.PaginationDtoResponse allPostsOrderedBySortStrategy = postService.getAllPostsOrderedBySortStrategy(
+		PaginationDto.PaginationDtoResponse allPostsOrderedBySortStrategy = postService.searchAllPostsBySearchCriteria(
 			paginationDto);
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(allPostsOrderedBySortStrategy);

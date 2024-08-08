@@ -58,7 +58,7 @@ public class WebOAuthSecurityConfig {
 		http.authorizeHttpRequests(authorize -> authorize
 			.requestMatchers("/api/token").permitAll()
 			.requestMatchers("/posts/**").permitAll()
-			.requestMatchers("/api/v1/image/*").permitAll() // TODO: 나중에 GET만 permit 되도록 꼭!!! 수정 필요.
+			.requestMatchers("/api/v1/image/**").permitAll() // TODO: 나중에 GET만 permit 되도록 꼭!!! 수정 필요.
 			.requestMatchers("/api/**").authenticated()
 			.anyRequest().permitAll()
 		);

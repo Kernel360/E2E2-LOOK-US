@@ -95,7 +95,7 @@ class PostServiceTest {
 	}
 
 	@Test
-	@DisplayName("게시물 조회 실패 테스틑")
+	@DisplayName("게시물 조회 실패 테스트")
 	void testSearchAllPostsBySearchCriteria_NoPostsFound() {
 		PaginationDto.PaginationDtoRequest paginationRequestDto = new PaginationDto.PaginationDtoRequest(
 			0, 10, "postId", "DESC", "#test1", "Test"

@@ -115,28 +115,14 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 		this.profileImageId = profileImageId;
 	}
 
-	@Override // 권한 반환
+	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority("user"));
+		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
 	}
 
-	// 사용자의 id 반환
-	public Long getUserId() {
-		return userId;
-	}
-
-	// 사용자의 id를 반환(고유한 값)
 	@Override
 	public String getUsername() {
 		return email;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public Role getRole() {
-		return role;
 	}
 
 	// 사용자의 패스워드 반환

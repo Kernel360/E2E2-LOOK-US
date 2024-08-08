@@ -1,5 +1,6 @@
 package org.example.config.oauth;
 
+import org.example.user.common.RandomName;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.enums.Role;
 import org.example.user.repository.member.UserRepository;
@@ -18,6 +19,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RandomName randomName;
 
 
     @Override
@@ -38,6 +40,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
         String username = oAuth2UserInfo.getUsername();
         String email = oAuth2UserInfo.getEmail();
         String password = passwordEncoder.encode("겟인데어");
+        String nickname = randomName.setsNickName();
 
         UserEntity user = userRepository.findByEmail(email)
                 .map(entity -> entity.update(username))
@@ -45,6 +48,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
                         .username(username)
                         .password(password)
                         .email(email)
+                        .nickname(nickname)
                         .provider(provider)
                         .providerId(providerId)
 						.role(Role.ROLE_USER)

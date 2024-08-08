@@ -22,7 +22,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -34,7 +33,6 @@ public class PostService {
 	private final HashtagRepository hashtagRepository;
 	private final ImageStorageManager imageStorageManager;
 
-	@Transactional
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
 		String email, MultipartFile image) {
 		UserEntity user = userRepository.findByEmail(email)

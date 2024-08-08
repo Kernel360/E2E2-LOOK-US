@@ -1,17 +1,18 @@
 package org.example.post.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.example.post.domain.dto.PaginationDto;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.service.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,9 +20,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -46,15 +44,23 @@ class PostControllerTest {
 		);
 
 		PaginationDto.PaginationDtoResponse paginationResponseDto = new PaginationDto.PaginationDtoResponse(
-			0, 10, 2, 1, "search", postList
+			0, 10, 2, 1, "post", postList
 		);
 
-		when(postService.getAllPostsOrderedBySortStrategy(ArgumentMatchers.any()))
-			.thenReturn(paginationResponseDto);
+		// Call service method test
+		when(postService.getAllPostsOrderedBySortStrategy(argThat(request ->
+			request.page() == 0 &&
+				request.size() == 10 &&
+				"createdAt".equals(request.sortField()) &&
+				"DESC".equals(request.sortDirection()) &&
+				"#tag1".equals(request.searchHashtagList()) &&
+				"post".equals(request.searchString())
+		))).thenReturn(paginationResponseDto);
 
+		// GET test
 		ResultActions result = mockMvc.perform(get("/posts")
 			.param("searchHashtags", "#tag1")
-			.param("searchString", "search")
+			.param("searchString", "post")
 			.param("sortField", "createdAt")
 			.param("sortDirection", "DESC")
 			.param("page", "0")
@@ -67,7 +73,7 @@ class PostControllerTest {
 			.andExpect(jsonPath("$.size").value(10))
 			.andExpect(jsonPath("$.totalElements").value(2))
 			.andExpect(jsonPath("$.totalPages").value(1))
-			.andExpect(jsonPath("$.searchString").value("search"))
+			.andExpect(jsonPath("$.searchString").value("post"))
 			.andExpect(jsonPath("$.postResponseDtoList[0].postId").value(1))
 			.andExpect(jsonPath("$.postResponseDtoList[0].postContent").value("Post Content 1"))
 			.andExpect(jsonPath("$.postResponseDtoList[0].hashtagContents[0]").value("#tag1"))

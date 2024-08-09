@@ -11,6 +11,7 @@ import org.example.post.domain.entity.PostEntity;
 import org.example.user.domain.entity.member.UserEntity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.querydsl.core.annotations.QueryProjection;
 
 public class PostDto {
 	public record CreatePostDtoRequest(
@@ -57,7 +58,7 @@ public class PostDto {
 
 	// TODO: 원래 ID를 받는게 맞지만, 프론트 테스트를 위해서 Resource를 바로 던지는 것으로 변경될 예정입니다.
 	//       이후 프론트 개발이 진행될 때는 image_id를 사용합니다.
-	public record GetPostDtoResponse(
+	public record PostDetailDtoResponse(
 		String nickname,
 		Long postId,
 		Long imageId,
@@ -67,8 +68,30 @@ public class PostDto {
 		LocalDateTime createdAt,
 		LocalDateTime updatedAt
 	) {
-		public static GetPostDtoResponse toDto(PostEntity postEntity) {
-			return new GetPostDtoResponse(
+
+		@QueryProjection
+		public PostDetailDtoResponse(
+			String nickname,
+			Long postId,
+			Long imageId,
+			String postContent,
+			List<String> hashtagContents,
+			Integer likeCount,
+			LocalDateTime createdAt,
+			LocalDateTime updatedAt
+		){
+			this.nickname = nickname;
+			this.postId = postId;
+			this.imageId = imageId;
+			this.postContent = postContent;
+			this.hashtagContents = hashtagContents;
+			this.likeCount = likeCount;
+			this.createdAt = createdAt;
+			this.updatedAt = updatedAt;
+		}
+
+		public static PostDetailDtoResponse toDto(PostEntity postEntity) {
+			return new PostDetailDtoResponse(
 				postEntity.getUser().getNickname(),
 				postEntity.getPostId(),
 				postEntity.getImageId(),
@@ -80,5 +103,42 @@ public class PostDto {
 			);
 		}
 	}
-}
 
+
+	public record PostDtoResponse(
+		String nickname,
+		Long postId,
+		Long imageId
+		// List<String> hashtagContents
+	) {
+
+		@QueryProjection
+		public PostDtoResponse(
+			String nickname,
+			Long postId,
+			Long imageId
+
+		){
+			this.nickname = nickname;
+			this.postId = postId;
+			this.imageId = imageId;
+			// this.hashtagContents = hashtagContents;
+		}
+
+		public static PostDtoResponse toDto(PostEntity postEntity) {
+			return new PostDtoResponse(
+				postEntity.getUser().getNickname(),
+				postEntity.getPostId(),
+				postEntity.getImageId()
+				// postEntity.getHashtagContents() != null ? postEntity.getHashtagContents() : Collections.emptyList()
+			);
+		}
+	}
+
+
+
+
+
+
+
+}

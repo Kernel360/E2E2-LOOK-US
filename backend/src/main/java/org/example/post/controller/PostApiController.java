@@ -43,7 +43,7 @@ public class PostApiController {
 	}
 
 	@GetMapping("/posts/{post_id}")
-	public ResponseEntity<PostDto.GetPostDtoResponse> getPostById(
+	public ResponseEntity<PostDto.PostDetailDtoResponse> getPostById(
 		@PathVariable Long post_id
 	) {
 		return ResponseEntity.status(HttpStatus.OK)

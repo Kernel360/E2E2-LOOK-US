@@ -1,11 +1,8 @@
 // package org.example.blog.presentation.article;
 //
 // import com.fasterxml.jackson.databind.ObjectMapper;
-// import org.example.blog.domain.entity.article.Article;
-// import org.example.user.domain.entity.member.User;
-// import org.example.blog.domain.dto.request.article.AddArticleRequest;
-// import org.example.blog.domain.dto.request.article.UpdateArticleRequest;
-// import org.example.blog.repository.article.BlogRepository;
+//
+// import org.example.user.repository.member.UserRepository;
 // import org.junit.jupiter.api.BeforeEach;
 // import org.junit.jupiter.api.DisplayName;
 // import org.junit.jupiter.api.Test;
@@ -23,7 +20,6 @@
 // import org.springframework.web.context.WebApplicationContext;
 //
 // import java.security.Principal;
-// import java.util.List;
 //
 // import static org.assertj.core.api.Assertions.assertThat;
 // import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,12 +38,13 @@
 //
 //     @Autowired
 //     protected ObjectMapper objectMapper;
+
 //
 //     @Autowired
 //     private WebApplicationContext context;
 //
 //     @Autowired
-//     UserRepository userRepository;
+// 	UserRepository userRepository;
 //
 //     User user;
 //

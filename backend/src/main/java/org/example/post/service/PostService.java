@@ -6,7 +6,6 @@ import java.util.List;
 import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageSaveResult;
 import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
-import org.example.post.domain.dto.PaginationDto;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.PostEntity;
@@ -65,88 +64,11 @@ public class PostService {
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
 	}
 
-	public PaginationDto.PaginationDtoResponse searchAllPostsBySearchCriteria(
-		PaginationDto.PaginationDtoRequest paginationRequestDto
-	) {
-
-		// get information for pagination by DTO
-		int page = paginationRequestDto.page();
-		int size = paginationRequestDto.size();
-		String searchString = paginationRequestDto.searchString();
-		String direction = paginationRequestDto.sortDirection();
-		String field = paginationRequestDto.sortField();
-		List<String> searchHashtagList = new ArrayList<>();
-		if (paginationRequestDto.searchHashtagList() != null) {
-			searchHashtagList = paginationRequestDto.convertHashtagContents(
-				paginationRequestDto.searchHashtagList(), "#");
-		}
-
-		// sort by field ordered by descending
-		Sort sort = Sort.by(field).descending();
-		if (direction.equalsIgnoreCase("ASC")) {
-			// sort by field ordered by ascending
-			sort = Sort.by(field).ascending();
-		}
-
-		// pagination
-		Pageable pageable = PageRequest.of(page, size, sort);
-		Page<PostEntity> postPage = null;
-
-		// search all posts
-		// searchString null and hashtagList null
-		if (searchString == null && searchHashtagList.isEmpty()) {
-			postPage = postRepository.findAllByPostStatus(PostStatus.PUBLISHED, pageable);
-		}
-
-		// search posts containing searchString(post content)
-		// searchString not null
-		if (searchString != null && searchHashtagList.isEmpty()) {
-			postPage = postRepository.findAllByPostContentContainingAndPostStatus(
-				searchString, PostStatus.PUBLISHED, pageable
-			);
-		}
-
-		// search posts containing hashtag content
-		// hashtagList not null
-		if (!searchHashtagList.isEmpty() && searchString == null) {
-			postPage = postRepository.findAllByPostStatusAndHashtags_HashtagContentIn(
-				PostStatus.PUBLISHED, searchHashtagList, pageable
-			);
-		}
-
-		// search posts containing both searchString and hashtag content
-		// get only some posts which must have both elements
-		if (searchString != null && !searchHashtagList.isEmpty()) {
-			postPage = postRepository.findAllByPostContentContainingAndHashtags_HashtagContentInAndPostStatus(
-				searchString, searchHashtagList, PostStatus.PUBLISHED, pageable
-			);
-		}
-
-		// find no post about search condition
-		if (postPage == null) {
-			throw new NullPointerException("No posts found");
-		}
-
-		// DTO for return data
-		PaginationDto.PaginationDtoResponse paginationResponseDto = new PaginationDto.PaginationDtoResponse(
-			page,
-			size,
-			postPage.getTotalElements(),
-			postPage.getTotalPages(),
-			searchString,
-			null
-		);
-
-		List<PostDto.GetPostDtoResponse> postResponseDtos = postPage.stream()
-			.map(PostDto.GetPostDtoResponse::toDto).toList();
-		return paginationResponseDto.withAdditionalPosts(postResponseDtos);
-	}
-
-	public PostDto.GetPostDtoResponse getPostById(Long postId) {
+	public PostDto.PostDetailDtoResponse getPostById(Long postId) {
 		PostEntity postEntity = postRepository.findById(postId)
 			.orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
 
-		return PostDto.GetPostDtoResponse.toDto(postEntity);
+		return PostDto.PostDetailDtoResponse.toDto(postEntity);
 
 	}
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 
 import org.example.config.jwt.TokenProvider;
+import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.entity.token.RefreshToken;
 import org.example.user.repository.token.RefreshTokenRepository;

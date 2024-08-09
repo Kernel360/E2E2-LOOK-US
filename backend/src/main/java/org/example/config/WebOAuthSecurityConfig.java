@@ -8,6 +8,7 @@ import org.example.user.repository.token.RefreshTokenRepository;
 import org.example.user.service.member.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -58,7 +59,8 @@ public class WebOAuthSecurityConfig {
 		http.authorizeHttpRequests(authorize -> authorize
 			.requestMatchers("/api/token").permitAll()
 			.requestMatchers("/posts/**").permitAll()
-			.requestMatchers("/api/v1/image/**").permitAll() // TODO: 나중에 GET만 permit 되도록 꼭!!! 수정 필요.
+			.requestMatchers(HttpMethod.GET, "/api/v1/image/**").permitAll()
+			.requestMatchers("/api/v1/image/**").authenticated()
 			.requestMatchers("/api/**").authenticated()
 			.anyRequest().permitAll()
 		);

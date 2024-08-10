@@ -1,49 +1,34 @@
 import React, { Suspense } from 'react'
-import { useRouter } from 'next/navigation'
-import { PostImage } from '../app/post/[post_id]/page';
+import { postPreviewContent } from '@/app/_api/fetchStyle'
+import Link from 'next/link'
+import { API_PUBLIC_URL } from '@/app/_common/constants'
+import Image from 'next/image'
+import '@/app/(after-login)/posts/gallery.scss'
+import { cn } from '@/lib/utils'
 
-export interface PostPreviewProps {
-    userId: number,
-    postId: number,
-    imageId: number,
-    postContent: string,
-    hashtagContents: string[],
-    likeCount: number,
-    createdAt: Date,
-    updatedAt: Date,
-}
-
-async function PostPreview({
-    postPreviewData
+export default function StylePreview({
+    content,
+    className,
 }: {
-    postPreviewData: PostPreviewProps
+    content: postPreviewContent
+    className?: string
 }) {
-
-    const router = useRouter();
-
     return (
-        <div className=''>
-            <div className="
-        relative before:absolute
-        before:h-full before:w-full
-        before:rounded-3xl
-        before:z-10
-        hover:before:bg-gray-600 
-        before:opacity-50
-        cursor-pointer
-    "
-                onClick={() => router.push(`/post/${postPreviewData.postId}`)}>
-                <Suspense fallback={<div>Loading...</div>}>
-                    <PostImage
-                        className='rounded-3xl cursor-pointer relative z-0'
-                        imageId={postPreviewData.imageId}
-                    />
-                </Suspense>
+        <Link className={cn(className, '')} href={`/posts/${content.postId}`}>
+            <div className='overflow-hidden group'>
+                <Image
+                    className='group-hover:opacity-75'
+                    src={`${API_PUBLIC_URL}/image/${content.imageId}`}
+                    alt='style'
+                    unoptimized={true} // NOTE: used for local host... remove later
+                    priority={true}
+                    width={400}
+                    height={600}
+                    sizes='250px'
+                    // placeholder="blur"
+                    // blurDataURL={photo.blurredDataUrl}
+                />
             </div>
-            <p>hashTag : {`${postPreviewData.hashtagContents}`}</p>
-            <p>postContent : {`${postPreviewData.postContent}`}</p>
-        </div>
+        </Link>
     )
 }
-
-export default PostPreview;

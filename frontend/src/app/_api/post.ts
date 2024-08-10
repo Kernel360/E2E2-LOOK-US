@@ -2,6 +2,8 @@ import { ApiError } from "next/dist/server/api-utils";
 import { API_PRIVATE_URL, API_PUBLIC_URL } from "../_common/constants";
 import { PostFormValues } from "@/components/post-create";
 
+import { getCookie, setCookie } from 'cookies-next';
+
 export interface GetPostResponse {
     userId: number,
     postId: number,
@@ -37,30 +39,64 @@ export interface CreatePostRequest {
     } 
 }
 
-export async function createPost(form: PostFormValues) {
-    const requestUrl = `${API_PRIVATE_URL}/posts`;
+// Create Blob file from URL 
+const dataURLtoBlob = (dataUrl: string) => {
+    const arr = dataUrl.split(",");
 
-    // https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
-    const reqeustBody: CreatePostRequest = {
-        image: form.image,
-        userRequest: {
-            post_content: form.content,
-            hashtag_content: `#${form.hashtags?.join("#")}`
-        }
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    if (!mimeMatch || mimeMatch.length < 2) {
+      throw new Error("Invalid data URL");
     }
 
+    const mime = mimeMatch[1];
+    const bstr = atob(arr[1]);
+    const n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    for (let i = 0; i < n; i++) {
+      u8arr[i] = bstr.charCodeAt(i);
+    }
+
+    return new Blob([u8arr], { type: mime });
+};
+
+/** 
+ * - How to send image blob to server.
+ * https://advanced-cropper.github.io/react-advanced-cropper/docs/guides/recipes/ 
+*/
+export async function createPost(form: PostFormValues) {
+
+    const requestUrl = `${API_PRIVATE_URL}/posts`;
+    const formData = new FormData();
+
+    // 1. append image blob (file format is already set in Blob object)
+    formData.append('image', form.editedImageBlob);
+
+    // 2. append user input data (content, hashtag, etc...)
+    const data = new Blob(
+    [
+        JSON.stringify({
+            post_content: form.content,
+            hashtag_content: `#${form.hashtags?.map(tag => tag.value).join("#")}`
+        })
+    ],{
+        type: 'application/json'
+    });
+    formData.append( 'userRequest', data);
+
+    // 3. send image to server
     const res = await fetch(requestUrl, {
         method: 'POST',
-        body: JSON.stringify(reqeustBody),
-        // image file (form-data)
-        // headers: { "Content-Type": "multipart/form-data" }, // 이 부분 세팅하지 말라는 말이 있음.
-        // (https://muffinman.io/blog/uploading-files-using-fetch-multipart-form-data/)
+        credentials: 'include',
+        headers: { 
+            'Authorization': 'Bearer ' + getCookie('token')
+        },
+        body: formData
     });
 
-
-    if (false === res.ok) {
+    if (!res.ok) {
         // ...
-        // const body = await res.json();
-        throw new ApiError(res.status, "error");
+        const body = await res.json();
+        throw new ApiError(res.status, body);
     }
 }

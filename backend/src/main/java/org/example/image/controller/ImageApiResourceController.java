@@ -36,15 +36,14 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("/api/v1")
-public class ImageResourceController {
+public class ImageApiResourceController {
 
 	private final ImageStorageManager imageStorageManager;
 
-	public ImageResourceController(ImageStorageManager imageStorageManager) {
+	public ImageApiResourceController(ImageStorageManager imageStorageManager) {
 		this.imageStorageManager = imageStorageManager;
 	}
 
-	// TODO: Validate jwt token for image access authority
 	@PostMapping("/image")
 	public ResponseEntity<Long> handleImageUpload(
 		@RequestParam("image") MultipartFile file
@@ -53,19 +52,5 @@ public class ImageResourceController {
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 							 .body(result.resourceLocationId());
-	}
-
-	// TODO: Validate jwt token for image access authority
-	@GetMapping("/image/{resourceId}")
-	@ResponseBody
-	public ResponseEntity<Resource> serveFile(
-		@PathVariable Long resourceId
-	) {
-		StorageFindResult result = this.imageStorageManager.findResourceById(resourceId);
-
-		return ResponseEntity.ok().header(
-			HttpHeaders.CONTENT_DISPOSITION,
-			"attachment; filename=\"" + result.resource().getFilename() + "\""
-		).body(result.resource());
 	}
 }

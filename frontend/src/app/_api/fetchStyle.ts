@@ -11,29 +11,44 @@ export interface postPreviewsAllRequest {
     searchString?: string,
 }
 
+export interface postPreviewContent {
+        nickname: string,
+        postId: number,
+        imageId: number,
+};
+
 // TODO: change this to preview dto later...
 export interface postPreviewsAllResponse {
-    page: number, // 몇번째 페이지의 
-    size: number, // 사이즈는 몇이다.
-    totalElements: number, // 전체 개수
     totalPages: number,
-    searchString: string,
-    postResponseDtoList: GetPostResponse[], // TODO : change later
+    totalElements: number, // 전체 개수
+    pagable: {
+        pageNumber: number,
+        pageSize: number,
+        sort: { 
+            sorted: boolean,
+            empty: boolean,
+            unsorted: boolean,
+         },
+         offset: number,
+         paged: boolean,
+         unpaged: boolean,
+    },
+    first: boolean,
+    last: boolean,
+    size: number,
+    content: postPreviewContent[],
+    numberOfElements: number,
+    emtpy: boolean,
 }
 
 export async function getAllPostPreviews(
     request?: postPreviewsAllRequest
 ) {
 
-    // const requestUrl = `${API_URL}/posts`;
     const requestUrl = `${API_PUBLIC_URL}/posts`;
 
-    // console.log(requestUrl);
+    const res = await fetch(requestUrl, {method: "GET"})
 
-    const res = await fetch(requestUrl, {
-        cache: "no-store",
-        method: "GET",
-    })
 
     if (false === res.ok) {
         // ...
@@ -42,7 +57,6 @@ export async function getAllPostPreviews(
     }
 
     const body = await res.json();
-    // console.log(body);
 
     return body as postPreviewsAllResponse;
 

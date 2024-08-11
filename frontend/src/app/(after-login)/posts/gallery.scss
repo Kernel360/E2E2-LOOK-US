@@ -1,0 +1,13 @@
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+}
+  
+.gallery-item {
+    border-radius: 0.3rem;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+  

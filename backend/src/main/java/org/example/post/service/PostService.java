@@ -9,15 +9,13 @@ import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.PostEntity;
-import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.HashtagRepository;
 import org.example.post.repository.PostRepository;
+import org.example.post.repository.custom.PostSearchCondition;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,6 +60,12 @@ public class PostService {
 		postRepository.save(postEntity);
 
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
+	}
+
+	public Page<PostDto.PostDtoResponse> findAllPosts(
+		PostSearchCondition postSearchCondition, Pageable pageable
+	) {
+		return postRepository.search(postSearchCondition, pageable);
 	}
 
 	public PostDto.PostDetailDtoResponse getPostById(Long postId) {

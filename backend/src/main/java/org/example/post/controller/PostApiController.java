@@ -1,7 +1,12 @@
 package org.example.post.controller;
 
 import org.example.post.domain.dto.PostDto;
+import org.example.post.repository.custom.PostSearchCondition;
 import org.example.post.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +32,7 @@ public class PostApiController {
 
 	private final PostService postService;
 
+	// Permit Only User
 	@Operation(summary = "게시글 작성 API", description = "사용자가 게시글을 작성할 수 있다.")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "ok!!"),
@@ -42,12 +48,5 @@ public class PostApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(post);
 	}
 
-	@GetMapping("/posts/{post_id}")
-	public ResponseEntity<PostDto.PostDetailDtoResponse> getPostById(
-		@PathVariable Long post_id
-	) {
-		return ResponseEntity.status(HttpStatus.OK)
-			.body(postService.getPostById(post_id));
-	}
 
 }

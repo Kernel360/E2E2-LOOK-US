@@ -8,6 +8,7 @@ import org.example.user.repository.token.RefreshTokenRepository;
 import org.example.user.service.member.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -57,8 +58,11 @@ public class WebOAuthSecurityConfig {
 			.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/token").permitAll()
-				.requestMatchers("/posts/**", "/image/**").permitAll() // TODO: 나중에 GET만 permit 되도록 꼭!!! 수정 필요.
-				.requestMatchers("/api/**").hasRole("USER")
+
+				.requestMatchers("/image/**").permitAll() // TODO: 나중에 GET만 permit 되도록 꼭!!! 수정 필요.
+				.requestMatchers("/api/a1/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/api/v1/image/**").permitAll()
+				.requestMatchers("/api/v1/**").hasRole("USER")
 				.anyRequest().permitAll())
 			.oauth2Login(oauth2 -> oauth2
 				.loginPage("/login")

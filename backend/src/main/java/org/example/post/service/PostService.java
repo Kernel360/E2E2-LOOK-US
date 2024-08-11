@@ -1,13 +1,11 @@
 package org.example.post.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageSaveResult;
 import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
-import org.example.post.domain.dto.PaginationDto;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.PostEntity;
@@ -20,12 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -36,25 +31,7 @@ public class PostService {
 	private final UserRepository userRepository;
 	private final HashtagRepository hashtagRepository;
 	private final ImageStorageManager imageStorageManager;
-	// @Transactional
-	// public PostResponseDto createPost(PostRequestDto postDto, String name) {
-	// 	UserEntity user = userRepository.findByUsername(name)
-	// 		.orElseThrow(() -> new IllegalArgumentException("User not found"));
-	//
-	// 	PostEntity postEntity = new PostEntity(    // TODO: getImageFile(url, image 분리 필요)
-	// 		user,
-	// 		postDto.getPostContent(),
-	// 		postDto.getImageFile().toString(),
-	// 		0, // Initialize likeCount
-	// 		PostStatus.PUBLISHED, // Set default status
-	// 		postDto.convertStringsToHashtags(postDto.getHashtagContents())
-	// 	);
-	//
-	// 	PostEntity savedPost = postRepository.save(postEntity);
-	// 	return PostMapper.toDto(savedPost);
-	// }
 
-	@Transactional
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
 		String email, MultipartFile image) {
 		UserEntity user = userRepository.findByEmail(email)
@@ -87,87 +64,11 @@ public class PostService {
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
 	}
 
-	public PaginationDto.PaginationDtoResponse getAllPostsOrderedBySortStrategy(
-		PaginationDto.PaginationDtoRequest paginationRequestDto
-	) {
-
-		// get information for pagination by DTO
-		int page = paginationRequestDto.page();
-		int size = paginationRequestDto.size();
-		String searchString = paginationRequestDto.searchString();
-		String direction = paginationRequestDto.sortDirection();
-		String field = paginationRequestDto.sortField();
-		List<String> searchHashtagList = new ArrayList<>();
-		if(paginationRequestDto.searchHashtagList() != null){
-			searchHashtagList = paginationRequestDto.convertHashtagContents(
-				paginationRequestDto.searchHashtagList(), "#");
-		}
-
-		// sort by field ordered by descending
-		Sort sort = Sort.by(field).descending();
-		if (direction.equalsIgnoreCase("ASC")) {
-			// sort by field ordered by ascending
-			sort = Sort.by(field).ascending();
-		}
-
-		// pagination
-		Pageable pageable = PageRequest.of(page, size, sort);
-		Page<PostEntity> postPage;
-
-		// search all posts
-		// searchString null and hashtagList null
-		postPage = postRepository.findAllByPostStatus(PostStatus.PUBLISHED, pageable);
-
-		// search posts containing searchString(post content)
-		// searchString not null
-		if (searchString != null && !searchString.isBlank()) {
-			postPage = postRepository.findAllByPostContentContainingAndPostStatus(
-				searchString, PostStatus.PUBLISHED, pageable
-			);
-		}
-
-		// search posts containing hashtag content
-		// hashtagList not null
-		if (searchHashtagList != null && !searchHashtagList.isEmpty()) {
-			postPage = postRepository.findAllByPostStatusAndHashtags_HashtagContentIn(
-				PostStatus.PUBLISHED, searchHashtagList, pageable
-			);
-		}
-
-		// search posts containing both searchString and hashtag content
-		// get only some posts which must have both elements
-		if (searchHashtagList != null && searchString != null && !searchHashtagList.isEmpty()
-			&& !searchString.isBlank()) {
-			postPage = postRepository.findAllByPostContentContainingAndHashtags_HashtagContentInAndPostStatus(
-				searchString, searchHashtagList, PostStatus.PUBLISHED, pageable
-			);
-		}
-
-		// find no post about search condition
-		if (postPage == null) {
-			throw new NullPointerException("No posts found");
-		}
-
-		// DTO for return data
-		PaginationDto.PaginationDtoResponse paginationResponseDto = new PaginationDto.PaginationDtoResponse(
-			page,
-			size,
-			postPage.getTotalElements(),
-			postPage.getTotalPages(),
-			searchString,
-			null
-		);
-
-		List<PostDto.GetPostDtoResponse> postResponseDtos = postPage.stream()
-			.map(PostDto.GetPostDtoResponse::toDto).toList();
-		return paginationResponseDto.withAdditionalPosts(postResponseDtos);
-	}
-
-	public PostDto.GetPostDtoResponse getPostById(Long postId) {
+	public PostDto.PostDetailDtoResponse getPostById(Long postId) {
 		PostEntity postEntity = postRepository.findById(postId)
 			.orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
 
-		return PostDto.GetPostDtoResponse.toDto(postEntity);
+		return PostDto.PostDetailDtoResponse.toDto(postEntity);
 
 	}
 

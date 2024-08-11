@@ -27,7 +27,6 @@ public class HashtagEntity {
 	@JoinColumn(name = "post_id", nullable = false)
 	private PostEntity postEntity;
 
-	@Getter
 	@Column(name = "hashtag_content", nullable = false)
 	private String hashtagContent;
 

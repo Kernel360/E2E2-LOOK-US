@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 
 import org.example.config.jwt.TokenProvider;
+import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.entity.token.RefreshToken;
 import org.example.user.repository.token.RefreshTokenRepository;
@@ -28,7 +29,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 	public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
 	public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(1);
-	public static final String REDIRECT_PATH = "/articles"; //redirect 경로
+
+	// TODO: 나중에 프론트 앱 쪽 URL로 해줄 것!
+	public static final String REDIRECT_PATH = "http://localhost:3000"; //redirect 경로
 
 	private final TokenProvider tokenProvider;
 	private final RefreshTokenRepository refreshTokenRepository;

@@ -3,6 +3,7 @@ import { getAllPostPreviews, postPreviewContent } from '../../_api/fetchStyle'
 import StylePreview from '@/components/post-preview'
 import './gallery.scss'
 import { Separator } from '@radix-ui/react-select'
+import HeaderSearch from '@/components/search-bar'
 
 /**
  * @link https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#revalidate
@@ -24,14 +25,17 @@ export default async function Gallery() {
     const styles: postPreviewContent[] = (await getAllPostPreviews()).content
 
     return (
-        <section className='gallery'>
-            {styles?.map((item, index) => (
-                <StylePreview
-                    className='gallery-item'
-                    content={item}
-                    key={index}
-                />
-            ))}
-        </section>
+        <div className=''>
+            <HeaderSearch />
+            <section className='gallery'>
+                {styles?.map((item, index) => (
+                    <StylePreview
+                        className='gallery-item'
+                        content={item}
+                        key={index}
+                    />
+                ))}
+            </section>
+        </div>
     )
 }

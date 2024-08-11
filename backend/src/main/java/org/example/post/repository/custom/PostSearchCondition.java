@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class PostSearchCondition {
 	private String postContent;
-
+	private String hashtags;
 }

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.PostEntity;
@@ -21,7 +22,7 @@ public class PostDto {
 		@JsonProperty("hashtag_content")
 		String hashtagContents
 	) {
-
+		// Split and Convert String to List<HashtagEntity>
 		public List<HashtagEntity> getHashtagEntityFromString(String hashtagContent, String regex) {
 			List<String> hashtagContentList = splitString(hashtagContent, regex);
 			return hashtagContentList.stream()
@@ -29,6 +30,7 @@ public class PostDto {
 				.map(HashtagEntity::new).collect(Collectors.toList());
 		}
 
+		// Split and Convert String to List<String>
 		public List<String> convertHashtagContents(String hashtagContents, String regex) {
 			return Arrays.stream(hashtagContents.split(regex))
 				.filter(s -> !s.isEmpty())
@@ -79,7 +81,7 @@ public class PostDto {
 			Integer likeCount,
 			LocalDateTime createdAt,
 			LocalDateTime updatedAt
-		){
+		) {
 			this.nickname = nickname;
 			this.postId = postId;
 			this.imageId = imageId;
@@ -103,42 +105,34 @@ public class PostDto {
 			);
 		}
 	}
-
-
 	public record PostDtoResponse(
 		String nickname,
 		Long postId,
-		Long imageId
-		// List<String> hashtagContents
+		Long imageId,
+		List<String> hashtags
 	) {
 
+		// Canonical Constructor
 		@QueryProjection
 		public PostDtoResponse(
 			String nickname,
 			Long postId,
-			Long imageId
-
-		){
-			this.nickname = nickname;
-			this.postId = postId;
-			this.imageId = imageId;
-			// this.hashtagContents = hashtagContents;
+			Long imageId,
+			String hashtagContent
+		) {
+			this(nickname, postId, imageId, splitHashtags(hashtagContent));
 		}
 
-		public static PostDtoResponse toDto(PostEntity postEntity) {
-			return new PostDtoResponse(
-				postEntity.getUser().getNickname(),
-				postEntity.getPostId(),
-				postEntity.getImageId()
-				// postEntity.getHashtagContents() != null ? postEntity.getHashtagContents() : Collections.emptyList()
-			);
+		// Helper Method to split hashtagContent into List<String>
+		private static List<String> splitHashtags(String hashtagContent) {
+			if (hashtagContent == null || hashtagContent.isEmpty()) {
+				return List.of();
+			}
+			return Stream.of(hashtagContent.split("#"))
+				.filter(s -> !s.isEmpty())
+				.collect(Collectors.toList());
 		}
 	}
-
-
-
-
-
 
 
 }

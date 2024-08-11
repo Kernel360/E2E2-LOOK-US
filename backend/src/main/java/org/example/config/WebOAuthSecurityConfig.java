@@ -58,10 +58,7 @@ public class WebOAuthSecurityConfig {
 			.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/token").permitAll()
-
-				.requestMatchers("/image/**").permitAll() // TODO: 나중에 GET만 permit 되도록 꼭!!! 수정 필요.
 				.requestMatchers("/api/a1/**").permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/v1/image/**").permitAll()
 				.requestMatchers("/api/v1/**").hasRole("USER")
 				.anyRequest().permitAll())
 			.oauth2Login(oauth2 -> oauth2

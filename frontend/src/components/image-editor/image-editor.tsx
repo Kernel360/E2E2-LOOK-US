@@ -22,7 +22,7 @@ import {
     FixedCropperRef,
 } from 'react-advanced-cropper'
 import { Navigation } from './core/Navigation'
-import { Grid, Undo } from 'lucide-react'
+import { Undo } from 'lucide-react'
 import './image-editor.scss'
 import { Slider } from '../ui/slider'
 import { Button } from '../ui/button'
@@ -30,6 +30,7 @@ import { AdjustableCropperBackground } from './core/AdjustableCropperBackground'
 import 'react-advanced-cropper/dist/style.css'
 import 'react-advanced-cropper/dist/themes/corners.css'
 import { Image } from '../post-create'
+import { IMAGE_ASPECT_RATIO } from '@/app/_common/constants'
 
 // The polyfill for Safari browser. The dynamic require is needed to work with SSR
 if (typeof window !== 'undefined') {
@@ -37,7 +38,6 @@ if (typeof window !== 'undefined') {
 }
 
 // 4:5 Aspect Ratio for Fassion Photo
-const IMAGE_ASPECT_RATIO = 2 / 3
 const CROP_HEIGHT = 700
 const CROP_WIDTH = CROP_HEIGHT * IMAGE_ASPECT_RATIO
 

@@ -4,20 +4,8 @@
 .image-editor {
 	color: $theme-color;
 	border: solid 1px #dfdfdf;
-	&__preview {
-		height: 45px;
-		width: 45px;
-		// background: black;
-		background: rgb(212, 212, 212);
-		border: solid 1px #2b2a30;
-		position: absolute;
-		left: 20px;
-		top: 20px;
-		// border-radius: 50%;
-	}
 	&__cropper {
 		background: #0f0e13;
-		// background: white;
 		height: 800px;
 		max-height: 100vh;
 		position: relative;

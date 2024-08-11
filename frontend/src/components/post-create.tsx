@@ -86,7 +86,8 @@ export function PostContentForm({
     const router = useRouter()
 
     const [image, setImage] = useState<Image | null>(null)
-    const [previewImage, setPreviewImage] = useState<string>('')
+    const [previewImageObjectUrl, setPreviewImageObjectUrl] =
+        useState<string>('')
 
     const form = useForm<PostFormValues>({
         resolver: zodResolver(contentFormSchema),
@@ -105,10 +106,16 @@ export function PostContentForm({
 
             // 2. move to '/posts'
             router.push(`/posts`)
-
-            // 3.
-            router.refresh()
         })(/** IIFE */)
+    }
+
+    function discardCurrentImage() {
+        // 1. discard preview image (object url)
+        URL.revokeObjectURL(previewImageObjectUrl)
+        setPreviewImageObjectUrl('')
+
+        // 2. discard image form data
+        setImage(null)
     }
 
     useEffect(() => {
@@ -118,16 +125,16 @@ export function PostContentForm({
     useEffect(() => {
         if (image && image.blob) {
             form.setValue('editedImageBlob', image.blob)
-            setPreviewImage(URL.createObjectURL(image.blob))
+            setPreviewImageObjectUrl(URL.createObjectURL(image.blob))
         }
         // Revoke the object URL, to allow the garbage collector to destroy the uploaded before file
         return () => {
-            URL.revokeObjectURL(previewImage)
+            URL.revokeObjectURL(previewImageObjectUrl)
         }
     }, [image])
 
     return (
-        <div className=''>
+        <div className=' max-w-2xl'>
             {!image && (
                 <div className=' shadow-md shadow-gray-100'>
                     <ImageEditor setImage={setImage} />
@@ -135,17 +142,17 @@ export function PostContentForm({
             )}
 
             {/* image submitted preview */}
-            {previewImage && (
-                <Avatar className=' flex justify-center relative'>
+            {previewImageObjectUrl && (
+                <Avatar className=' flex justify-center relative shadow-sm'>
                     <AvatarImage
-                        className=' w-full border-t border-gray-200 shadow-sm'
-                        src={previewImage}
+                        className=' w-full'
+                        src={previewImageObjectUrl}
                     />
                     {/* reset image */}
                     <Button
                         variant='outline'
-                        onClick={() => setImage({ blob: undefined })}
-                        className=' absolute right-32 top-5 p-2 '
+                        onClick={discardCurrentImage}
+                        className=' absolute right-8 top-6 p-2 '
                     >
                         <X />
                     </Button>

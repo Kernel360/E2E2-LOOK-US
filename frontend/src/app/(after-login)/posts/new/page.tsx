@@ -17,7 +17,7 @@ export default function PostCreateForm() {
             </div>
 
             <div className='flex flex-col space-y-8 lg:flex-row'>
-                <div className='flex-1 justify-center lg:max-w-2xl'>
+                <div className='flex-1'>
                     <PostContentForm accessToken={cookies().get('token')} />
                 </div>
             </div>

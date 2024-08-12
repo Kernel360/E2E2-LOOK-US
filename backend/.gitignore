@@ -4,6 +4,7 @@ resources/templates/data.sql
 build/
 data/mysql-data
 data/mysql-files
+data/images
 !data/images/Readme.md
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/

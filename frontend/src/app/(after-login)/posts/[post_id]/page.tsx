@@ -1,18 +1,34 @@
 'use client'
 
 import { getPost } from '@/app/_api/post'
-import { Suspense } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Image from 'next/image'
 import styles from './Post.module.scss'
 import { API_PUBLIC_URL } from '@/app/_common/constants'
+import { useRouter } from 'next/navigation'
 
 type Props = {
     params: { post_id: number }
     searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default async function Page({ params, searchParams }: Props) {
-    const post = await getPost(params.post_id)
+export default function Page({ params, searchParams }: Props) {
+    const [post, setPost] = useState<any>(null)
+    const router = useRouter()
+
+    useEffect(() => {
+        const fetchPost = async () => {
+            const post = await getPost(params.post_id)
+            setPost(post)
+        }
+        fetchPost()
+    }, [params.post_id])
+
+    const handleHashtagClick = (hashtag: string) => {
+        // router.push(`/search?hashtags=${encodeURIComponent(hashtag)}`)
+    }
+
+    if (!post) return <div>Loading...</div>
 
     return (
         <div className={styles.container}>
@@ -41,7 +57,17 @@ export default async function Page({ params, searchParams }: Props) {
             </div>
             <div className={styles.content}>{post.postContent}</div>
             <Suspense fallback={<div>Loading...</div>}>
-                <div className={styles.hashtags}>{post.hashtagContents}</div>
+                <div className={styles.hashtags}>
+                    {post.hashtagContents.map((hashtag: string) => (
+                        <span
+                            key={hashtag}
+                            className={styles.hashtag}
+                            onClick={() => handleHashtagClick(hashtag)}
+                        >
+                            #{hashtag}
+                        </span>
+                    ))}
+                </div>
             </Suspense>
         </div>
     )

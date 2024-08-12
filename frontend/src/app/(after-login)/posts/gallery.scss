@@ -1,11 +1,11 @@
 .gallery {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 12px;
+    gap: 6px;
 }
 
 .gallery-item {
-    border-radius: 1rem;
+    // border-radius: 1rem;
     position: relative;
     margin: 0 auto;
     overflow: hidden;
@@ -14,7 +14,7 @@
 @media (max-width: 600px) {
     .gallery {
         grid-template-columns: repeat(
-            3,
+            2,
             1fr
         ); // 모바일에서 3개의 아이템이 보이도록 설정
     }

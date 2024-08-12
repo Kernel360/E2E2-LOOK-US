@@ -3,12 +3,10 @@
 import * as React from 'react'
 
 import { cn } from '@/lib/utils'
-import { Input } from './ui/input'
-import { Label } from './ui/label'
 import { Icons } from './Icons'
 import Link from 'next/link'
 import { buttonVariants } from './ui/button'
-import { API_OAUTH2_URL, API_PUBLIC_URL } from '@/app/_common/constants'
+import { API_OAUTH2_URL } from '@/app/_common/constants'
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 

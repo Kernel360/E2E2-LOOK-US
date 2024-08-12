@@ -2,8 +2,6 @@ import { ApiError } from 'next/dist/server/api-utils'
 import { API_PRIVATE_URL, API_PUBLIC_URL } from '../_common/constants'
 import { PostFormValues } from '@/components/post-create'
 
-import { getCookie, setCookie } from 'cookies-next'
-
 export interface GetPostResponse {
     nickname: string
     postId: number
@@ -20,14 +18,14 @@ export async function getPost(postId: number) {
     const res = await fetch(requestUrl, {
         method: 'GET',
     })
-    // const body = await res.json();
+
+    const body = await res.json();
 
     if (false === res.ok) {
-        // ...
-        // throw new ApiError(res.status, body)
+        throw new ApiError(res.status, body)
     }
 
-    return (await res.json()) as GetPostResponse
+    return body as GetPostResponse
 }
 
 export interface CreatePostRequest {
@@ -36,27 +34,6 @@ export interface CreatePostRequest {
         post_content: string
         hashtag_content: string
     }
-}
-
-// Create Blob file from URL
-const dataURLtoBlob = (dataUrl: string) => {
-    const arr = dataUrl.split(',')
-
-    const mimeMatch = arr[0].match(/:(.*?);/)
-    if (!mimeMatch || mimeMatch.length < 2) {
-        throw new Error('Invalid data URL')
-    }
-
-    const mime = mimeMatch[1]
-    const bstr = atob(arr[1])
-    const n = bstr.length
-    const u8arr = new Uint8Array(n)
-
-    for (let i = 0; i < n; i++) {
-        u8arr[i] = bstr.charCodeAt(i)
-    }
-
-    return new Blob([u8arr], { type: mime })
 }
 
 /**
@@ -88,9 +65,6 @@ export async function createPost(form: PostFormValues) {
     const res = await fetch(requestUrl, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-            Authorization: 'Bearer ' + getCookie('token'),
-        },
         body: formData,
     })
 

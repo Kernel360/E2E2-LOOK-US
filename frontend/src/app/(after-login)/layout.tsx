@@ -20,14 +20,14 @@ export default function RootLayout({
     return (
         <html lang='en'>
             <body className={cn(inter.className)}>
-                <Separator className=' my-10' />
+                {/* <Separator className=' my-10' /> */}
                 <main
-                    className='max-w-5xl mx-auto p-4 overflow-hidden rounded-[0.5rem] 
+                    className='max-w-5xl mx-auto overflow-scroll 
                                     border bg-background shadow-md md:shadow-md'
                 >
                     {children}
                 </main>
-                <Separator className=' my-[7rem]' />
+                {/* <Separator className=' my-[7rem]' /> */}
 
                 {/* TODO: show controlbar if user logged in */}
                 <BottomControlBar />

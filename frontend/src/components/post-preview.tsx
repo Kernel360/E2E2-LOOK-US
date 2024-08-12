@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import { postPreviewContent } from '@/app/_api/fetchStyle'
 import Link from 'next/link'
 import { API_PUBLIC_URL } from '@/app/_common/constants'
@@ -25,8 +25,6 @@ export default function StylePreview({
                     width={400}
                     height={600}
                     sizes='250px'
-                    // placeholder="blur"
-                    // blurDataURL={photo.blurredDataUrl}
                 />
             </div>
         </Link>

@@ -1,13 +1,48 @@
 .gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 6px;
 }
-  
+
 .gallery-item {
-    border-radius: 0.3rem;
+    // border-radius: 1rem;
     position: relative;
-    width: 100%;
+    margin: 0 auto;
     overflow: hidden;
 }
-  
+
+@media (max-width: 600px) {
+    .gallery {
+        grid-template-columns: repeat(
+            2,
+            1fr
+        ); // 모바일에서 3개의 아이템이 보이도록 설정
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1180px) {
+    .gallery {
+        grid-template-columns: repeat(
+            5,
+            1fr
+        ); // 태블릿에서 5개의 아이템이 보이도록 설정
+    }
+}
+
+@media (min-width: 1181px) and (max-width: 1200px) {
+    .gallery {
+        grid-template-columns: repeat(
+            8,
+            1fr
+        ); // 더 큰 화면에서 8개의 아이템이 보이도록 설정
+    }
+}
+
+@media (min-width: 1201px) {
+    .gallery {
+        grid-template-columns: repeat(
+            9,
+            1fr
+        ); // 매우 큰 화면에서는 9개의 아이템이 보이도록 설정
+    }
+}

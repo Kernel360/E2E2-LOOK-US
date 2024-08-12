@@ -47,13 +47,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		long total = queryFactory
 			.select(postEntity.postId.countDistinct())
 			.from(postEntity)
-			.leftJoin(postEntity.user, userEntity)
-			.leftJoin(postEntity.hashtags, hashtagEntity)
+			.leftJoin(postEntity.user, userEntity).fetchJoin()
+			// .leftJoin(postEntity.hashtags, hashtagEntity)
 			.where(builder)
 			.fetchCount();
 
 		List<Tuple> results = queryFactory
-			.select(userEntity.nickname, postEntity.postId, postEntity.imageId, hashtagEntity.hashtagContent)
+			.select(userEntity.nickname, postEntity.postId, postEntity.imageId, hashtagEntity.hashtagContent).distinct()
 			.from(postEntity)
 			.leftJoin(postEntity.user, userEntity)
 			.leftJoin(postEntity.hashtags, hashtagEntity)

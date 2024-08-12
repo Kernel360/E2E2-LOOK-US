@@ -30,8 +30,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 	public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
 	public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(1);
 
-	// TODO: 나중에 프론트 앱 쪽 URL로 해줄 것!
-	public static final String REDIRECT_PATH = "http://localhost:3000"; //redirect 경로
+	public static final String OAUTH2_SUCCESS_REDIRECT_PATH = "http://localhost:3000";
 
 	private final TokenProvider tokenProvider;
 	private final RefreshTokenRepository refreshTokenRepository;
@@ -50,11 +49,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 		String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
 		addAccessTokenToCookie(request, response, accessToken);
-		String targetUrl = getTargetUrl(accessToken);
 
 		clearAuthenticationAttributes(request, response);
 
-		getRedirectStrategy().sendRedirect(request, response, targetUrl); //target url로 redirect
+		getRedirectStrategy().sendRedirect(request, response, OAUTH2_SUCCESS_REDIRECT_PATH);
 	}
 
 	private void saveRefreshToken(Long userId, String newRefreshToken) {
@@ -84,12 +82,5 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 	private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
 		super.clearAuthenticationAttributes(request);
 		authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
-	}
-
-	private String getTargetUrl(String token) {
-		return UriComponentsBuilder.fromUriString(REDIRECT_PATH)
-			.queryParam("token", token)
-			.build()
-			.toUriString();
 	}
 }

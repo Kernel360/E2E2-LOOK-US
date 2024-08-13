@@ -29,10 +29,10 @@ public class UserEntityTest {
 	@Test
 	public void testGetAuthorities() {
 		Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
-		assertThat(authorities).hasSize(2);
+		assertThat(authorities).hasSize(1);
 		// 각 권한이 포함되어 있는지 검증
 		assertThat(authorities).extracting(GrantedAuthority::getAuthority)
-			.containsExactlyInAnyOrder("USER", "ADMIN");
+			.containsExactlyInAnyOrder("ROLE_USER");
 	}
 
 	@DisplayName("user update test")

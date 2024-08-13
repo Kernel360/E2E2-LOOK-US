@@ -54,7 +54,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			.fetchCount();
 
 		List<Tuple> results = queryFactory
-			.select(userEntity.nickname, postEntity.postId, postEntity.imageId, hashtagEntity.hashtagContent, postEntity.likeCount).distinct()
+			.select(userEntity.nickname, postEntity.postId, postEntity.imageId, hashtagEntity.hashtagContent,
+				postEntity.likeCount).distinct()
 			.from(postEntity)
 			.leftJoin(postEntity.user, userEntity)
 			.leftJoin(postEntity.hashtags, hashtagEntity)

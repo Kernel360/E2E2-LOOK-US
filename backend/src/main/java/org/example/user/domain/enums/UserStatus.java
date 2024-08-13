@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public enum UserStatus {
-	USER_STATUS_SIGNED_IN("SIGNIN"), USER_STATUS_SIGNED_OUT("SIGNOUT");
+	USER_STATUS_ACTIVATE("SIGNIN"), USER_STATUS_DEACTIVATE("SIGNOUT");
 	private String userStatusType;
 
 	UserStatus(String userSign) {

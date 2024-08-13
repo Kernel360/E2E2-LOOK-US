@@ -6,27 +6,48 @@ import java.util.function.Supplier;
 import org.springframework.http.HttpStatus;
 
 import jakarta.annotation.Nullable;
-import lombok.Builder;
+import lombok.ToString;
 
-public class ApiException extends RuntimeException {
+@ToString
+public abstract class ApiException extends RuntimeException {
 	private final ApiErrorCategory category;
+	private final ApiErrorSubCategory subCategory;
 	private final Supplier<?> errorDataSupplier;
-
-	public static ApiException UNKNOWN_EXCEPTION() {
-		return new ApiException(ApiErrorCategory.UNKNOWN_ERROR, null);
-	}
 
 	public ApiException(
 		ApiErrorCategory category,
+		@Nullable ApiErrorSubCategory subCategory,
 		@Nullable Supplier<?> setErrorData
 	) {
-		super(category.getErrorCategoryName());
+		super(category.getErrorCategoryDescription());
 		this.category = category;
+		this.subCategory = subCategory;
 		this.errorDataSupplier = setErrorData;
 	}
 
+	/**
+	 * 에러 서브-카테고리를 처리하기 위한 함수입니다.
+	 */
+	public abstract void processEachSubCategoryCase();
+
 	public HttpStatus getHttpStatus() {
 		return this.category.getErrorStatusCode();
+	}
+
+	public String getErrorCategoryDescription() {
+		return this.category.getErrorCategoryDescription();
+	}
+
+	public String getErrorSubCategoryDescription() {
+		return this.subCategory.toString();
+	}
+
+	public ApiErrorSubCategory getErrorSubCategory() {
+		return this.subCategory;
+	}
+
+	public ApiErrorCategory getErrorCategory() {
+		return this.category;
 	}
 
 	public Optional<Object> getErrorData() {

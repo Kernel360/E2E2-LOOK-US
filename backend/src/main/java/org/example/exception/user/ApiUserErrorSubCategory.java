@@ -1,12 +1,16 @@
 package org.example.exception.user;
 
-public enum ApiUserErrorSubCategory {
+import org.example.exception.common.ApiErrorSubCategory;
+
+public enum ApiUserErrorSubCategory implements ApiErrorSubCategory {
 
 	USER_NOT_FOUND("존재하지 않는 사용자입니다."),
 
 	USER_ALREADY_EXISTS("이미 존재하는 사용자입니다."),
 
 	USER_ALREADY_LOGGED_IN("이미 로그인한 사용자입니다."),
+
+	USER_SCRAP_DUPLICATION("리소스 스크랩은 리소스 당 1번만 가능합니다."),
 
 	USER_DEACTIVATE("회원 탈퇴한 유저입니다."),
 

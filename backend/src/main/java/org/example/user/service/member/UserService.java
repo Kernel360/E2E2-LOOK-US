@@ -1,5 +1,8 @@
 package org.example.user.service.member;
 
+import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.user.ApiUserErrorSubCategory;
+import org.example.exception.user.ApiUserException;
 import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageSaveResult;
 import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
@@ -53,13 +56,22 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public UserEntity findById(Long userId) {
 		return userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+							 .orElseThrow(
+								 () -> ApiUserException.builder()
+									 .category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+									 .subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+									 .build()
+							 );
 	}
 
 	@Transactional(readOnly = true)
 	public UserEntity findByEmail(String email) {
 		return userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("unexpected user"));
+							 .orElseThrow(
+								 () -> ApiUserException.builder()
+									 .category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+									 .subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+									 .build()
+							 );
 	}
-
 }

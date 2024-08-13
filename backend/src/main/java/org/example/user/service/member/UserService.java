@@ -113,7 +113,6 @@ public class UserService {
 	public void resignUser(String email, HttpServletRequest request, HttpServletResponse response) {
 		UserEntity userEntity = findByEmail(email);
 		userEntity.setUserStatus(UserStatus.USER_STATUS_DEACTIVATE);
-		userRepository.save(userEntity);
 
 		CookieUtil.deleteCookie(request, response, ACCESS_TOKEN_COOKIE_NAME);
 		CookieUtil.deleteCookie(request, response, REFRESH_TOKEN_COOKIE_NAME);

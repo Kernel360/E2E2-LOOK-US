@@ -42,9 +42,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 			.map(postEntity1 -> new UserDto.UserGetPostsResponse(
 				postEntity1.getImageId(),
 				postEntity1.getPostContent(),
-				postEntity1.getHashtags().stream()
-					.map(HashtagEntity::getHashtagContent)
-					.toList(),
+				postEntity1.getHashtagContents(),
 				postEntity1.getLikeCount()
 			))
 			.toList();

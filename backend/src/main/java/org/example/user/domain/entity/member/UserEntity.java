@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.entity.UserPostLikesEntity;
+import org.example.scrap.domain.entity.ScrapEntity;
 import org.example.user.domain.entity.BaseEntity;
 import org.example.user.domain.enums.Gender;
 import org.example.user.domain.enums.Role;
@@ -79,6 +80,8 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<UserPostLikesEntity> postLikesEntities = new ArrayList<>();
 
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<ScrapEntity> postScrapEntities = new ArrayList<>();
 
 	@Builder
 	public UserEntity(String username, String password, String email, Gender gender, String birth, String nickname,

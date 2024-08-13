@@ -11,6 +11,10 @@ public enum ApiUserErrorSubCategory implements ApiErrorSubCategory {
 	USER_ALREADY_LOGGED_IN("이미 로그인한 사용자입니다."),
 
 	USER_SCRAP_DUPLICATION("리소스 스크랩은 리소스 당 1번만 가능합니다."),
+
+	USER_DEACTIVATE("회원 탈퇴한 유저입니다."),
+
+	USER_UPDATE_IMPOSSIBLE("업데이트 할 회원 정보가 입력되지 않았습니다.")
 	;
 
 	private final String userApiErrorSubCategory;

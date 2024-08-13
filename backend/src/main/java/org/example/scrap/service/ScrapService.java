@@ -16,7 +16,6 @@ import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,14 +27,12 @@ public class ScrapService {
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
 	private final ScrapRepository scrapRepository;
-	private final SimpleControllerHandlerAdapter simpleControllerHandlerAdapter;
 
 	/**
 	 * 사용자가 스크랩한 모든 게시글 Id 리스트를 반환합니다.
 	 */
 	public List<Long> getAllScrapedPostIdByUserEmail(String email) {
-		return this.findUserByEmail(email)
-				   .getPostScrapEntities().stream()
+		return scrapRepository.findAllByUser_Email(email).stream()
 				   .map(ScrapEntity::getId)
 				   .toList();
 	}

@@ -1,5 +1,6 @@
 package org.example.scrap.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.example.post.domain.entity.PostEntity;
@@ -12,4 +13,6 @@ public interface ScrapRepository extends JpaRepository<ScrapEntity, Long> {
 	void deleteByPostAndUser(PostEntity post, UserEntity user);
 
 	Optional<ScrapEntity> findByPost_PostIdAndUser_Email(Long postId, String user);
+
+	List<ScrapEntity> findAllByUser_Email(String email);
 }

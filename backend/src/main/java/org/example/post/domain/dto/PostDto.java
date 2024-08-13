@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.PostEntity;
-import org.example.user.domain.entity.member.UserEntity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
@@ -22,14 +20,6 @@ public class PostDto {
 		@JsonProperty("hashtag_content")
 		String hashtagContents
 	) {
-		// Split and Convert String to List<HashtagEntity>
-		public List<HashtagEntity> getHashtagEntityFromString(String hashtagContent, String regex) {
-			List<String> hashtagContentList = splitString(hashtagContent, regex);
-			return hashtagContentList.stream()
-				.filter(s -> !s.isEmpty())
-				.map(HashtagEntity::new).collect(Collectors.toList());
-		}
-
 		// Split and Convert String to List<String>
 		public List<String> convertHashtagContents(String hashtagContents, String regex) {
 			return Arrays.stream(hashtagContents.split(regex))
@@ -37,14 +27,6 @@ public class PostDto {
 				.collect(Collectors.toList());
 		}
 
-		public List<String> splitString(String str, String regex) {
-			return List.of(str.split(regex));
-		}
-
-		public PostEntity toEntity(UserEntity user, Long imageId) {
-			List<HashtagEntity> hashtags = getHashtagEntityFromString(this.hashtagContents, "#");
-			return new PostEntity(user, this.postContent, imageId, hashtags);
-		}
 	}
 
 	public record CreatePostDtoResponse(
@@ -66,7 +48,7 @@ public class PostDto {
 		Long imageId,
 		String postContent,
 		List<String> hashtagContents,
-		Integer likeCount,
+		int likeCount,
 		LocalDateTime createdAt,
 		LocalDateTime updatedAt
 	) {
@@ -78,7 +60,7 @@ public class PostDto {
 			Long imageId,
 			String postContent,
 			List<String> hashtagContents,
-			Integer likeCount,
+			int likeCount,
 			LocalDateTime createdAt,
 			LocalDateTime updatedAt
 		) {
@@ -109,7 +91,8 @@ public class PostDto {
 		String nickname,
 		Long postId,
 		Long imageId,
-		List<String> hashtags
+		List<String> hashtags,
+		int likeCount
 	) {
 
 		// Canonical Constructor
@@ -118,9 +101,10 @@ public class PostDto {
 			String nickname,
 			Long postId,
 			Long imageId,
-			String hashtagContent
+			String hashtagContent,
+			int likeCount
 		) {
-			this(nickname, postId, imageId, splitHashtags(hashtagContent));
+			this(nickname, postId, imageId, splitHashtags(hashtagContent), likeCount);
 		}
 
 		// Helper Method to split hashtagContent into List<String>
@@ -134,5 +118,8 @@ public class PostDto {
 		}
 	}
 
-
+	public record PostLikeRequest(
+		Long postId
+	) {
+	}
 }

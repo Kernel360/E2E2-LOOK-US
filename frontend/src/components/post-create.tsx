@@ -26,14 +26,10 @@ import { Textarea } from './ui/textarea'
 import { useEffect, useState } from 'react'
 import { ImageEditor } from './image-editor/image-editor'
 import { Separator } from '@radix-ui/react-select'
-import { Delete, Plus, X } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
+import { Plus, X } from 'lucide-react'
+import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
 import { createPost } from '@/app/_api/post'
-import { cookies } from 'next/headers'
-import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies'
-import { setCookie } from 'cookies-next'
 import { useRouter } from 'next/navigation'
-import { revalidatePath } from 'next/cache'
 
 // const ACCEPTED_IMAGE_MIME_TYPES = [
 //     'image/jpeg',
@@ -75,14 +71,7 @@ export interface Image {
     blob?: Blob
 }
 
-export function PostContentForm({
-    accessToken,
-}: {
-    accessToken?: RequestCookie
-}) {
-    // ---------------------------------------
-    // console.log(accessToken?.value);
-    setCookie('token', accessToken?.value)
+export function PostContentForm() {
     const router = useRouter()
 
     const [image, setImage] = useState<Image | null>(null)

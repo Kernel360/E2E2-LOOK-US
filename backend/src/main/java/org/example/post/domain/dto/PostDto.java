@@ -87,6 +87,7 @@ public class PostDto {
 			);
 		}
 	}
+
 	public record PostDtoResponse(
 		String nickname,
 		Long postId,
@@ -121,5 +122,27 @@ public class PostDto {
 	public record PostLikeRequest(
 		Long postId
 	) {
+	}
+	public record PostMyPageDtoResponse(
+		Long postId,
+		Long imageId,
+		String postContent,
+		List<String> hashtagContents,
+		Integer likeCount,
+		LocalDateTime createdAt,
+		LocalDateTime updatedAt
+	) {
+
+		public static PostMyPageDtoResponse toDto(PostEntity postEntity) {
+			return new PostMyPageDtoResponse(
+				postEntity.getPostId(),
+				postEntity.getImageId(),
+				postEntity.getPostContent(),
+				postEntity.getHashtagContents(),
+				postEntity.getLikeCount(),
+				postEntity.getCreatedAt(),
+				postEntity.getUpdatedAt()
+			);
+		}
 	}
 }

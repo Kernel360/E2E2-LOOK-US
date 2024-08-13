@@ -3,6 +3,7 @@ package org.example.exception.storage;
 import java.util.function.Supplier;
 
 import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.common.ApiErrorSubCategory;
 import org.example.exception.common.ApiException;
 
 import jakarta.annotation.Nullable;
@@ -15,15 +16,29 @@ import lombok.Getter;
 @Getter
 public class ApiStorageException extends ApiException {
 
-	private final ApiStorageErrorSubCategory subCategory;
-
 	@Builder
 	protected ApiStorageException(
 		ApiErrorCategory category,
 		ApiStorageErrorSubCategory subCategory,
 		@Nullable Supplier<?> setErrorData
 	) {
-		super(category, setErrorData);
-		this.subCategory = subCategory;
+		super(category, subCategory, setErrorData);
+	}
+
+	@Override
+	public void processEachSubCategoryCase() {
+		ApiErrorSubCategory subCategory = this.getErrorSubCategory();
+
+		switch ( (ApiStorageErrorSubCategory)subCategory ) {
+			case FILE_IS_EMPTY -> {}
+			case FILE_NOT_FOUND -> {}
+			case FILE_NOT_READABLE -> {}
+			case FILE_DUPLICATE -> {}
+			case FILE_READ_IO_FAILURE -> {}
+			case DIRECTORY_NOT_ACCESSIBLE -> {}
+			case RESOURCE_LOCATION_NOT_FOUND -> {}
+			case FILE_SAVE_PROCESS_FAILURE -> {}
+			default -> {}
+		}
 	}
 }

@@ -1,6 +1,8 @@
 package org.example.exception.storage;
 
-public enum ApiStorageErrorSubCategory {
+import org.example.exception.common.ApiErrorSubCategory;
+
+public enum ApiStorageErrorSubCategory implements ApiErrorSubCategory {
 
 	RESOURCE_LOCATION_NOT_FOUND("[ResourceLocationRepository] 리소스의 위치 정보가 존재하지 않습니다."),
 

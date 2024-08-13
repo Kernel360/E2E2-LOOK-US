@@ -9,10 +9,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ApiExceptionHandler {
 
-	@ExceptionHandler(Exception.class)
-	public ApiErrorResponse handleException(Exception error) {
-		log.error("handleException", error);
+	@ExceptionHandler(ApiException.class)
+	public ApiErrorResponse handleApiException(ApiException exception) {
+		log.error(exception.toString(), exception);
+		exception.processEachSubCategoryCase();
 
-		return ApiErrorResponse.UNKNOWN_ERROR();
+		return ApiErrorResponse.from(exception);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ApiErrorResponse handleGlobalException(Exception exception) {
+		log.error("handleException", exception);
+
+		return ApiErrorResponse.UNKNOWN_ERROR(exception);
 	}
 }

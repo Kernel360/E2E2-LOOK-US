@@ -10,6 +10,7 @@ import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.repository.PostRepository;
+import org.example.scrap.domain.dto.ScrapDto;
 import org.example.scrap.domain.entity.ScrapEntity;
 import org.example.scrap.repository.ScrapRepository;
 import org.example.user.domain.entity.member.UserEntity;
@@ -31,14 +32,16 @@ public class ScrapService {
 	/**
 	 * 사용자가 스크랩한 모든 게시글 Id 리스트를 반환합니다.
 	 */
-	public List<Long> getAllScrapedPostIdByUserEmail(String email) {
-		return scrapRepository.findAllByUser_Email(email).stream()
-				   .map(ScrapEntity::getId)
-				   .toList();
+	public ScrapDto.GetAllPostScrapsResponseDto getAllScrapedPostIdByUserEmail(String email) {
+		return new ScrapDto.GetAllPostScrapsResponseDto(
+			scrapRepository.findAllByUser_Email(email).stream()
+						   .map(ScrapEntity::getId)
+						   .toList()
+		);
 	}
 
-	public void scrapPostByPostId(Long postId, String userEmail) {
-		Optional<ScrapEntity> scrap = scrapRepository.findByPost_PostIdAndUser_Email(postId, userEmail);
+	public void scrapPostByPostId(Long postId, String email) {
+		Optional<ScrapEntity> scrap = scrapRepository.findByPost_PostIdAndUser_Email(postId, email);
 
 		if (scrap.isPresent()) {
 			// 스크랩 요청 중복은 프론트에서 부터 처리되어야 합니다.
@@ -51,7 +54,7 @@ public class ScrapService {
 		scrapRepository.save(
 			ScrapEntity.builder()
 				.post(this.findPost(postId))
-				.user(this.findUserByEmail(userEmail))
+				.user(this.findUserByEmail(email))
 				.build()
 		);
 	}

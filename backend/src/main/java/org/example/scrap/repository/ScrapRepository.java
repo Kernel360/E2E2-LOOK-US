@@ -12,7 +12,7 @@ public interface ScrapRepository extends JpaRepository<ScrapEntity, Long> {
 
 	void deleteByPostAndUser(PostEntity post, UserEntity user);
 
-	Optional<ScrapEntity> findByPost_PostIdAndUser_Email(Long postId, String user);
+	Optional<ScrapEntity> findByPost_PostIdAndUser_Email(Long postId, String email);
 
 	List<ScrapEntity> findAllByUser_Email(String email);
 }

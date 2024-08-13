@@ -8,4 +8,5 @@ public interface PostRepositoryCustom {
 	Page<PostDto.PostDtoResponse> search(
 		PostSearchCondition searchCondition, Pageable pageable
 	);
+
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.example.user.domain.entity.BaseEntity;
 import org.example.user.domain.enums.Gender;
 import org.example.user.domain.enums.Role;
+import org.example.user.domain.enums.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Table(name = "user")
@@ -58,16 +60,16 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	@Enumerated(EnumType.STRING)
 	private Role role;
 
+	@Setter
 	private Long profileImageId;
 
 	private String provider;
 
 	private String providerId;
 
-	// // TODO : 고쳐보기
-	// @ColumnDefault("USER_STATUS_SIGNED_IN")    // TODO: 제대로 초기화 되는지 확인 필요
-	// private UserStatus userStatus = UserStatus.USER_STATUS_SIGNED_IN;
-
+	@Setter
+	@Enumerated(EnumType.STRING)
+	private UserStatus userStatus = UserStatus.USER_STATUS_ACTIVATE;
 
 	@Builder
 	public UserEntity(String username, String password, String email, Gender gender, String birth, String nickname,

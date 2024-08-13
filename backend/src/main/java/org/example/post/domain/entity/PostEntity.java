@@ -1,13 +1,14 @@
 package org.example.post.domain.entity;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.example.common.TimeTrackableEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,6 +22,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,36 +49,49 @@ public class PostEntity extends TimeTrackableEntity {
 
 	@Column(name = "post_status", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private PostStatus postStatus; //TODO: build() 에서 제외
+	private PostStatus postStatus = PostStatus.PUBLISHED;
 
-	@Column(name = "like_count", nullable = false, columnDefinition = "INT")
-	@ColumnDefault("0")
-	private Integer likeCount = 0;
+	@Column(name = "like_count", nullable = false)
+	private int likeCount = 0;
 
-	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<HashtagEntity> hashtags;
+	// @Column(name = "like_count", nullable = false, columnDefinition = "INT")
+	// @ColumnDefault("0")
+	// private Integer likeCount = 0;
 
-/*	@OneToMany(mappedBy = "postEntity", fetch = FetchType.LAZY)
-	private List<UserPostLikesEntity> likesList;*/
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	private List<HashtagEntity> hashtags = new ArrayList<>();
 
-	public PostEntity(UserEntity user, String postContent, Long imageId, List<HashtagEntity> hashtags) {
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	private List<LikeEntity> likes = new ArrayList<>();
+
+	@Builder
+	public PostEntity(UserEntity user, String postContent, Long imageId, int likeCount) {
 		this.user = user;
 		this.postContent = postContent;
 		this.imageId = imageId;
-		this.hashtags = hashtags;
-		this.likeCount = 0;
-		this.postStatus = PostStatus.PUBLISHED;
+		this.likeCount = likeCount;
 	}
 
+	public void addHashtags(List<HashtagEntity> hashtags) {
+		this.hashtags.addAll(hashtags);
+	}
 
 	// convert List<HashtagEntity> to List<String>
 	public List<String> getHashtagContents() {
 		return hashtags.stream()
 			.map(HashtagEntity::getHashtagContent)
-			.toList();
+			.collect(Collectors.toList());
 	}
 
-	public void setHashtags(List<HashtagEntity> hashtags) {
-		this.hashtags.addAll(hashtags);
+	public void increaseLikeCount() {
+		this.likeCount++;
+	}
+
+	public void decreaseLikeCount() {
+		this.likeCount--;
+		if (likeCount < 0) {
+			this.likeCount++;
+			throw new IllegalArgumentException("좋아요 수는 음수가 안됩니다");
+		}
 	}
 }

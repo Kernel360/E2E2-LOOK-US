@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.example.post.domain.dto.PostDto;
 import org.springframework.data.domain.Page;
@@ -53,7 +54,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			.fetchCount();
 
 		List<Tuple> results = queryFactory
-			.select(userEntity.nickname, postEntity.postId, postEntity.imageId, hashtagEntity.hashtagContent).distinct()
+			.select(userEntity.nickname, postEntity.postId, postEntity.imageId, hashtagEntity.hashtagContent, postEntity.likeCount).distinct()
 			.from(postEntity)
 			.leftJoin(postEntity.user, userEntity)
 			.leftJoin(postEntity.hashtags, hashtagEntity)
@@ -70,9 +71,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			Long postId = tuple.get(postEntity.postId);
 			Long imageId = tuple.get(postEntity.imageId);
 			String hashtagContent = tuple.get(hashtagEntity.hashtagContent);
+			int likeCount = Optional.ofNullable(tuple.get(postEntity.likeCount)).orElse(0);
 
 			PostDto.PostDtoResponse dto = postDtoMap.computeIfAbsent(postId, id ->
-				new PostDto.PostDtoResponse(nickname, id, imageId, new ArrayList<>())
+				new PostDto.PostDtoResponse(nickname, id, imageId, new ArrayList<>(), likeCount)
 			);
 
 			if (hashtagContent != null && !dto.hashtags().contains(hashtagContent)) {

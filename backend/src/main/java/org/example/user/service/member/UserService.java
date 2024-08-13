@@ -10,7 +10,6 @@ import org.example.exception.user.ApiUserException;
 import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageSaveResult;
 import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
-import org.example.post.domain.dto.PostDto;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.enums.UserStatus;
@@ -41,7 +40,7 @@ public class UserService {
 	) {
 		UserEntity userEntity = getUser(email);
 
-		checkUser(userEntity);
+		isUserAccountDeactivated(userEntity);
 
 		if (profileImage != null && !profileImage.isEmpty()) {
 			StorageSaveResult storageSaveResult = imageStorageManager.saveResource(profileImage,
@@ -79,7 +78,7 @@ public class UserService {
 	public UserDto.UserGetInfoResponse getMyInfo(String email) {
 		UserEntity userEntity = getUser(email);
 
-		checkUser(userEntity);
+		isUserAccountDeactivated(userEntity);
 
 		return UserDto.UserGetInfoResponse.toDto(userEntity,  userRepository.postCount(userEntity));
 	}
@@ -89,7 +88,7 @@ public class UserService {
 		UserEntity userEntity = userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
 
-		checkUser(userEntity);
+		isUserAccountDeactivated(userEntity);
 
 		return userEntity;
 	}
@@ -98,7 +97,7 @@ public class UserService {
 	public UserEntity findByEmail(String email) {
 		UserEntity userEntity = getUser(email);
 
-		checkUser(userEntity);
+		isUserAccountDeactivated(userEntity);
 
 		return userEntity;
 	}
@@ -124,7 +123,7 @@ public class UserService {
 			.orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
 	}
 
-	private void checkUser(UserEntity userEntity) {
+	private void isUserAccountDeactivated(UserEntity userEntity) {
 		if (userEntity.getUserStatus() == UserStatus.USER_STATUS_DEACTIVATE) {
 			throw ApiUserException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)

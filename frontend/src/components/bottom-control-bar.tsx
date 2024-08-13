@@ -12,10 +12,12 @@ export default function BottomControlBar() {
         <div className='fixed bottom-0 border-t border-t-gray-200 left-0 z-50 w-full bg-background shadow-t'>
             <div className='flex justify-center'>
                 <nav className='flex flex-1 max-w-6xl h-20 items-center justify-between px-4'>
-                    <Button variant='ghost'>
-                        <HomeIcon className='h-6 w-6' />
-                        <span className='sr-only'>Home</span>
-                    </Button>
+                    <Link href={'/posts'}>
+                        <Button variant='ghost'>
+                            <HomeIcon className='h-6 w-6' />
+                            <span className='sr-only'>Home</span>
+                        </Button>
+                    </Link>
                     <Button variant='ghost'>
                         <ExpandIcon className='h-6 w-6' />
                         <span className='sr-only'>Explore</span>
@@ -29,15 +31,18 @@ export default function BottomControlBar() {
                         </Button>
                     </Link>
                     {/* ---------------------------------------------------------------- */}
-
-                    <Button variant='ghost'>
-                        <UsersIcon className='h-6 w-6' />
-                        <span className='sr-only'>Profile</span>
-                    </Button>
-                    <Button variant='ghost'>
-                        <SettingsIcon className='h-6 w-6' />
-                        <span className='sr-only'>Settings</span>
-                    </Button>
+                    <Link href={'/mypage'}>
+                        <Button variant='ghost'>
+                            <UsersIcon className='h-6 w-6' />
+                            <span className='sr-only'>Profile</span>
+                        </Button>
+                    </Link>
+                    <Link href={'/settings'}>
+                        <Button variant='ghost'>
+                            <SettingsIcon className='h-6 w-6' />
+                            <span className='sr-only'>Settings</span>
+                        </Button>
+                    </Link>
                 </nav>
             </div>
         </div>

@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.time.Duration;
 
 import org.example.config.jwt.TokenProvider;
+import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.user.ApiUserErrorSubCategory;
+import org.example.exception.user.ApiUserException;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.entity.token.RefreshToken;
+import org.example.user.domain.enums.UserStatus;
 import org.example.user.repository.token.RefreshTokenRepository;
 import org.example.user.service.member.UserService;
 import org.example.util.CookieUtil;
@@ -40,6 +44,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		Authentication authentication) throws IOException {
 		OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 		UserEntity user = userService.findByEmail((String)oAuth2User.getAttributes().get("email"));
+
+		if (user.getUserStatus() == UserStatus.USER_STATUS_DEACTIVATE) {
+			throw ApiUserException.builder()
+				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+				.subCategory(ApiUserErrorSubCategory.USER_DEACTIVATE)
+				.setErrorData(() -> ("입력된 이메일을 다시 확인하세요" + user.getEmail()))
+				.build();
+		}
 
 		String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
 		saveRefreshToken(user.getUserId(), refreshToken);

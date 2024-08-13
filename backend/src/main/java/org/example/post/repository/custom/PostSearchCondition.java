@@ -1,6 +1,5 @@
 package org.example.post.repository.custom;
 
-import java.util.List;
 
 import lombok.Data;
 

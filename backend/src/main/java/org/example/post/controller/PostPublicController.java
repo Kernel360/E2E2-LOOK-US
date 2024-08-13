@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,5 +48,17 @@ public class PostPublicController {
 	) {
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(postService.getPostById(post_id));
+	}
+
+	//TODO : Request Body로 날리기
+	@Operation(summary = "게시글 좋아요 수 가져오는 API", description = "게시글의 좋아요 수를 가져온다")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "ok!!"),
+		@ApiResponse(responseCode = "404", description = "Resource not found!!")
+	})
+	@GetMapping("/likes")
+	public ResponseEntity<Integer> likeCount(@RequestBody PostDto.PostLikeRequest likeRequest) {
+		int likeCount = postService.likeCount(likeRequest.postId());
+		return ResponseEntity.status(HttpStatus.OK).body(likeCount);
 	}
 }

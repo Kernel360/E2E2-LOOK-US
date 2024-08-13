@@ -1,12 +1,8 @@
 package org.example.user.domain.entity.member;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.example.post.domain.entity.PostEntity;
-import org.example.post.domain.entity.UserPostLikesEntity;
-import org.example.scrap.domain.entity.ScrapEntity;
 import org.example.user.domain.entity.BaseEntity;
 import org.example.user.domain.enums.Gender;
 import org.example.user.domain.enums.Role;
@@ -14,7 +10,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,7 +17,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -74,14 +68,6 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	// @ColumnDefault("USER_STATUS_SIGNED_IN")    // TODO: 제대로 초기화 되는지 확인 필요
 	// private UserStatus userStatus = UserStatus.USER_STATUS_SIGNED_IN;
 
-	@OneToMany(mappedBy = "user")
-	private List<PostEntity> posts = new ArrayList<>();
-
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-	private List<UserPostLikesEntity> postLikesEntities = new ArrayList<>();
-
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-	private List<ScrapEntity> postScrapEntities = new ArrayList<>();
 
 	@Builder
 	public UserEntity(String username, String password, String email, Gender gender, String birth, String nickname,

@@ -1,19 +1,16 @@
 package org.example.post.controller;
 
 import org.example.post.domain.dto.PostDto;
-import org.example.post.repository.custom.PostSearchCondition;
 import org.example.post.service.PostService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +23,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class PostApiController {
 
@@ -38,7 +35,7 @@ public class PostApiController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-	@PostMapping(value = "/posts", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<PostDto.CreatePostDtoResponse> createPost(
 		@Valid @RequestPart("userRequest") PostDto.CreatePostDtoRequest userRequest,
 		@RequestPart(value = "image") MultipartFile image) {
@@ -47,6 +44,23 @@ public class PostApiController {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(post);
 	}
+
+	//TODO: request body 로 날리기
+	@Operation(summary = "게시글 좋아요 API", description = "사용자가 게시글에 좋아요를 누를 수 있다")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "ok!!"),
+		@ApiResponse(responseCode = "404", description = "Resource not found!!")
+	})
+	@PatchMapping("/likes")
+	public ResponseEntity<String> like(@RequestBody PostDto.PostLikeRequest likeRequest, Authentication authentication) {
+		Boolean like = postService.like(likeRequest.postId(), authentication.getName());
+		String message = like ? "좋아요 완료" : "좋아요 취소";
+		return ResponseEntity.status(HttpStatus.OK).body(message);
+	}
+
+
+
+
 
 
 }

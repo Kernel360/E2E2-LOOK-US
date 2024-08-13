@@ -46,7 +46,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * @deprecated Auth 헤더가 아닌 Cookie에서 Token을 전달 받으므로, 현재는 사용하지 않습니다.
+     * Auth 헤더가 아닌 Cookie에서 Token을 전달 받으므로, 현재는 사용하지 않습니다.
      */
     private String getAccessToken(String authorizationHeader) {
         String TOKEN_PREFIX = "Bearer ";

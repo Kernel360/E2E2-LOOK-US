@@ -3,6 +3,7 @@ package org.example.exception.user;
 import java.util.function.Supplier;
 
 import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.common.ApiErrorSubCategory;
 import org.example.exception.common.ApiException;
 
 import jakarta.annotation.Nullable;
@@ -15,15 +16,25 @@ import lombok.Getter;
 @Getter
 public class ApiUserException extends ApiException {
 
-	private final ApiUserErrorSubCategory subCategory;
-
 	@Builder
 	protected ApiUserException(
 		ApiErrorCategory category,
 		ApiUserErrorSubCategory subCategory,
 		@Nullable Supplier<?> setErrorData
 	) {
-		super(category, setErrorData);
-		this.subCategory = subCategory;
+		super(category, subCategory, setErrorData);
+	}
+
+	@Override
+	public void processEachSubCategoryCase() {
+		ApiErrorSubCategory subCategory = this.getErrorSubCategory();
+
+		switch ( (ApiUserErrorSubCategory)subCategory ) {
+			case USER_NOT_FOUND -> {}
+			case USER_ALREADY_EXISTS -> {}
+			case USER_ALREADY_LOGGED_IN -> {}
+			case USER_SCRAP_DUPLICATION -> {}
+			default -> {}
+		}
 	}
 }

@@ -1,5 +1,6 @@
-package org.example.follow.domain.entity;
+package org.example.scrap.domain.entity;
 
+import org.example.post.domain.entity.PostEntity;
 import org.example.user.domain.entity.member.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,22 +17,21 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "follow")
+@Table(name = "scrap_post")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Follow {
+public class ScrapEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "follow_id")
+	@Column(name = "scrap_id")
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "follower_id")
-	private UserEntity fromUser;
+	@JoinColumn(name = "user_id")
+	private UserEntity user;
 
 	@ManyToOne
-	@JoinColumn(name = "following_id")
-	private UserEntity toUser;
-
+	@JoinColumn(name = "post_id")
+	private PostEntity post;
 }

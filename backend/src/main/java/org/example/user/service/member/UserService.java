@@ -120,7 +120,12 @@ public class UserService {
 
 	private UserEntity getUser(String email){
 		return userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+							 .orElseThrow(
+								 () -> ApiUserException.builder()
+									 .category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+									 .subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+									 .build()
+							 );
 	}
 
 	private void isUserAccountDeactivated(UserEntity userEntity) {

@@ -16,24 +16,30 @@ import lombok.Getter;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ApiErrorResponse extends ProblemDetail {
 
-	@JsonProperty(value = "error_data")
-	private final Object errorData;
+	protected ApiErrorResponse(ApiException apiException) {
+		super( ProblemDetail.forStatus(apiException.getHttpStatus()) );
+		super.setProperty("data", apiException.getErrorData());
+		super.setProperty("category", apiException.getMessage());
+		super.setProperty("subcategory", apiException.getErrorSubCategoryDescription());
+	}
 
-	protected ApiErrorResponse(
-		ApiException apiException
-	) {
-		super(ProblemDetail.forStatusAndDetail(
-			apiException.getHttpStatus(),
-			apiException.getMessage()
+	private ApiErrorResponse(Exception exception) {
+		super(ProblemDetail.forStatus(
+			ApiErrorCategory.UNKNOWN_ERROR.getErrorStatusCode()
 		));
-		this.errorData = apiException.getErrorData();
+		super.setProperty("category",
+			ApiErrorCategory.UNKNOWN_ERROR.getErrorCategoryDescription()
+		);
+		// TODO: 예외 메시지가 클라이언트에 노출됩니다.
+		//       따라서 배포 버전에서는 아래 힌트가 비활성화 되어야 합니다.
+		super.setProperty("debug-hint", exception.getMessage());
 	}
 
 	public static ApiErrorResponse from(ApiException apiException) {
 		return new ApiErrorResponse(apiException);
 	}
 
-	public static ApiErrorResponse UNKNOWN_ERROR() {
-		return new ApiErrorResponse(ApiException.UNKNOWN_EXCEPTION());
+	public static ApiErrorResponse UNKNOWN_ERROR(Exception exception) {
+		return new ApiErrorResponse(exception);
 	}
 }

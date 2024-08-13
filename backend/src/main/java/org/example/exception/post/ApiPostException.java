@@ -3,6 +3,7 @@ package org.example.exception.post;
 import java.util.function.Supplier;
 
 import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.common.ApiErrorSubCategory;
 import org.example.exception.common.ApiException;
 
 import jakarta.annotation.Nullable;
@@ -15,15 +16,25 @@ import lombok.Getter;
 @Getter
 public class ApiPostException extends ApiException {
 
-	private final ApiPostErrorSubCategory subCategory;
-
 	@Builder
 	protected ApiPostException(
 		ApiErrorCategory category,
 		ApiPostErrorSubCategory subCategory,
 		@Nullable Supplier<?> setErrorData
 	) {
-		super(category, setErrorData);
-		this.subCategory = subCategory;
+		super(category, subCategory, setErrorData);
+	}
+
+	@Override
+	public void processEachSubCategoryCase() {
+		ApiErrorSubCategory subCategory = this.getErrorSubCategory();
+
+		switch ((ApiPostErrorSubCategory)subCategory) {
+			case POST_DELETED -> {}
+			case POST_DISABLED -> {}
+			case POST_NOT_FOUND -> {}
+			case POST_INVALID_SCRAP_STATUS -> {}
+			default -> {}
+		}
 	}
 }

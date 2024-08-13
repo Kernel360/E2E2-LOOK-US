@@ -3,6 +3,9 @@ package org.example.post.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.post.ApiPostErrorSubCategory;
+import org.example.exception.post.ApiPostException;
 import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageSaveResult;
 import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
@@ -70,10 +73,13 @@ public class PostService {
 
 	public PostDto.PostDetailDtoResponse getPostById(Long postId) {
 		PostEntity postEntity = postRepository.findById(postId)
-			.orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
+											  .orElseThrow(
+												  () -> ApiPostException.builder()
+													  .category(ApiErrorCategory.RESOURCE_UNAUTHORIZED)
+													  .subCategory(ApiPostErrorSubCategory.POST_NOT_FOUND)
+													  .build()
+											  );
 
 		return PostDto.PostDetailDtoResponse.toDto(postEntity);
-
 	}
-
 }

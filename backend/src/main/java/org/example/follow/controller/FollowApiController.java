@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/me/follow")
-public class FollowController {
+public class FollowApiController {
 
 	private final FollowService followService;
 

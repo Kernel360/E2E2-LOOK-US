@@ -37,7 +37,9 @@
 - 마이페이지
 
 ## 🎨 Frontend Wireframe
+![image](https://github.com/user-attachments/assets/aad0b6ab-36a5-4a84-b2fe-8dae9df73b44)
 
+![image](https://github.com/user-attachments/assets/31b5f20d-de5d-4329-915c-1fe87ba66c74)
 
 ## 🔧 Stack
 

@@ -1,7 +1,11 @@
 package org.example.post.domain.entity;
 
+import java.time.LocalDateTime;
+
 import org.example.common.TimeTrackableEntity;
 import org.example.user.domain.entity.member.UserEntity;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,6 +26,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @Table(name = "\"like\"")
+@SQLDelete(sql = "UPDATE `like` SET removed_at = CURRENT_TIMESTAMP WHERE id=?")
+@Where(clause = "removed_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LikeEntity extends TimeTrackableEntity {
 
@@ -38,6 +44,8 @@ public class LikeEntity extends TimeTrackableEntity {
 	@JoinColumn(name = "post_id")
 	private PostEntity post;
 
+	@Column(name = "removed_at")
+	private LocalDateTime removedAt;
 
 	public static LikeEntity toEntity(UserEntity user, PostEntity post) {
 		return LikeEntity.builder()

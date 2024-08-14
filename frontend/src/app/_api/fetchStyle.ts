@@ -54,11 +54,18 @@ export interface postPreviewsAllResponse {
     empty: boolean
 }
 export async function getAllPostPreviews(request?: postPreviewsAllRequest) {
-    const { page, size, sort, direction, hashtags, postContent } = request || {}
+    const {
+        page = 0,
+        size = 10,
+        sort,
+        direction,
+        hashtags,
+        postContent,
+    } = request || {}
 
     const params = new URLSearchParams()
-    if (page) params.append('page', String(page))
-    if (size) params.append('size', String(size))
+    params.append('page', String(page))
+    params.append('size', String(size))
     if (sort) params.append('sort', sort)
     if (direction) params.append('direction', direction)
     if (hashtags) params.append('hashtags', hashtags)

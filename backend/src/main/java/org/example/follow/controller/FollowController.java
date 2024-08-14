@@ -1,12 +1,13 @@
 package org.example.follow.controller;
 
+import org.example.follow.domain.dto.FollowRequestDto;
 import org.example.follow.domain.enums.FollowStatus;
 import org.example.follow.service.FollowService;
+import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.service.member.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,20 +26,18 @@ public class FollowController {
 	/**
 	 * 팔로우, 언팔로우
 	 */
-	@PutMapping("/follows/{user_id}")
+	@PutMapping("/follow")
 	public ResponseEntity handleFollow(
-		@PathVariable("user_id") Long user_id,
-		@RequestBody FollowRequest followRequest
+		@RequestBody FollowRequestDto requestDto
 	) {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		FollowStatus status = FollowStatus.fromStatus(followRequest.getStatus());
-
-		switch (status) {
+		String fromUser = SecurityContextHolder.getContext().getAuthentication().getName();
+		String toUser = requestDto.getNickname();
+		switch (requestDto.getFollowStatus()) {
 			case FOLLOW:
-				followService.follow(email, user_id);
+				followService.follow(fromUser, toUser);
 				break;
 			case UNFOLLOW:
-				followService.unFollow(email, user_id);
+				followService.unFollow(fromUser, toUser);
 				break;
 			default:
 				return ResponseEntity.badRequest().body("Invalid status value");
@@ -48,36 +47,25 @@ public class FollowController {
 	}
 
 
-	// Request Body로 받을 클래스 정의
-	public static class FollowRequest {
-		private int status;
-
-		public int getStatus() {
-			return status;
-		}
-
-		public void setStatus(int status) {
-			this.status = status;
-		}
-	}
-
 	/**
-	 * 나의 전체 팔로우/팔로워 리스트 조회
+	 * 특정 사용자의 팔로우/팔로워 리스트 조회
 	 * GET
 	 */
-/*	@GetMapping("/relation")
+	@GetMapping("/follow/relation")
 	public ResponseEntity getFollowList(
-		@RequestParam("type") String followType
+		@RequestParam("type") String followType,
+		@RequestParam("nickname") String targetUserNickname
 	) {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		if (followType.equals("followers")) {
-			followService.followerList()
-		} else if (followType.equals("followings")) {
-
-
+		String loggedInUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		UserEntity loggedInUser = userService.findByEmail(loggedInUserEmail);
+		if (followType.equals("followers")) { //targetUser를 팔로우하는 사람들 목록 조회 (팔로워 조회)
+			return ResponseEntity.ok().body(followService.followerList(targetUserNickname, loggedInUser));
+		} else if (followType.equals("followings")) { //targetUser가 팔로우 하고있는 사람들 목록 조회 (팔로잉 조회)
+			return ResponseEntity.ok().body(followService.followingList(targetUserNickname, loggedInUser));
 		}
 
-	}*/
+		return ResponseEntity.badRequest().body("Invalid follow type");
+	}
 
 
 }

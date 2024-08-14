@@ -19,8 +19,16 @@ export default function RootLayout({
     return (
         <html lang='en'>
             <body className={cn(inter.className)}>
-                <main className='max-w-6xl mx-auto'>{children}</main>
-                {/* TODO: show controlbar if user logged in */}
+                <main
+                    className='max-w-5xl mt-8 ml-4 mr-4'
+                    style={{
+                        overflow: 'visible', // 스크롤 해제
+                        paddingBottom: '80px', // BottomControlBar의 높이만큼 패딩 추가
+                    }}
+                >
+                    {children}
+                </main>
+                <BottomControlBar />
             </body>
         </html>
     )

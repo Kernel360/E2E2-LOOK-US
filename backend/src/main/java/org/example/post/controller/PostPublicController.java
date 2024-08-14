@@ -42,6 +42,11 @@ public class PostPublicController {
 	}
 
 	// Permit All
+	@Operation(summary = "게시글 상세 조회 API", description = "게시글 ID를 통해 게시글 조회에 필요한 데이터 반환")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "ok!!"),
+		@ApiResponse(responseCode = "404", description = "Resource not found!!")
+	})
 	@GetMapping("/posts/{post_id}")
 	public ResponseEntity<PostDto.PostDetailDtoResponse> getPostById(
 		@PathVariable Long post_id

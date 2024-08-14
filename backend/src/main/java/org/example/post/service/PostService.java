@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
+import org.example.exception.user.ApiUserErrorSubCategory;
+import org.example.exception.user.ApiUserException;
 import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageSaveResult;
 import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
@@ -12,7 +14,7 @@ import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.LikeEntity;
 import org.example.post.domain.entity.PostEntity;
-import org.example.post.repository.HashtagRepository;
+import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.LikeRepository;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.PostSearchCondition;
@@ -33,14 +35,12 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
-	private final HashtagRepository hashtagRepository;
 	private final ImageStorageManager imageStorageManager;
 	private final LikeRepository likeRepository;
 
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
 		String email, MultipartFile image) {
-		UserEntity user = userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		UserEntity user = findUserByEmail(email);
 
 		StorageSaveResult storageSaveResult = imageStorageManager.saveResource(image,
 			StorageType.LOCAL_FILE_SYSTEM);
@@ -61,6 +61,52 @@ public class PostService {
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
 	}
 
+	public PostDto.CreatePostDtoResponse updatePost(PostDto.CreatePostDtoRequest updateRequest, MultipartFile image,
+		String email, Long postId) {
+		UserEntity user = findUserByEmail(email);
+
+		PostEntity post = findPostById(postId);
+
+		// check if post is disable
+		if (post.getPostStatus().equals(PostStatus.DISABLED)) {
+			throw ApiPostException.builder()
+				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+				.subCategory(ApiPostErrorSubCategory.POST_DISABLED)
+				.build();
+		}
+
+		// check user is right author of post
+		if (post.getUser().equals(user)) {
+			throw ApiPostException.builder()
+				.category(ApiErrorCategory.RESOURCE_UNAUTHORIZED)
+				.subCategory(ApiPostErrorSubCategory.POST_INVALID_AUTHOR)
+				.build();
+		}
+
+		if(!image.isEmpty()) {
+			StorageSaveResult storageSaveResult = imageStorageManager.saveResource(
+				image,
+				StorageType.LOCAL_FILE_SYSTEM
+			);
+			post.updateImage(storageSaveResult.resourceLocationId());
+		}
+
+		if(updateRequest.postContent() != null) {
+			post.updatePostContent(updateRequest.postContent());
+		}
+
+		if(updateRequest.hashtagContents() != null) {
+			post.updateHashtags(
+				updateRequest.convertHashtagContents(updateRequest.hashtagContents(), "#")
+					.stream()
+					.map(hashtag -> new HashtagEntity(post, hashtag))
+					.toList()
+			);
+		}
+
+		return PostDto.CreatePostDtoResponse.toDto(post);
+	}
+
 	@Transactional(readOnly = true)
 	public Page<PostDto.PostDtoResponse> findAllPosts(
 		PostSearchCondition postSearchCondition, Pageable pageable
@@ -70,23 +116,15 @@ public class PostService {
 
 	@Transactional(readOnly = true)
 	public PostDto.PostDetailDtoResponse getPostById(Long postId) {
-		PostEntity postEntity = postRepository.findById(postId)
-											  .orElseThrow(
-												  () -> ApiPostException.builder()
-													  .category(ApiErrorCategory.RESOURCE_UNAUTHORIZED)
-													  .subCategory(ApiPostErrorSubCategory.POST_NOT_FOUND)
-													  .build()
-											  );
+		PostEntity post = findPostById(postId);
 
-		return PostDto.PostDetailDtoResponse.toDto(postEntity);
+		return PostDto.PostDetailDtoResponse.toDto(post);
 	}
 
 	public Boolean like(Long postId, String email) {
-		PostEntity post = postRepository.findById(postId)
-			.orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
+		PostEntity post = findPostById(postId);
 
-		UserEntity user = userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		UserEntity user = findUserByEmail(email);
 
 		// user 는 like 을 한번 만 누를 수 있다.
 		if (existLikePost(user, post)) {
@@ -115,9 +153,33 @@ public class PostService {
 	}
 
 	public int likeCount(Long postId) {
-		PostEntity post = postRepository.findById(postId)
-			.orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
+		PostEntity post = findPostById(postId);
 
 		return likeRepository.likeCount(post);
 	}
+
+	private PostEntity findPostById(Long postId) {
+
+		return postRepository.findById(postId)
+			.orElseThrow(
+				() -> ApiPostException.builder()
+					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+					.subCategory(ApiPostErrorSubCategory.POST_NOT_FOUND)
+					.setErrorData(() -> ("잘못된 게시글 조회 요청입니다."))
+					.build()
+			);
+
+	}
+
+	private UserEntity findUserByEmail(String email) {
+		return userRepository.findByEmail(email)
+			.orElseThrow(
+				() -> ApiUserException.builder()
+					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+					.subCategory(ApiUserErrorSubCategory.USER_DEACTIVATE)
+					.setErrorData(() -> ("입력된 이메일을 다시 확인하세요" + email))
+					.build()
+			);
+	}
+
 }

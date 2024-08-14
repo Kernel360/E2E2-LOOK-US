@@ -39,6 +39,7 @@ public class UserDto {
 		String birth,
 		String nickname,
 		String instaId,
+		Long imageId,
 		int postNum
 
 	) {
@@ -51,6 +52,7 @@ public class UserDto {
 				userEntity.getBirth(),
 				userEntity.getNickname(),
 				userEntity.getInstaId(),
+				userEntity.getProfileImageId(),
 				postNum
 			);
 		}

@@ -1,8 +1,10 @@
 package org.example.post.controller;
 
 import org.example.exception.common.ApiErrorCategory;
+
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
+
 import org.example.post.domain.dto.PostDto;
 import org.example.post.service.PostService;
 import org.example.user.domain.entity.member.UserEntity;
@@ -52,6 +54,33 @@ public class PostApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(post);
 	}
 
+	@Operation(summary = "게시글 수정 API", description = "게시물 작성자가 게시글을 수정할 수 있다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "ok!!"),
+		@ApiResponse(responseCode = "404", description = "Resource not found!!")
+	})
+	@PatchMapping(path = "/{post_id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<PostDto.CreatePostDtoResponse> updatePost(
+		@RequestPart PostDto.CreatePostDtoRequest updateRequest,
+		@RequestPart(value = "image") MultipartFile image,
+		@PathVariable Long post_id
+	) {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		if (updateRequest.postContent().isEmpty() &&
+			updateRequest.hashtagContents().isEmpty() &&
+			image.isEmpty()) {
+			throw ApiPostException.builder()
+				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+				.subCategory(ApiPostErrorSubCategory.POST_INVALID_UPDATE)
+				.setErrorData(() -> "업데이트할 게시글 정보가 입력되지 않았습니다.")
+				.build();
+		}
+
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(postService.updatePost(updateRequest, image, email, post_id));
+	}
+
 	//TODO: request body 로 날리기
 	@Operation(summary = "게시글 좋아요 API", description = "사용자가 게시글에 좋아요를 누를 수 있다")
 	@ApiResponses({
@@ -65,11 +94,12 @@ public class PostApiController {
 		// String message = like ? "좋아요 완료" : "좋아요 취소";
 		return ResponseEntity.status(HttpStatus.OK).body(like);
 	}
-
+  
 	@DeleteMapping("")
 	public ResponseEntity<Void> deletePost(@RequestBody PostDto.PostIdRequest deleteRequest, Authentication authentication) {
 
 		postService.delete(deleteRequest.postId(), authentication.getName());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
+
 }

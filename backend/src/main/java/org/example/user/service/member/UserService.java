@@ -38,34 +38,34 @@ public class UserService {
 		String email,
 		MultipartFile profileImage
 	) {
-		UserEntity userEntity = getUser(email);
+		UserEntity user = getUser(email);
 
-		isUserAccountDeactivated(userEntity);
+		isUserAccountDeactivated(user);
 
 		if (profileImage != null && !profileImage.isEmpty()) {
 			StorageSaveResult storageSaveResult = imageStorageManager.saveResource(profileImage,
 				StorageType.LOCAL_FILE_SYSTEM);
-			userEntity.updateProfileImage(storageSaveResult.resourceLocationId());
+			user.updateProfileImage(storageSaveResult.resourceLocationId());
 		}
 
 		if(updateRequest != null) {
-			userEntity.updateDetails(updateRequest.birth(), updateRequest.instaId(), updateRequest.nickName(),
+			user.updateDetails(updateRequest.birth(), updateRequest.instaId(), updateRequest.nickName(),
 				updateRequest.gender());
 		}
 
 		// UserEntity savedUser = userRepository.save(user);
-		return UserDto.UserUpdateResponse.toDto(userEntity);
+		return UserDto.UserUpdateResponse.toDto(user);
 
 	}
 
 	public Long saveUser(UserDto.UserCreateRequest addUserRequest) {
-		UserEntity userEntity = getUser(addUserRequest.email());
+		UserEntity user = getUser(addUserRequest.email());
 
-		if (userEntity.getUserStatus() == UserStatus.USER_STATUS_DEACTIVATE) {
-			userEntity.setUserStatus(UserStatus.USER_STATUS_ACTIVATE);
-			userRepository.save(userEntity);
+		if (user.getUserStatus() == UserStatus.USER_STATUS_DEACTIVATE) {
+			user.setUserStatus(UserStatus.USER_STATUS_ACTIVATE);
+			userRepository.save(user);
 
-			return userEntity.getUserId();
+			return user.getUserId();
 		}
 
 		return userRepository.save(UserEntity.builder()
@@ -76,42 +76,46 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public UserDto.UserGetInfoResponse getMyInfo(String email) {
-		UserEntity userEntity = getUser(email);
+		UserEntity user = getUser(email);
 
-		isUserAccountDeactivated(userEntity);
+		isUserAccountDeactivated(user);
 
-		return UserDto.UserGetInfoResponse.toDto(userEntity,  userRepository.postCount(userEntity));
+		return UserDto.UserGetInfoResponse.toDto(user,  userRepository.postCount(user));
 	}
 
 	@Transactional(readOnly = true)
 	public UserEntity findById(Long userId) {
-		UserEntity userEntity = userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+		UserEntity user = userRepository.findById(userId)
+			.orElseThrow(() -> ApiUserException.builder()
+				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+				.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+				.setErrorData(() -> "찾을 수 없는 유저입니다.")
+				.build());
 
-		isUserAccountDeactivated(userEntity);
+		isUserAccountDeactivated(user);
 
-		return userEntity;
+		return user;
 	}
 
 	@Transactional(readOnly = true)
 	public UserEntity findByEmail(String email) {
-		UserEntity userEntity = getUser(email);
+		UserEntity user = getUser(email);
 
-		isUserAccountDeactivated(userEntity);
+		isUserAccountDeactivated(user);
 
-		return userEntity;
+		return user;
 	}
 
 	@Transactional(readOnly = true)
 	public List<UserDto.UserGetPostsResponse> getMyPosts(String email) {
-		UserEntity userEntity = getUser(email);
+		UserEntity user = getUser(email);
 
-		return userRepository.postList(userEntity);
+		return userRepository.postList(user);
 	}
 
 	public void resignUser(String email, HttpServletRequest request, HttpServletResponse response) {
-		UserEntity userEntity = findByEmail(email);
-		userEntity.setUserStatus(UserStatus.USER_STATUS_DEACTIVATE);
+		UserEntity user = findByEmail(email);
+		user.setUserStatus(UserStatus.USER_STATUS_DEACTIVATE);
 
 		CookieUtil.deleteCookie(request, response, ACCESS_TOKEN_COOKIE_NAME);
 		CookieUtil.deleteCookie(request, response, REFRESH_TOKEN_COOKIE_NAME);

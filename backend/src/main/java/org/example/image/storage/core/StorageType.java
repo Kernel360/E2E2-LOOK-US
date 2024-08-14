@@ -4,7 +4,6 @@ public enum StorageType {
 	/**
 	 * 서버 로컬 파일 시스템을 스토리지로 사용합니다.
 	 */
-	@Deprecated
 	LOCAL_FILE_SYSTEM,
 
 	/**

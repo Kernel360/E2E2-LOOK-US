@@ -3,6 +3,9 @@ package org.example.follow.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.user.ApiUserErrorSubCategory;
+import org.example.exception.user.ApiUserException;
 import org.example.follow.domain.dto.FollowResponseDto;
 import org.example.follow.domain.entity.Follow;
 import org.example.follow.repository.FollowRepository;
@@ -23,18 +26,25 @@ public class FollowService {
 
 	//follow 거는 경우
 	public String follow(String email, String nickname) {
-		UserEntity fromUser = userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-		UserEntity toUser = userRepository.findByNickname(nickname)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		UserEntity fromUser = this.getUserByEmail(email);
+		UserEntity toUser = this.getUserByNickname(nickname);
 
 		if (fromUser.equals(toUser)) {
-			throw new IllegalArgumentException("You cannot follow yourself");
+			throw ApiUserException.builder()
+				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+				.subCategory(ApiUserErrorSubCategory.USER_FOLLOW_INVALID_REQUEST)
+				.build();
 		}
 
-		followRepository.findByFromUserAndToUser(fromUser, toUser)
-			.ifPresent(f -> { throw new IllegalArgumentException("Already following this user"); });
+		followRepository
+			.findByFromUserAndToUser(fromUser, toUser)
+			.ifPresent((follow) -> {
+				throw ApiUserException.builder()
+					.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+					.subCategory(ApiUserErrorSubCategory.USER_FOLLOW_INVALID_REQUEST)
+					.setErrorData(() -> String.format("%s --> %s", follow.getFromUser(), follow.getToUser()))
+					.build();
+			});
 
 		Follow follow = Follow.builder()
 			.fromUser(fromUser)
@@ -46,34 +56,32 @@ public class FollowService {
 	}
 
 	public String unFollow(String email, String nickname) {
-		UserEntity fromUser = userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("User not found")); //팔로우하려는 사용자의 정보가 없을 경우 예외처리
+		UserEntity fromUser = this.getUserByEmail(email);
+		UserEntity toUser = this.getUserByNickname(nickname);
 
-		UserEntity toUser = userRepository.findByNickname(nickname)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-		//fromUser, toUser간 팔로우 관계 삭제하기
 		Follow follow = followRepository.findByFromUserAndToUser(fromUser, toUser)
-			.orElseThrow(() -> new IllegalArgumentException("Follow relation not found"));
-
+										.orElseThrow(
+											() -> ApiUserException.builder()
+												.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+												.subCategory(ApiUserErrorSubCategory.USER_FOLLOW_INVALID_REQUEST)
+												.build()
+										);
 		followRepository.delete(follow);
+
 		return "Success";
 	}
 
-	public List<FollowResponseDto> followingList(String targetUserName, UserEntity requestUser) {
-		UserEntity targetUser = userRepository.findByNickname(targetUserName)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
-
+	public List<FollowResponseDto> followingList(String targetUserName) {
+		UserEntity targetUser = this.getUserByNickname(targetUserName);
 		List<Follow> list = followRepository.findByFromUser(targetUser);
 		List<FollowResponseDto> followList = new ArrayList<>();
 
 		for (Follow follow : list) {
 			UserEntity toUser = follow.getToUser();
-			int followersCount = followRepository.findByToUser(toUser).size();
-			String status = findStatus(toUser, requestUser);
+
 			followList.add(new FollowResponseDto(
 				toUser.getNickname(),
-				followersCount,
+				followRepository.findByToUser(toUser).size(),
 				toUser.getProfileImageId()
 			));
 		}
@@ -81,20 +89,17 @@ public class FollowService {
 		return followList;
 	}
 
-	public List<FollowResponseDto> followerList(String targetUserName, UserEntity requestUser) {
-		UserEntity targetUser = userRepository.findByNickname(targetUserName)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
-
+	public List<FollowResponseDto> followerList(String targetUserName) {
+		UserEntity targetUser = this.getUserByNickname(targetUserName);
 		List<Follow> list = followRepository.findByToUser(targetUser);
 		List<FollowResponseDto> followList = new ArrayList<>();
 
 		for (Follow follow : list) {
 			UserEntity fromUser = follow.getFromUser();
-			int followersCount = followRepository.findByToUser(fromUser).size();
-			String status = findStatus(fromUser, requestUser);
+
 			followList.add(new FollowResponseDto(
 				fromUser.getNickname(),
-				followersCount,
+				followRepository.findByToUser(fromUser).size(),
 				fromUser.getProfileImageId()
 			));
 		}
@@ -102,11 +107,23 @@ public class FollowService {
 		return followList;
 	}
 
-	//A와 B의 follow관계 찾기
-	private String findStatus(UserEntity selectedUser, UserEntity requestUser) {
-		if (selectedUser.equals(requestUser)) {
-			return "self";
-		}
-		return followRepository.findByFromUserAndToUser(requestUser, selectedUser).isPresent() ? "following" : "none";
+	private UserEntity getUserByEmail(String email) throws ApiUserException {
+		return userRepository.findByEmail(email)
+							 .orElseThrow(
+								 () -> ApiUserException.builder()
+									 .category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+									 .subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+									 .build()
+							 );
+	}
+
+	private UserEntity getUserByNickname(String nickname) throws ApiUserException {
+		return userRepository.findByNickname(nickname)
+							 .orElseThrow(
+								 () -> ApiUserException.builder()
+									 .category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+									 .subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+									 .build()
+							 );
 	}
 }

@@ -38,13 +38,15 @@ public class UserService {
 		String email,
 		MultipartFile profileImage
 	) {
-		UserEntity user = getUser(email);
+		UserEntity user = this.getUser(email);
 
-		isUserAccountDeactivated(user);
+		ThrowApiExceptionIfUserAccountIsDeactivated(user);
 
 		if (profileImage != null && !profileImage.isEmpty()) {
-			StorageSaveResult storageSaveResult = imageStorageManager.saveResource(profileImage,
-				StorageType.LOCAL_FILE_SYSTEM);
+			StorageSaveResult storageSaveResult = imageStorageManager.saveResource(
+				profileImage, StorageType.LOCAL_FILE_SYSTEM
+			);
+
 			user.updateProfileImage(storageSaveResult.resourceLocationId());
 		}
 
@@ -53,13 +55,11 @@ public class UserService {
 				updateRequest.gender());
 		}
 
-		// UserEntity savedUser = userRepository.save(user);
 		return UserDto.UserUpdateResponse.toDto(user);
-
 	}
 
 	public Long saveUser(UserDto.UserCreateRequest addUserRequest) {
-		UserEntity user = getUser(addUserRequest.email());
+		UserEntity user = this.getUser(addUserRequest.email());
 
 		if (user.getUserStatus() == UserStatus.USER_STATUS_DEACTIVATE) {
 			user.setUserStatus(UserStatus.USER_STATUS_ACTIVATE);
@@ -76,9 +76,9 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public UserDto.UserGetInfoResponse getMyInfo(String email) {
-		UserEntity user = getUser(email);
+		UserEntity user = this.getUser(email);
 
-		isUserAccountDeactivated(user);
+		ThrowApiExceptionIfUserAccountIsDeactivated(user);
 
 		return UserDto.UserGetInfoResponse.toDto(user,  userRepository.postCount(user));
 	}
@@ -92,23 +92,23 @@ public class UserService {
 				.setErrorData(() -> "찾을 수 없는 유저입니다.")
 				.build());
 
-		isUserAccountDeactivated(user);
+		ThrowApiExceptionIfUserAccountIsDeactivated(user);
 
 		return user;
 	}
 
 	@Transactional(readOnly = true)
 	public UserEntity findByEmail(String email) {
-		UserEntity user = getUser(email);
+		UserEntity user = this.getUser(email);
 
-		isUserAccountDeactivated(user);
+		ThrowApiExceptionIfUserAccountIsDeactivated(user);
 
 		return user;
 	}
 
 	@Transactional(readOnly = true)
 	public List<UserDto.UserGetPostsResponse> getMyPosts(String email) {
-		UserEntity user = getUser(email);
+		UserEntity user = this.getUser(email);
 
 		return userRepository.postList(user);
 	}
@@ -122,7 +122,7 @@ public class UserService {
 	}
 
 
-	private UserEntity getUser(String email){
+	private UserEntity getUser(String email) throws ApiUserException {
 		return userRepository.findByEmail(email)
 							 .orElseThrow(
 								 () -> ApiUserException.builder()
@@ -132,7 +132,7 @@ public class UserService {
 							 );
 	}
 
-	private void isUserAccountDeactivated(UserEntity userEntity) {
+	private void ThrowApiExceptionIfUserAccountIsDeactivated(UserEntity userEntity) throws ApiUserException {
 		if (userEntity.getUserStatus() == UserStatus.USER_STATUS_DEACTIVATE) {
 			throw ApiUserException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)

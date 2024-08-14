@@ -61,7 +61,9 @@ public class PostApiController {
 	) {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		if(updateRequest == null && image.isEmpty()){
+		if (updateRequest.postContent().isEmpty() &&
+			updateRequest.hashtagContents().isEmpty() &&
+			image.isEmpty()) {
 			throw ApiPostException.builder()
 				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
 				.subCategory(ApiPostErrorSubCategory.POST_INVALID_UPDATE)

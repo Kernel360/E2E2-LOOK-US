@@ -85,7 +85,8 @@ public class PostEntity extends TimeTrackableEntity {
 	}
 
 	public void updateHashtags(List<HashtagEntity> hashtags){
-		this.hashtags = hashtags;
+		this.hashtags.clear();
+		this.hashtags.addAll(hashtags);
 	}
 
 	// convert List<HashtagEntity> to List<String>

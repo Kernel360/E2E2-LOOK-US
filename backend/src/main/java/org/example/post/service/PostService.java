@@ -1,5 +1,7 @@
 package org.example.post.service;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.example.exception.common.ApiErrorCategory;
@@ -15,6 +17,7 @@ import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.LikeEntity;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
+import org.example.post.repository.HashtagRepository;
 import org.example.post.repository.LikeRepository;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.PostSearchCondition;
@@ -37,6 +40,7 @@ public class PostService {
 	private final UserRepository userRepository;
 	private final ImageStorageManager imageStorageManager;
 	private final LikeRepository likeRepository;
+	private final HashtagRepository hashtagRepository;
 
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
 		String email, MultipartFile image) {
@@ -61,8 +65,12 @@ public class PostService {
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
 	}
 
-	public PostDto.CreatePostDtoResponse updatePost(PostDto.CreatePostDtoRequest updateRequest, MultipartFile image,
-		String email, Long postId) {
+	public PostDto.CreatePostDtoResponse updatePost(
+		PostDto.CreatePostDtoRequest updateRequest,
+		MultipartFile image,
+		String email,
+		Long postId
+	) {
 		UserEntity user = findUserByEmail(email);
 
 		PostEntity post = findPostById(postId);
@@ -76,14 +84,14 @@ public class PostService {
 		}
 
 		// check user is right author of post
-		if (post.getUser().equals(user)) {
+		if (!post.getUser().getUserId().equals(user.getUserId())) {
 			throw ApiPostException.builder()
 				.category(ApiErrorCategory.RESOURCE_UNAUTHORIZED)
 				.subCategory(ApiPostErrorSubCategory.POST_INVALID_AUTHOR)
 				.build();
 		}
 
-		if(!image.isEmpty()) {
+		if (!image.isEmpty()) {
 			StorageSaveResult storageSaveResult = imageStorageManager.saveResource(
 				image,
 				StorageType.LOCAL_FILE_SYSTEM
@@ -91,17 +99,22 @@ public class PostService {
 			post.updateImage(storageSaveResult.resourceLocationId());
 		}
 
-		if(updateRequest.postContent() != null) {
+		if (!updateRequest.postContent().isEmpty()) {
 			post.updatePostContent(updateRequest.postContent());
 		}
 
-		if(updateRequest.hashtagContents() != null) {
-			post.updateHashtags(
-				updateRequest.convertHashtagContents(updateRequest.hashtagContents(), "#")
-					.stream()
-					.map(hashtag -> new HashtagEntity(post, hashtag))
-					.toList()
-			);
+		if (!updateRequest.hashtagContents().isEmpty()) {
+			List<HashtagEntity> hashtagEntity = hashtagRepository.findAllByPost(post);
+			for(HashtagEntity he : hashtagEntity) {
+				hashtagRepository.deleteById(he.getHashtagId());
+			}
+			List<HashtagEntity> hashtagEntities =  updateRequest.convertHashtagContents(updateRequest.hashtagContents(), "#")
+				.stream()
+				.map(hashtag -> new HashtagEntity(post, hashtag))
+				.toList();
+
+			hashtagRepository.saveAll(hashtagEntities);
+			post.updateHashtags(hashtagEntities);
 		}
 
 		return PostDto.CreatePostDtoResponse.toDto(post);

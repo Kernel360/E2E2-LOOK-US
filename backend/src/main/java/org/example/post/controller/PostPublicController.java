@@ -47,7 +47,7 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-	@GetMapping("/posts/{post_id}")
+	@GetMapping("/{post_id}")
 	public ResponseEntity<PostDto.PostDetailDtoResponse> getPostById(
 		@PathVariable Long post_id
 	) {

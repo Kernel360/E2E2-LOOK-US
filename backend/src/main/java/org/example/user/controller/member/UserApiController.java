@@ -40,6 +40,7 @@ public class UserApiController {
 			throw ApiUserException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiUserErrorSubCategory.USER_UPDATE_IMPOSSIBLE)
+				.setErrorData(() -> "수정할 데이터가 입력되지 않았습니다.")
 				.build();
 		}
 

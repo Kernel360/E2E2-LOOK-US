@@ -1,5 +1,6 @@
 package org.example.post.service;
 
+import java.util.Objects;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -171,6 +172,18 @@ public class PostService {
 		return likeRepository.likeCount(post);
 	}
 
+
+	public void delete(Long postId, String email) {
+		UserEntity user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		PostEntity post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("no post"));
+		if (!Objects.equals(post.getUser().getUserId(), user.getUserId())) {
+			throw new IllegalArgumentException("User does not match");
+		}
+		likeRepository.deleteAllByPost(post);
+		postRepository.delete(post);
+	}
+
 	private PostEntity findPostById(Long postId) {
 
 		return postRepository.findById(postId)
@@ -194,5 +207,4 @@ public class PostService {
 					.build()
 			);
 	}
-
 }

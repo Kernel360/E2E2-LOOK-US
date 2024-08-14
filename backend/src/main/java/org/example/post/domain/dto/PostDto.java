@@ -119,7 +119,7 @@ public class PostDto {
 		}
 	}
 
-	public record PostLikeRequest(
+	public record PostIdRequest(
 		Long postId
 	) {
 	}

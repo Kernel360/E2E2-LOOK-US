@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/a1")
+@RequestMapping("/api/a1/posts")
 @RequiredArgsConstructor
 public class PostPublicController {
 	private final PostService postService;
@@ -32,7 +32,7 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-	@GetMapping("/posts")
+	@GetMapping("")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
 		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) PostSearchCondition postSearchCondition,
 		Pageable pageable
@@ -47,7 +47,7 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-	@GetMapping("/posts/{post_id}")
+	@GetMapping("/{post_id}")
 	public ResponseEntity<PostDto.PostDetailDtoResponse> getPostById(
 		@PathVariable Long post_id
 	) {
@@ -62,7 +62,7 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
 	@GetMapping("/likes")
-	public ResponseEntity<Integer> likeCount(@RequestBody PostDto.PostLikeRequest likeRequest) {
+	public ResponseEntity<Integer> likeCount(@RequestBody PostDto.PostIdRequest likeRequest) {
 		int likeCount = postService.likeCount(likeRequest.postId());
 		return ResponseEntity.status(HttpStatus.OK).body(likeCount);
 	}

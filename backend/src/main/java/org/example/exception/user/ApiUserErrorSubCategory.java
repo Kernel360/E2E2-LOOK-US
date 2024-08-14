@@ -14,7 +14,9 @@ public enum ApiUserErrorSubCategory implements ApiErrorSubCategory {
 
 	USER_DEACTIVATE("회원 탈퇴한 유저입니다."),
 
-	USER_UPDATE_IMPOSSIBLE("업데이트 할 회원 정보가 입력되지 않았습니다.")
+	USER_UPDATE_IMPOSSIBLE("업데이트 할 회원 정보가 입력되지 않았습니다."),
+
+	USER_FOLLOW_INVALID_REQUEST("비정상적인 팔로우 요청입니다."),
 	;
 
 	private final String userApiErrorSubCategory;

@@ -1,5 +1,6 @@
 package org.example.post.domain.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,8 +8,12 @@ import java.util.stream.Collectors;
 import org.example.common.TimeTrackableEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -28,6 +33,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "post")
+@SQLDelete(sql = "UPDATE post SET removed_at = CURRENT_TIMESTAMP WHERE post_id=?")
+@Where(clause = "removed_at IS NULL")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostEntity extends TimeTrackableEntity {
@@ -61,8 +68,11 @@ public class PostEntity extends TimeTrackableEntity {
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	private List<HashtagEntity> hashtags = new ArrayList<>();
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<LikeEntity> likes = new ArrayList<>();
+
+	@Column(name = "removed_at")
+	private LocalDateTime removedAt;
 
 	@Builder
 	public PostEntity(UserEntity user, String postContent, Long imageId, int likeCount) {

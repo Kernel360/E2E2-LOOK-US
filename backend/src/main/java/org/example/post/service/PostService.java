@@ -1,5 +1,6 @@
 package org.example.post.service;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.example.exception.common.ApiErrorCategory;
@@ -119,5 +120,16 @@ public class PostService {
 			.orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다")); //TODO : custom 예외처리로 리팩토링 필요
 
 		return likeRepository.likeCount(post);
+	}
+
+	public void delete(Long postId, String email) {
+		UserEntity user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		PostEntity post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("no post"));
+		if (!Objects.equals(post.getUser().getUserId(), user.getUserId())) {
+			throw new IllegalArgumentException("User does not match");
+		}
+		likeRepository.deleteAllByPost(post);
+		postRepository.delete(post);
 	}
 }

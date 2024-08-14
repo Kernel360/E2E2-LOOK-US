@@ -53,7 +53,7 @@ public class PostApiController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-	@PostMapping(path = "/{post_id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	@PatchMapping(path = "/{post_id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<PostDto.CreatePostDtoResponse> updatePost(
 		@RequestPart PostDto.CreatePostDtoRequest updateRequest,
 		@RequestPart(value = "image") MultipartFile image,

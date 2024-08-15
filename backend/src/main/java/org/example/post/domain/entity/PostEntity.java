@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.example.common.TimeTrackableEntity;
+import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.post.ApiPostErrorSubCategory;
+import org.example.exception.post.ApiPostException;
+import org.example.exception.user.ApiUserException;
 import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -61,10 +63,6 @@ public class PostEntity extends TimeTrackableEntity {
 	@Column(name = "like_count", nullable = false)
 	private int likeCount = 0;
 
-	// @Column(name = "like_count", nullable = false, columnDefinition = "INT")
-	// @ColumnDefault("0")
-	// private Integer likeCount = 0;
-
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	private List<HashtagEntity> hashtags = new ArrayList<>();
 
@@ -99,7 +97,6 @@ public class PostEntity extends TimeTrackableEntity {
 		this.hashtags.addAll(hashtags);
 	}
 
-	// convert List<HashtagEntity> to List<String>
 	public List<String> getHashtagContents() {
 		return hashtags.stream()
 			.map(HashtagEntity::getHashtagContent)
@@ -114,7 +111,11 @@ public class PostEntity extends TimeTrackableEntity {
 		this.likeCount--;
 		if (likeCount < 0) {
 			this.likeCount++;
-			throw new IllegalArgumentException("좋아요 수는 음수가 안됩니다");
+			throw ApiPostException
+				.builder()
+				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+				.subCategory(ApiPostErrorSubCategory.POST_INVALID_LIKE_REQUEST)
+				.build();
 		}
 	}
 }

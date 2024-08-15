@@ -10,8 +10,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
+
 	List<Follow> findByFromUser(UserEntity fromUser);
+
 	List<Follow> findByToUser(UserEntity toUser);
-	void deleteFollowByFromUser(UserEntity fromUser);
+
+	void deleteByFromUserAndToUser(UserEntity fromUser, UserEntity toUser);
+
 	Optional<Follow> findByFromUserAndToUser(UserEntity fromUser, UserEntity toUser);
 }

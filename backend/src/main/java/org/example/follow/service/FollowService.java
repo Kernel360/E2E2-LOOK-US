@@ -1,12 +1,9 @@
 package org.example.follow.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.follow.domain.dto.FollowResponseDto;
+import org.example.follow.domain.dto.FollowDto;
 import org.example.follow.domain.entity.Follow;
 import org.example.follow.repository.FollowRepository;
 import org.example.user.domain.entity.member.UserEntity;
@@ -24,8 +21,33 @@ public class FollowService {
 	private final UserRepository userRepository;
 	private final FollowRepository followRepository;
 
-	//follow 거는 경우
-	public String follow(String email, String nickname) {
+	// follow 거는 경우
+	public void follow(String fromUser_Email, String toUser_Nickname) {
+		UserEntity fromUser = this.getUserByEmail(fromUser_Email);
+		UserEntity toUser = this.getUserByNickname(toUser_Nickname);
+
+		if (fromUser.equals(toUser)) {
+			throw ApiUserException.builder()
+				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+				.subCategory(ApiUserErrorSubCategory.USER_FOLLOW_INVALID_REQUEST)
+				.build();
+		}
+
+		followRepository.findByFromUserAndToUser(fromUser, toUser)
+						.ifPresent((follow) -> {
+							throw ApiUserException.builder()
+								.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+								.subCategory(ApiUserErrorSubCategory.USER_FOLLOW_INVALID_REQUEST)
+								.setErrorData(() -> String.format("%s --> %s", follow.getFromUser(), follow.getToUser()))
+								.build();
+						});
+
+		followRepository.save(
+			Follow.builder().fromUser(fromUser).toUser(toUser).build()
+		);
+	}
+
+	public void unFollow(String email, String nickname) {
 		UserEntity fromUser = this.getUserByEmail(email);
 		UserEntity toUser = this.getUserByNickname(nickname);
 
@@ -36,75 +58,36 @@ public class FollowService {
 				.build();
 		}
 
-		followRepository
-			.findByFromUserAndToUser(fromUser, toUser)
-			.ifPresent((follow) -> {
-				throw ApiUserException.builder()
-					.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
-					.subCategory(ApiUserErrorSubCategory.USER_FOLLOW_INVALID_REQUEST)
-					.setErrorData(() -> String.format("%s --> %s", follow.getFromUser(), follow.getToUser()))
-					.build();
-			});
-
-		Follow follow = Follow.builder()
-			.fromUser(fromUser)
-			.toUser(toUser)
-			.build();
-
-		followRepository.save(follow);
-		return "Success";
+		followRepository.deleteByFromUserAndToUser(fromUser, toUser);
 	}
 
-	public String unFollow(String email, String nickname) {
-		UserEntity fromUser = this.getUserByEmail(email);
-		UserEntity toUser = this.getUserByNickname(nickname);
-
-		Follow follow = followRepository.findByFromUserAndToUser(fromUser, toUser)
-										.orElseThrow(
-											() -> ApiUserException.builder()
-												.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
-												.subCategory(ApiUserErrorSubCategory.USER_FOLLOW_INVALID_REQUEST)
-												.build()
-										);
-		followRepository.delete(follow);
-
-		return "Success";
+	public FollowDto.GetFollowListResponseDto followingList(String targetUserName) {
+		return new FollowDto.GetFollowListResponseDto(
+			followRepository.findByFromUser(
+								this.getUserByNickname(targetUserName)
+							).stream()
+							.map(Follow::getFromUser)
+							.map((following) -> new FollowDto.FollowUserDto(
+								following.getNickname(),
+								this.getFollowerCountOfUser(following),
+								following.getProfileImageId()
+							)).toList()
+		);
 	}
 
-	public List<FollowResponseDto> followingList(String targetUserName) {
-		UserEntity targetUser = this.getUserByNickname(targetUserName);
-		List<Follow> list = followRepository.findByFromUser(targetUser);
-		List<FollowResponseDto> followList = new ArrayList<>();
+	public FollowDto.GetFollowListResponseDto followerList(String targetUserName) {
 
-		for (Follow follow : list) {
-			UserEntity toUser = follow.getToUser();
-
-			followList.add(new FollowResponseDto(
-				toUser.getNickname(),
-				followRepository.findByToUser(toUser).size(),
-				toUser.getProfileImageId()
-			));
-		}
-
-		return followList;
-	}
-
-	public List<FollowResponseDto> followerList(String targetUserName) {
-		UserEntity targetUser = this.getUserByNickname(targetUserName);
-		List<Follow> list = followRepository.findByToUser(targetUser);
-		List<FollowResponseDto> followList = new ArrayList<>();
-
-		for (Follow follow : list) {
-			UserEntity fromUser = follow.getFromUser();
-
-			followList.add(new FollowResponseDto(
-				fromUser.getNickname(),
-				followRepository.findByToUser(fromUser).size(),
-				fromUser.getProfileImageId()
-			));
-		}
-
-		return followList;
+		return new FollowDto.GetFollowListResponseDto(
+			followRepository.findByToUser(
+								this.getUserByNickname(targetUserName)
+							).stream()
+							.map(Follow::getToUser)
+							.map((follower) -> new FollowDto.FollowUserDto(
+								follower.getNickname(),
+								this.getFollowerCountOfUser(follower),
+								follower.getProfileImageId()
+							)).toList()
+		);
 	}
 
 	private UserEntity getUserByEmail(String email) throws ApiUserException {
@@ -125,5 +108,9 @@ public class FollowService {
 									 .subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
 									 .build()
 							 );
+	}
+
+	private int getFollowerCountOfUser(UserEntity user) {
+		return this.followRepository.findByToUser(user).size();
 	}
 }

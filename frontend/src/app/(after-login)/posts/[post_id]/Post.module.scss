@@ -1,12 +1,15 @@
-.container {
+.postContainer {
     max-width: 600px;
     margin: 0 auto;
+    // padding-bottom: 2em;
     padding: 16px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border: 1px solid #e6e6e6;
     overflow: auto; /* 스크롤바가 필요할 때만 나타나게 변경 */
+    margin-bottom: 5rem;
+    margin-top: 1rem;
 }
 
 .imageContainer {

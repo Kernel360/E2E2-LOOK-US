@@ -8,9 +8,6 @@ export default function PostCreateForm() {
                 <h2 className='text-2xl font-bold tracking-tight'>
                     글 작성하기
                 </h2>
-                <p className='text-muted-foreground'>
-                    Manage your account settings and set e-mail preferences.
-                </p>
             </div>
 
             <div className='flex flex-col space-y-8 lg:flex-row'>

@@ -44,7 +44,7 @@ export default function Gallery() {
     )
 
     return (
-        <div className=''>
+        <div className='container'>
             <HeaderSearch onSearch={handleSearch} />
             <section className='gallery'>
                 {styles?.map((item, index) => (

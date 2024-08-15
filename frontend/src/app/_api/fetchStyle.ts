@@ -79,6 +79,7 @@ export async function getAllPostPreviews(request?: postPreviewsAllRequest) {
         const body = await res.json()
         throw new ApiError(res.status, body)
     }
+    console.log('ok')
 
     const body = await res.json()
     return body as postPreviewsAllResponse

@@ -85,7 +85,7 @@ class UserViewControllerTest {
 			.andExpect(redirectedUrl("/login"));
 
 		// then
-		Mockito.verify(userService, Mockito.times(1)).saveUser(userCreateRequest);
+		Mockito.verify(userService, Mockito.times(1)).signupUser(userCreateRequest);
 	}
 
 	@DisplayName("일반 폼 로그아웃 성공 Controller Test")

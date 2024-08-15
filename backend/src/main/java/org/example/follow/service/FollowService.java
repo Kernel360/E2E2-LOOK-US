@@ -47,9 +47,9 @@ public class FollowService {
 		);
 	}
 
-	public void unFollow(String email, String nickname) {
-		UserEntity fromUser = this.getUserByEmail(email);
-		UserEntity toUser = this.getUserByNickname(nickname);
+	public void unFollow(String fromUser_Email, String toUser_Nickname) {
+		UserEntity fromUser = this.getUserByEmail(fromUser_Email);
+		UserEntity toUser = this.getUserByNickname(toUser_Nickname);
 
 		if (fromUser.equals(toUser)) {
 			throw ApiUserException.builder()

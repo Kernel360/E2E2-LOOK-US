@@ -6,16 +6,16 @@ import org.example.follow.domain.enums.FollowStatus;
 
 public class FollowDto {
 
-	public record FollowRequestDto(
+	public record FollowRequest(
 		String nickname,
 		FollowStatus followStatus
 	) {}
 
-	public record GetFollowListResponseDto(
-		List<FollowUserDto> followers
+	public record FollowListResponse(
+		List<FollowUser> followers
 	) {}
 
-	public record FollowUserDto(
+	public record FollowUser(
 		String nickname,
 		int followersCount,
 		Long profileImageId

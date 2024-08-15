@@ -61,13 +61,13 @@ public class FollowService {
 		followRepository.deleteByFromUserAndToUser(fromUser, toUser);
 	}
 
-	public FollowDto.GetFollowListResponseDto followingList(String targetUserName) {
-		return new FollowDto.GetFollowListResponseDto(
+	public FollowDto.FollowListResponse followingList(String targetUserName) {
+		return new FollowDto.FollowListResponse(
 			followRepository.findByFromUser(
 								this.getUserByNickname(targetUserName)
 							).stream()
 							.map(Follow::getFromUser)
-							.map((following) -> new FollowDto.FollowUserDto(
+							.map((following) -> new FollowDto.FollowUser(
 								following.getNickname(),
 								this.getFollowerCountOfUser(following),
 								following.getProfileImageId()
@@ -75,14 +75,14 @@ public class FollowService {
 		);
 	}
 
-	public FollowDto.GetFollowListResponseDto followerList(String targetUserName) {
+	public FollowDto.FollowListResponse followerList(String targetUserName) {
 
-		return new FollowDto.GetFollowListResponseDto(
+		return new FollowDto.FollowListResponse(
 			followRepository.findByToUser(
 								this.getUserByNickname(targetUserName)
 							).stream()
 							.map(Follow::getToUser)
-							.map((follower) -> new FollowDto.FollowUserDto(
+							.map((follower) -> new FollowDto.FollowUser(
 								follower.getNickname(),
 								this.getFollowerCountOfUser(follower),
 								follower.getProfileImageId()

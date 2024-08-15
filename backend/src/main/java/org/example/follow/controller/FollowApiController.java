@@ -26,7 +26,7 @@ public class FollowApiController {
 	 */
 	@PutMapping("")
 	public ResponseEntity<?> handleFollow(
-		@RequestBody FollowDto.FollowRequestDto requestDto
+		@RequestBody FollowDto.FollowRequest requestDto
 	) {
 		String fromUser = SecurityContextHolder.getContext().getAuthentication().getName();
 		String toUser = requestDto.nickname();

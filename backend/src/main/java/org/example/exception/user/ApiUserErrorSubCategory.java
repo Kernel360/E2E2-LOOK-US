@@ -17,6 +17,10 @@ public enum ApiUserErrorSubCategory implements ApiErrorSubCategory {
 	USER_UPDATE_IMPOSSIBLE("업데이트 할 회원 정보가 입력되지 않았습니다."),
 
 	USER_FOLLOW_INVALID_REQUEST("비정상적인 팔로우 요청입니다."),
+
+	USER_INVALID_REFRESH_TOKEN("Refresh 토큰 검증에 실패하였습니다."),
+
+	USER_REFRESH_TOKEN_NOT_FOUND("Refresh 토큰 정보가 존재하지 않습니다."),
 	;
 
 	private final String userApiErrorSubCategory;

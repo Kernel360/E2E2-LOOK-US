@@ -168,11 +168,21 @@ public class PostService {
 
 	public void delete(Long postId, String email) {
 		UserEntity user = userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+										.orElseThrow(() -> ApiUserException.builder()
+											.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+											.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+											.build()
+										);
+
 		PostEntity post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("no post"));
-		if (!Objects.equals(post.getUser().getUserId(), user.getUserId())) {
-			throw new IllegalArgumentException("User does not match");
+
+		if (!user.getUserId().equals(post.getUser().getUserId())) {
+			throw ApiPostException.builder()
+				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+				.subCategory(ApiPostErrorSubCategory.POST_INVALID_AUTHOR)
+				.build();
 		}
+
 		likeRepository.deleteAllByPost(post);
 		postRepository.delete(post);
 	}

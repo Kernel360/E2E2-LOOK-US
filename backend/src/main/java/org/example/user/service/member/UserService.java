@@ -118,6 +118,7 @@ public class UserService {
 	/**
 	 * NOTE: 만약 비활성화된 사용자를 검색한 경우, ApiUserException을 발생시킵니다.
 	 */
+	@Transactional(readOnly = true)
 	public UserEntity getUserById(Long userId) throws ApiUserException {
 		UserEntity user = getUserById_internal(userId);
 		AssertThat_UserAccountIsActive(user);
@@ -128,6 +129,7 @@ public class UserService {
 	/**
 	 * NOTE: 만약 비활성화된 사용자를 검색한 경우, ApiUserException을 발생시킵니다.
 	 */
+	@Transactional(readOnly = true)
 	public UserEntity getUserByEmail(String email) throws ApiUserException {
 		UserEntity user = getUserByEmail_internal(email);
 		AssertThat_UserAccountIsActive(user);

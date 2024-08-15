@@ -153,12 +153,6 @@ public class PostService {
 			likeRepository.save(LikeEntity.toEntity(user, post));
 			return true;
 		}
-
-		// TODO : 위에 방법으로 대체
-		// likeRepository.findByUserAndPost(user, post).ifPresent(it -> {
-		// 	throw new IllegalArgumentException("사용자가 이미 좋아요를 눌렀습니다");
-		// });
-
 	}
 
 	@Transactional(readOnly = true)
@@ -171,7 +165,6 @@ public class PostService {
 
 		return likeRepository.likeCount(post);
 	}
-
 
 	public void delete(Long postId, String email) {
 		UserEntity user = userRepository.findByEmail(email)

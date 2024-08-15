@@ -9,7 +9,6 @@ import org.example.common.TimeTrackableEntity;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
-import org.example.exception.user.ApiUserException;
 import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
 import org.hibernate.annotations.SQLDelete;
@@ -53,7 +52,7 @@ public class PostEntity extends TimeTrackableEntity {
 	@Column(nullable = false)
 	private Long imageId;
 
-	@Column(name = "post_content", nullable = true, columnDefinition = "VARCHAR(255)")
+	@Column(name = "post_content", columnDefinition = "VARCHAR(255)")
 	private String postContent;
 
 	@Column(name = "post_status", nullable = false)
@@ -110,7 +109,7 @@ public class PostEntity extends TimeTrackableEntity {
 	public void decreaseLikeCount() {
 		this.likeCount--;
 		if (likeCount < 0) {
-			this.likeCount++;
+			this.likeCount = 0;
 			throw ApiPostException
 				.builder()
 				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)

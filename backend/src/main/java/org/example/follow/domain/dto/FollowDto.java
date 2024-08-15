@@ -1,6 +1,5 @@
 package org.example.follow.domain.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.example.follow.domain.enums.FollowStatus;

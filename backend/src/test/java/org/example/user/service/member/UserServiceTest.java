@@ -40,12 +40,6 @@ class UserServiceTest {
 	@InjectMocks
 	private UserService userService;
 
-	private UserDto.UserCreateRequest getCreateUserRequest(
-		String email, String password
-	) {
-		return new UserDto.UserCreateRequest(email, password);
-	}
-
 	private final UserEntity defaultUser =
 		UserEntity.builder()
 			.email("test@gmail.com")

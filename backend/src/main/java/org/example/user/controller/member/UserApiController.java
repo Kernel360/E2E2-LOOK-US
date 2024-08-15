@@ -5,11 +5,11 @@ import java.util.List;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.post.domain.dto.PostDto;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.service.member.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,7 +33,8 @@ public class UserApiController {
 	@PatchMapping("/update")
 	public ResponseEntity<UserDto.UserUpdateResponse> userUpdate(
 		@RequestPart(value = "updateRequest", required = false) UserDto.UserUpdateRequest updateRequest,
-		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage
+	) {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		if(updateRequest == null && profileImage.isEmpty()){
@@ -49,29 +50,30 @@ public class UserApiController {
 	}
 
 	@GetMapping("/me")
-	public ResponseEntity<UserDto.UserGetInfoResponse> getMyPage() {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+	public ResponseEntity<UserDto.UserGetInfoResponse> getMyPage(Authentication authentication) {
 
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(userService.getMyInfo(email));
+							 .body(userService.getMyInfo(authentication.getName()));
 	}
 
 	@GetMapping("/me/posts")
-	public ResponseEntity<List<UserDto.UserGetPostsResponse>> getMyPostPage() {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+	public ResponseEntity<List<UserDto.UserGetPostsResponse>> getMyPosts(Authentication authentication) {
 
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(userService.getMyPosts(email));
+							 .body(userService.getMyPosts(authentication.getName()));
 	}
 
 	@PostMapping("/resign")
-	public ResponseEntity<?> resignUser(HttpServletRequest request, HttpServletResponse response){
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		userService.resignUser(email,request,response);
+	public ResponseEntity<?> resignUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response){
+		userService.resignUser(authentication.getName(), request, response);
 
 		return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 	}
 
+	@PostMapping("/logout")
+	public ResponseEntity<?> logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response){
+		userService.logoutUser(authentication.getName(), request, response);
 
-
+		return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+	}
 }

@@ -3,7 +3,7 @@ package org.example.follow.controller;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.follow.domain.dto.FollowRequestDto;
+import org.example.follow.domain.dto.FollowDto;
 import org.example.follow.service.FollowService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,12 +26,12 @@ public class FollowApiController {
 	 */
 	@PutMapping("")
 	public ResponseEntity<?> handleFollow(
-		@RequestBody FollowRequestDto requestDto
+		@RequestBody FollowDto.FollowRequest requestDto
 	) {
 		String fromUser = SecurityContextHolder.getContext().getAuthentication().getName();
-		String toUser = requestDto.getNickname();
+		String toUser = requestDto.nickname();
 
-		switch (requestDto.getFollowStatus()) {
+		switch (requestDto.followStatus()) {
 			case FOLLOW -> followService.follow(fromUser, toUser);
 			case UNFOLLOW -> followService.unFollow(fromUser, toUser);
 			default ->
@@ -39,7 +39,7 @@ public class FollowApiController {
 					.builder()
 					.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
 					.subCategory(ApiUserErrorSubCategory.USER_FOLLOW_INVALID_REQUEST)
-					.setErrorData(() -> String.format("follow status = %s", requestDto.getFollowStatus()))
+					.setErrorData(() -> String.format("follow status = %s", requestDto.followStatus()))
 					.build();
 		}
 

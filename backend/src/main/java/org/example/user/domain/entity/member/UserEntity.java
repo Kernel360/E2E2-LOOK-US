@@ -23,7 +23,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 @Table(name = "user")
@@ -60,14 +59,12 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	@Enumerated(EnumType.STRING)
 	private Role role;
 
-	@Setter
 	private Long profileImageId;
 
 	private String provider;
 
 	private String providerId;
 
-	@Setter
 	@Enumerated(EnumType.STRING)
 	private UserStatus userStatus = UserStatus.USER_STATUS_ACTIVATE;
 
@@ -88,7 +85,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	}
 
 	// 사용자 이름 변경
-	public UserEntity update(String username) {
+	public UserEntity updateUsername(String username) {
 		this.username = username;
 		return this;
 	}
@@ -101,6 +98,11 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 		this.gender = gender;
 	}
 
+	// 사용자 계정 [ 활성화 | 비활성화 ] 업데이트
+	public void updateUserStatus(UserStatus userStatus) {
+		this.userStatus = userStatus;
+	}
+
 	// 이미지도 업데이트
 	public void updateProfileImage(Long profileImageId) {
 		this.profileImageId = profileImageId;
@@ -111,6 +113,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
 	}
 
+	// NOTE: security의 username을 email로 처리하도록 하기 위함입니다.
 	@Override
 	public String getUsername() {
 		return email;
@@ -148,5 +151,9 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	public boolean isEnabled() {
 		// 계정이 사용가능한지 확인하는 로직
 		return true; // true -> 사용 가능
+	}
+
+	public boolean equals(UserEntity user) {
+		return userId.equals(user.getUserId());
 	}
 }

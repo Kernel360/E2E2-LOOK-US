@@ -37,7 +37,7 @@ public class UserEntityTest {
 
 	@DisplayName("user update test")
 	@Test
-	public void testUpdateDetails() {
+	public void testUpdateUsernameDetails() {
 		user.updateDetails("2000-01-01", "instaId", "nickname", Gender.GENDER_WOMAN);
 		assertThat(user.getBirth()).isEqualTo("2000-01-01");
 		assertThat(user.getInstaId()).isEqualTo("instaId");
@@ -47,7 +47,7 @@ public class UserEntityTest {
 
 	@DisplayName("update profile image test")
 	@Test
-	public void testUpdateProfileImage() {
+	public void testUpdateUsernameProfileImage() {
 		Long newProfileImageId = 12345L;
 		user.updateProfileImage(newProfileImageId);
 		assertThat(user.getProfileImageId()).isEqualTo(newProfileImageId);

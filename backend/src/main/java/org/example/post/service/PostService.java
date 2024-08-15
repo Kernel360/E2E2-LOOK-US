@@ -153,12 +153,6 @@ public class PostService {
 			likeRepository.save(LikeEntity.toEntity(user, post));
 			return true;
 		}
-
-		// TODO : 위에 방법으로 대체
-		// likeRepository.findByUserAndPost(user, post).ifPresent(it -> {
-		// 	throw new IllegalArgumentException("사용자가 이미 좋아요를 눌렀습니다");
-		// });
-
 	}
 
 	@Transactional(readOnly = true)
@@ -172,14 +166,23 @@ public class PostService {
 		return likeRepository.likeCount(post);
 	}
 
-
 	public void delete(Long postId, String email) {
 		UserEntity user = userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+										.orElseThrow(() -> ApiUserException.builder()
+											.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+											.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+											.build()
+										);
+
 		PostEntity post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("no post"));
-		if (!Objects.equals(post.getUser().getUserId(), user.getUserId())) {
-			throw new IllegalArgumentException("User does not match");
+
+		if (!user.getUserId().equals(post.getUser().getUserId())) {
+			throw ApiPostException.builder()
+				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
+				.subCategory(ApiPostErrorSubCategory.POST_INVALID_AUTHOR)
+				.build();
 		}
+
 		likeRepository.deleteAllByPost(post);
 		postRepository.delete(post);
 	}

@@ -40,12 +40,6 @@ class UserServiceTest {
 	@InjectMocks
 	private UserService userService;
 
-	private UserDto.UserCreateRequest getCreateUserRequest(
-		String email, String password
-	) {
-		return new UserDto.UserCreateRequest(email, password);
-	}
-
 	private final UserEntity defaultUser =
 		UserEntity.builder()
 			.email("test@gmail.com")
@@ -69,7 +63,7 @@ class UserServiceTest {
 
 		ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
 
-		userService.saveUser(new UserDto.UserCreateRequest("test@gmail.com", "password"));
+		userService.signupUser(new UserDto.UserCreateRequest("test@gmail.com", "password"));
 
 		verify(userRepository, times(1)).save(captor.capture());
 		UserEntity savedUser = captor.getValue();
@@ -105,7 +99,7 @@ class UserServiceTest {
 	// TODO : 나중에 다시 해보기
 	@DisplayName("회원 아이디로 검색하기")
 	@Test
-	public void testFindById_UserExists() {
+	public void testGetUserById_UserExists() {
 		//given
 		given(userRepository.findById(anyLong()))
 			.willReturn(Optional.of(defaultUser));
@@ -114,7 +108,7 @@ class UserServiceTest {
 
 		System.out.println(defaultUser);
 		//when
-		UserEntity foundUser = userService.findById(1L);
+		UserEntity foundUser = userService.getUserById(1L);
 
 		//then
 		assertThat(foundUser.getUserId()).isEqualTo(1L);
@@ -122,23 +116,23 @@ class UserServiceTest {
 
 	@DisplayName("회원 아이디가 없을 때 예외발생")
 	@Test
-	public void testFindById_UserNotFound() {
+	public void testGetUserById_UserNotFound() {
 		when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
 		assertThrows(IllegalArgumentException.class, () -> {
-			userService.findById(1L);
+			userService.getUserById(1L);
 		});
 	}
 
 
 	@DisplayName("회원 이메일로 사용자 조회")
 	@Test
-	void findByEmail_Success() throws Exception {
+	void findUserByEmail_Success() throws Exception {
 		//given
 		given(userRepository.findByEmail(anyString())).willReturn(Optional.of(defaultUser));
 
 		//when
-		UserEntity foundUser = userService.findByEmail("test@gmail.com");
+		UserEntity foundUser = userService.getUserByEmail("test@gmail.com");
 
 		//then
 		assertThat(foundUser.getEmail()).isEqualTo("test@gmail.com");
@@ -146,11 +140,11 @@ class UserServiceTest {
 
 	@DisplayName("회원 이메일이 없을 때 예외")
 	@Test
-	public void testFindByEmail_UserNotFound() {
+	public void testFindUserByEmail_UserNotFound() {
 		when(userRepository.findByEmail("test2@gmail.com")).thenReturn(Optional.empty());
 
 		assertThrows(IllegalArgumentException.class, () -> {
-			userService.findByEmail("test2@gmail.com");
+			userService.getUserByEmail("test2@gmail.com");
 		});
 	}
 

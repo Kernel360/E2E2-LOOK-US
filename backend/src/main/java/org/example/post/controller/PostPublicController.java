@@ -34,8 +34,8 @@ public class PostPublicController {
 	})
 	@GetMapping("")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
-		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) PostSearchCondition postSearchCondition,
-		Pageable pageable
+		 PostSearchCondition postSearchCondition,
+		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(postService.findAllPosts(postSearchCondition, pageable));

@@ -63,19 +63,23 @@ public class UserDto {
 		Long imageId,
 		String postContent,
 		List<String> hashtags,
-		Integer likeCount) {
+		Integer likeCount,
+		Long postId
+	) {
 
 		@QueryProjection
 		public UserGetPostsResponse(
 			Long imageId,
 			String postContent,
 			List<String> hashtags,
-			Integer likeCount
+			Integer likeCount,
+			Long postId
 		) {
 			this.imageId = imageId;
 			this.postContent = postContent;
 			this.hashtags = hashtags;
 			this.likeCount = likeCount;
+			this.postId = postId;
 		}
 	}
 }

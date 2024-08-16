@@ -6,6 +6,7 @@ import Image from 'next/image'
 import styles from './Post.module.scss'
 import { API_PUBLIC_URL } from '@/app/_common/constants'
 import { useRouter } from 'next/navigation'
+import { follow, FollowRequest } from '@/app/_api/follow'
 
 type Props = {
     params: { post_id: number }
@@ -14,12 +15,14 @@ type Props = {
 
 export default function Page({ params, searchParams }: Props) {
     const [post, setPost] = useState<any>(null)
+    const [isFollowing, setIsFollowing] = useState<boolean>(false) // 팔로우 상태를 관리하는 상태 추가
     const router = useRouter()
 
     useEffect(() => {
         const fetchPost = async () => {
             const post = await getPost(params.post_id)
             setPost(post)
+            // 여기서는 초기 팔로우 상태를 false로 설정
         }
         fetchPost()
     }, [params.post_id])
@@ -28,10 +31,23 @@ export default function Page({ params, searchParams }: Props) {
         // router.push(`/search?hashtags=${encodeURIComponent(hashtag)}`)
     }
 
+    const handleFollowClick = async () => {
+        try {
+            const request: FollowRequest = {
+                nickname: post.nickname,
+                followStatus: isFollowing ? 0 : 1, // 팔로우 상태에 따라 요청 데이터 변경
+            }
+            // console.log(post.nickname)
+            await follow(request)
+            setIsFollowing(prev => !prev) // 상태 토글
+        } catch (error) {
+            console.error('Failed to update follow status:', error)
+        }
+    }
     if (!post) return <div>Loading...</div>
 
     return (
-        <div className={styles.container}>
+        <div className={styles.postContainer}>
             <div className={styles.imageContainer}>
                 <Image
                     src={`${API_PUBLIC_URL}/image/${post.imageId}`}
@@ -53,7 +69,16 @@ export default function Page({ params, searchParams }: Props) {
                     </div>
                     <span className={styles.username}>{post.nickname}</span>
                 </div>
-                <button className={styles.followButton}>팔로우</button>
+                <button
+                    className={
+                        isFollowing
+                            ? styles.followingButton
+                            : styles.followButton
+                    } // 팔로우 상태에 따른 스타일 변경
+                    onClick={handleFollowClick}
+                >
+                    {isFollowing ? '팔로잉' : '팔로우'}
+                </button>
             </div>
             <div className={styles.content}>{post.postContent}</div>
             <Suspense fallback={<div>Loading...</div>}>

@@ -43,7 +43,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 				postEntity1.getImageId(),
 				postEntity1.getPostContent(),
 				postEntity1.getHashtagContents(),
-				postEntity1.getLikeCount()
+				postEntity1.getLikeCount(),
+				postEntity1.getPostId()
 			))
 			.toList();
 

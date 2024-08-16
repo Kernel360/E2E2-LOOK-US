@@ -19,7 +19,7 @@ export async function getPost(postId: number) {
         method: 'GET',
     })
 
-    const body = await res.json();
+    const body = await res.json()
 
     if (false === res.ok) {
         throw new ApiError(res.status, body)
@@ -67,6 +67,7 @@ export async function createPost(form: PostFormValues) {
         credentials: 'include',
         body: formData,
     })
+    console.log('성공')
 
     if (!res.ok) {
         // ...

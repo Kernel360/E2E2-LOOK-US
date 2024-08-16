@@ -71,6 +71,9 @@ public class PostEntity extends TimeTrackableEntity {
 	@Column(name = "removed_at")
 	private LocalDateTime removedAt;
 
+
+	private LocalDateTime createdAt;
+
 	@Builder
 	public PostEntity(UserEntity user, String postContent, Long imageId, int likeCount) {
 		this.user = user;

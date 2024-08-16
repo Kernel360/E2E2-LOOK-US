@@ -1,7 +1,5 @@
 package org.example.post.service;
 
-import java.util.Objects;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -106,10 +104,11 @@ public class PostService {
 
 		if (!updateRequest.hashtagContents().isEmpty()) {
 			List<HashtagEntity> hashtagEntity = hashtagRepository.findAllByPost(post);
-			for(HashtagEntity he : hashtagEntity) {
+			for (HashtagEntity he : hashtagEntity) {
 				hashtagRepository.deleteById(he.getHashtagId());
 			}
-			List<HashtagEntity> hashtagEntities =  updateRequest.convertHashtagContents(updateRequest.hashtagContents(), "#")
+			List<HashtagEntity> hashtagEntities = updateRequest.convertHashtagContents(updateRequest.hashtagContents(),
+					"#")
 				.stream()
 				.map(hashtag -> new HashtagEntity(post, hashtag))
 				.toList();
@@ -167,14 +166,9 @@ public class PostService {
 	}
 
 	public void delete(Long postId, String email) {
-		UserEntity user = userRepository.findByEmail(email)
-										.orElseThrow(() -> ApiUserException.builder()
-											.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
-											.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
-											.build()
-										);
+		UserEntity user = findUserByEmail(email);
 
-		PostEntity post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("no post"));
+		PostEntity post = findPostById(postId);
 
 		if (!user.getUserId().equals(post.getUser().getUserId())) {
 			throw ApiPostException.builder()
@@ -187,7 +181,7 @@ public class PostService {
 		postRepository.delete(post);
 	}
 
-	private PostEntity findPostById(Long postId) {
+	public PostEntity findPostById(Long postId) {
 
 		return postRepository.findById(postId)
 			.orElseThrow(
@@ -200,7 +194,7 @@ public class PostService {
 
 	}
 
-	private UserEntity findUserByEmail(String email) {
+	public UserEntity findUserByEmail(String email) {
 		return userRepository.findByEmail(email)
 			.orElseThrow(
 				() -> ApiUserException.builder()

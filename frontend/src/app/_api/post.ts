@@ -75,3 +75,38 @@ export async function createPost(form: PostFormValues) {
         throw new ApiError(res.status, body)
     }
 }
+
+export async function likePost(postId: number) {
+    const requestUrl = `${API_PRIVATE_URL}/posts/likes`;
+
+    const res = await fetch(requestUrl, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId }),  // postId를 JSON 형식으로 전달
+    });
+
+    if (!res.ok) {
+        const body = await res.json();
+        throw new ApiError(res.status, body);
+    }
+
+    return await res.json(); // Returns true if liked, false if unliked
+}
+
+export async function getLikeStatus(postId: number) {
+    const requestUrl = `${API_PUBLIC_URL}/posts/${postId}/like-status`;
+    const res = await fetch(requestUrl, {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    if (!res.ok) {
+        throw new Error('Failed to fetch like status');
+    }
+
+    return await res.json(); // boolean 값 반환
+}
+

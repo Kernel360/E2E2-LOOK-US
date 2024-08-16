@@ -1,10 +1,8 @@
 package org.example.post.controller;
 
 import org.example.exception.common.ApiErrorCategory;
-
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
-
 import org.example.post.domain.dto.PostDto;
 import org.example.post.service.PostService;
 import org.springframework.http.HttpStatus;
@@ -91,9 +89,10 @@ public class PostApiController {
 		// String message = like ? "좋아요 완료" : "좋아요 취소";
 		return ResponseEntity.status(HttpStatus.OK).body(like);
 	}
-  
+
 	@DeleteMapping("")
-	public ResponseEntity<Void> deletePost(@RequestBody PostDto.PostIdRequest deleteRequest, Authentication authentication) {
+	public ResponseEntity<Void> deletePost(@RequestBody PostDto.PostIdRequest deleteRequest,
+		Authentication authentication) {
 
 		postService.delete(deleteRequest.postId(), authentication.getName());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

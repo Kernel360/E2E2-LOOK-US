@@ -1,12 +1,15 @@
 'use client'
 
-import { getPost } from '@/app/_api/post'
+import { getPost, getLikeStatus, likePost } from '@/app/_api/post'
 import { Suspense, useEffect, useState } from 'react'
 import Image from 'next/image'
 import styles from './Post.module.scss'
 import { API_PUBLIC_URL } from '@/app/_common/constants'
 import { useRouter } from 'next/navigation'
 import { follow, FollowRequest } from '@/app/_api/follow'
+import { GetPostResponse } from '@/app/_api/post'
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+
 
 type Props = {
     params: { post_id: number }
@@ -16,12 +19,17 @@ type Props = {
 export default function Page({ params, searchParams }: Props) {
     const [post, setPost] = useState<any>(null)
     const [isFollowing, setIsFollowing] = useState<boolean>(false) // 팔로우 상태를 관리하는 상태 추가
+    const [likeCount, setLikeCount] = useState<number>(0)
+    const [liked, setLiked] = useState<boolean>(false)
     const router = useRouter()
 
     useEffect(() => {
         const fetchPost = async () => {
             const post = await getPost(params.post_id)
             setPost(post)
+            setLikeCount(post.likeCount)
+            const isLiked = await getLikeStatus(params.post_id) // 좋아요 상태 확인
+            setLiked(isLiked)
             // 여기서는 초기 팔로우 상태를 false로 설정
         }
         fetchPost()
@@ -44,6 +52,16 @@ export default function Page({ params, searchParams }: Props) {
             console.error('Failed to update follow status:', error)
         }
     }
+    const handleLikeClick = async () => {
+        try {
+            const isLiked = await likePost(params.post_id)
+            setLiked(isLiked)
+            setLikeCount(prevCount => (isLiked ? prevCount + 1 : prevCount - 1))
+        } catch (error) {
+            console.error('Failed to update like status:', error)
+        }
+    }
+
     if (!post) return <div>Loading...</div>
 
     return (
@@ -69,7 +87,17 @@ export default function Page({ params, searchParams }: Props) {
                     </div>
                     <span className={styles.username}>{post.nickname}</span>
                 </div>
-                <button
+                
+                <div className={styles.actions}>
+                    <button className={styles.likeButton} onClick={handleLikeClick}>
+                        {liked ? (
+                            <AiFillHeart className={styles.heartIcon} />
+                        ) : (
+                            <AiOutlineHeart className={styles.heartIcon} />
+                        )}
+                    </button>
+                    <span className={styles.likeCount}>{likeCount}</span>
+                    <button
                     className={
                         isFollowing
                             ? styles.followingButton
@@ -79,6 +107,7 @@ export default function Page({ params, searchParams }: Props) {
                 >
                     {isFollowing ? '팔로잉' : '팔로우'}
                 </button>
+                </div>
             </div>
             <div className={styles.content}>{post.postContent}</div>
             <Suspense fallback={<div>Loading...</div>}>

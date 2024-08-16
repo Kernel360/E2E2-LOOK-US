@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.example.common.TimeTrackableEntity;
 import org.example.user.domain.entity.member.UserEntity;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @Table(name = "\"like\"")
-@SQLDelete(sql = "UPDATE `like` SET removed_at = CURRENT_TIMESTAMP WHERE id=?")
-@Where(clause = "removed_at IS NULL")
+@SQLDelete(sql = "UPDATE `like` SET removed_at = CURRENT_TIMESTAMP WHERE like_id=?")
+@SQLRestriction("removed_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LikeEntity extends TimeTrackableEntity {
 

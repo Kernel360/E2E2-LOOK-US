@@ -1,14 +1,18 @@
 package org.example.post.controller;
 
 import org.example.post.domain.dto.PostDto;
+import org.example.post.domain.entity.PostEntity;
 import org.example.post.repository.custom.PostSearchCondition;
 import org.example.post.service.PostService;
+import org.example.user.domain.entity.member.UserEntity;
+import org.example.user.service.member.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostPublicController {
 	private final PostService postService;
+	private final UserService userService;
 
 	// Permit All
 	@Operation(summary = "게시글 조회 API", description = "모든 게시글 조회 및 해시태그, 검색 키워드로 조회 가능하다.")
@@ -34,8 +39,8 @@ public class PostPublicController {
 	})
 	@GetMapping("")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
-		 PostSearchCondition postSearchCondition,
-		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+		PostSearchCondition postSearchCondition
 	) {
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(postService.findAllPosts(postSearchCondition, pageable));
@@ -65,5 +70,14 @@ public class PostPublicController {
 	public ResponseEntity<Integer> likeCount(@RequestBody PostDto.PostIdRequest likeRequest) {
 		int likeCount = postService.likeCount(likeRequest.postId());
 		return ResponseEntity.status(HttpStatus.OK).body(likeCount);
+	}
+
+	@GetMapping("/{postId}/like-status")
+	public ResponseEntity<Boolean> getLikeStatus(@PathVariable Long postId,
+		Authentication authentication) {
+		UserEntity user = userService.getUserByEmail(authentication.getName());
+		PostEntity post = postService.findPostById(postId);
+		boolean isLiked = postService.existLikePost(user, post);
+		return ResponseEntity.ok(isLiked);
 	}
 }

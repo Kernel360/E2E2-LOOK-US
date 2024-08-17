@@ -199,8 +199,8 @@ public class PostService {
 			.orElseThrow(
 				() -> ApiUserException.builder()
 					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
-					.subCategory(ApiUserErrorSubCategory.USER_DEACTIVATE)
-					.setErrorData(() -> ("입력된 이메일을 다시 확인하세요" + email))
+					.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+					.setErrorData(() -> ("존재하는 사용자가 없습니다" + email))
 					.build()
 			);
 	}

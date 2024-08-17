@@ -123,6 +123,7 @@ public class PostDto {
 		Long postId
 	) {
 	}
+
 	public record PostMyPageDtoResponse(
 		Long postId,
 		Long imageId,

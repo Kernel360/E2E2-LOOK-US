@@ -97,7 +97,7 @@ export async function likePost(postId: number) {
 }
 
 export async function getLikeStatus(postId: number) {
-    const requestUrl = `${API_PUBLIC_URL}/posts/${postId}/like-status`;
+    const requestUrl = `${API_PRIVATE_URL}/posts/${postId}/like-status`;
     const res = await fetch(requestUrl, {
         method: 'GET',
         credentials: 'include',

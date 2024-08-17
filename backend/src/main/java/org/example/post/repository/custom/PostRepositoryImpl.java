@@ -5,16 +5,20 @@ import static org.example.post.domain.entity.QHashtagEntity.*;
 import static org.example.post.domain.entity.QPostEntity.*;
 import static org.example.user.domain.entity.member.QUserEntity.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.example.post.domain.dto.PostDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
@@ -59,9 +63,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 				postEntity.postId,
 				postEntity.imageId,
 				hashtagEntity.hashtagContent,
-				postEntity.likeCount
+				postEntity.likeCount,
+				postEntity.createdAt
 			).distinct()
-			.from(postEntity)
+			.from(postEntity).distinct()
 			.leftJoin(postEntity.user, userEntity)
 			.leftJoin(postEntity.hashtags, hashtagEntity)
 			.where(builder)
@@ -77,10 +82,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			Long postId = tuple.get(postEntity.postId);
 			Long imageId = tuple.get(postEntity.imageId);
 			String hashtagContent = tuple.get(hashtagEntity.hashtagContent);
+			LocalDateTime createdAt = tuple.get(postEntity.createdAt);
 			int likeCount = Optional.ofNullable(tuple.get(postEntity.likeCount)).orElse(0);
 
 			PostDto.PostDtoResponse dto = postDtoMap.computeIfAbsent(postId, id ->
-				new PostDto.PostDtoResponse(nickname, id, imageId, new ArrayList<>(), likeCount)
+				new PostDto.PostDtoResponse(nickname, id, imageId, new ArrayList<>(), likeCount, createdAt)
 			);
 
 			if (hashtagContent != null && !dto.hashtags().contains(hashtagContent)) {
@@ -89,6 +95,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		}
 
 		List<PostDto.PostDtoResponse> content = new ArrayList<>(postDtoMap.values());
+
+		Sort sort = pageable.getSort();
+
+		if (sort.isSorted()) {
+			sortPosts(sort, content);
+		}
 
 		return new PageImpl<>(content, pageable, total);
 	}
@@ -117,11 +129,36 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		return hBuilder;
 	}
 
-	public List<String> splitString(String str, String delimiter) {
+	private List<String> splitString(String str, String delimiter) {
 		if (isEmpty(str)) {
 			return List.of();
 		}
 		return List.of(str.split(delimiter));
+	}
+
+	private List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content) {
+		final Map<String, Function<PostDto.PostDtoResponse, Comparable>> COMPARATORS = new HashMap<>();
+		COMPARATORS.put("createdAt", PostDto.PostDtoResponse::createdAt);
+
+		Comparator<PostDto.PostDtoResponse> comparator = null;
+
+		for (Sort.Order order : sort) {	// TODO: sort 조건 추가 입력 가능 1. createdAt, 2. ?
+			Comparator<PostDto.PostDtoResponse> newComparator;
+
+			newComparator = Comparator.comparing(COMPARATORS.get(order.getProperty()));
+
+			if (order.isDescending()) {
+				newComparator = newComparator.reversed();
+			}
+
+			comparator = comparator == null ? newComparator : comparator.thenComparing(newComparator);
+		}
+
+		if (comparator != null) {
+			content.sort(comparator);
+		}
+
+		return content;
 	}
 
 }

@@ -98,7 +98,8 @@ public class PostDto {
 		Long postId,
 		Long imageId,
 		List<String> hashtags,
-		int likeCount
+		int likeCount,
+		LocalDateTime createdAt
 	) {
 
 		// Canonical Constructor
@@ -108,9 +109,10 @@ public class PostDto {
 			Long postId,
 			Long imageId,
 			String hashtagContent,
-			int likeCount
+			int likeCount,
+			LocalDateTime createdAt
 		) {
-			this(nickname, postId, imageId, splitHashtags(hashtagContent), likeCount);
+			this(nickname, postId, imageId, splitHashtags(hashtagContent), likeCount, createdAt);
 		}
 
 		// Helper Method to split hashtagContent into List<String>

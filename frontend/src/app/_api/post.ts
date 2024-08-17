@@ -9,6 +9,7 @@ export interface GetPostResponse {
     postContent: string
     hashtagContents: string[]
     likeCount: number
+    likeStatus: boolean // likeStatus 필드 추가
     createdAt: Date
     updatedAt: Date
 }
@@ -95,18 +96,3 @@ export async function likePost(postId: number) {
 
     return await res.json(); // Returns true if liked, false if unliked
 }
-
-export async function getLikeStatus(postId: number) {
-    const requestUrl = `${API_PRIVATE_URL}/posts/${postId}/like-status`;
-    const res = await fetch(requestUrl, {
-        method: 'GET',
-        credentials: 'include',
-    });
-
-    if (!res.ok) {
-        throw new Error('Failed to fetch like status');
-    }
-
-    return await res.json(); // boolean 값 반환
-}
-

@@ -24,6 +24,8 @@ import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -131,7 +133,22 @@ public class PostService {
 	public PostDto.PostDetailDtoResponse getPostById(Long postId) {
 		PostEntity post = findPostById(postId);
 
-		return PostDto.PostDetailDtoResponse.toDto(post);
+		String email = null;
+		boolean existLikePost = false;
+
+		// 인증 정보가 있는지 확인
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.isAuthenticated()) {
+			email = authentication.getName();
+		}
+
+		// 회원인 경우 좋아요 상태 확인
+		if (email != null && !email.equals("anonymousUser")) {
+			UserEntity user = findUserByEmail(email);
+			existLikePost = existLikePost(user, post);
+		}
+
+		return PostDto.PostDetailDtoResponse.toDto(post, existLikePost);
 	}
 
 	public Boolean like(Long postId, String email) {

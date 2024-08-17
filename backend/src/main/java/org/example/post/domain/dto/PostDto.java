@@ -49,6 +49,7 @@ public class PostDto {
 		String postContent,
 		List<String> hashtagContents,
 		int likeCount,
+		boolean likeStatus,
 		LocalDateTime createdAt,
 		LocalDateTime updatedAt
 	) {
@@ -61,6 +62,7 @@ public class PostDto {
 			String postContent,
 			List<String> hashtagContents,
 			int likeCount,
+			boolean likeStatus,
 			LocalDateTime createdAt,
 			LocalDateTime updatedAt
 		) {
@@ -70,11 +72,13 @@ public class PostDto {
 			this.postContent = postContent;
 			this.hashtagContents = hashtagContents;
 			this.likeCount = likeCount;
+			this.likeStatus = likeStatus;
 			this.createdAt = createdAt;
 			this.updatedAt = updatedAt;
 		}
 
-		public static PostDetailDtoResponse toDto(PostEntity postEntity) {
+		public static PostDetailDtoResponse toDto(PostEntity postEntity, boolean likeStatus) {
+
 			return new PostDetailDtoResponse(
 				postEntity.getUser().getNickname(),
 				postEntity.getPostId(),
@@ -82,6 +86,7 @@ public class PostDto {
 				postEntity.getPostContent(),
 				postEntity.getHashtagContents() != null ? postEntity.getHashtagContents() : Collections.emptyList(),
 				postEntity.getLikeCount(),
+				likeStatus,
 				postEntity.getCreatedAt(),
 				postEntity.getUpdatedAt()
 			);

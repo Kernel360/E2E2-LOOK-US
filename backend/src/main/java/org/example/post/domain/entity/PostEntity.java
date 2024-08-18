@@ -12,7 +12,7 @@ import org.example.exception.post.ApiPostException;
 import org.example.post.domain.enums.PostStatus;
 import org.example.user.domain.entity.member.UserEntity;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "post")
 @SQLDelete(sql = "UPDATE post SET removed_at = CURRENT_TIMESTAMP WHERE post_id=?")
-@Where(clause = "removed_at IS NULL")
+@SQLRestriction("removed_at IS NULL")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostEntity extends TimeTrackableEntity {
@@ -91,7 +91,7 @@ public class PostEntity extends TimeTrackableEntity {
 		this.imageId = imageId;
 	}
 
-	public void updateHashtags(List<HashtagEntity> hashtags){
+	public void updateHashtags(List<HashtagEntity> hashtags) {
 		this.hashtags.clear();
 		this.hashtags.addAll(hashtags);
 	}

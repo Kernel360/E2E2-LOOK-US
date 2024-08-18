@@ -1,12 +1,11 @@
 package org.example.post.controller;
 
 import org.example.exception.common.ApiErrorCategory;
-
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
-
 import org.example.post.domain.dto.PostDto;
 import org.example.post.service.PostService;
+import org.example.user.service.member.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class PostApiController {
 
 	private final PostService postService;
+	private final UserService userService;
 
 	// Permit Only User
 	@Operation(summary = "게시글 작성 API", description = "사용자가 게시글을 작성할 수 있다.")
@@ -91,9 +91,10 @@ public class PostApiController {
 		// String message = like ? "좋아요 완료" : "좋아요 취소";
 		return ResponseEntity.status(HttpStatus.OK).body(like);
 	}
-  
+
 	@DeleteMapping("")
-	public ResponseEntity<Void> deletePost(@RequestBody PostDto.PostIdRequest deleteRequest, Authentication authentication) {
+	public ResponseEntity<Void> deletePost(@RequestBody PostDto.PostIdRequest deleteRequest,
+		Authentication authentication) {
 
 		postService.delete(deleteRequest.postId(), authentication.getName());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

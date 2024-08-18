@@ -1,7 +1,6 @@
 .postContainer {
     max-width: 600px;
     margin: 0 auto;
-    // padding-bottom: 2em;
     padding: 16px;
     background-color: #fff;
     border-radius: 8px;
@@ -91,4 +90,31 @@
 
 .hashtag:hover {
     background-color: #d0d0d0;
+}
+
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 좋아요와 팔로우 버튼 간격 */
+}
+
+.likeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.heartIcon {
+    font-size: 24px;
+    color: #ff5e57; /* 기본 하트 색상 */
+}
+
+.likeCount {
+    font-size: 16px;
+    margin-left: 4px;
+    color: #333;
 }

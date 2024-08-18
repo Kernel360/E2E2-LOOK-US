@@ -34,8 +34,8 @@ public class PostPublicController {
 	})
 	@GetMapping("")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
-		 PostSearchCondition postSearchCondition,
-		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+		PostSearchCondition postSearchCondition
 	) {
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(postService.findAllPosts(postSearchCondition, pageable));
@@ -66,4 +66,5 @@ public class PostPublicController {
 		int likeCount = postService.likeCount(likeRequest.postId());
 		return ResponseEntity.status(HttpStatus.OK).body(likeCount);
 	}
+
 }

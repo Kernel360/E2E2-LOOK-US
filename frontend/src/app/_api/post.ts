@@ -9,6 +9,7 @@ export interface GetPostResponse {
     postContent: string
     hashtagContents: string[]
     likeCount: number
+    likeStatus: boolean // likeStatus 필드 추가
     createdAt: Date
     updatedAt: Date
 }
@@ -17,6 +18,7 @@ export async function getPost(postId: number) {
     const requestUrl = `${API_PUBLIC_URL}/posts/${postId}`
     const res = await fetch(requestUrl, {
         method: 'GET',
+        credentials: 'include',
     })
 
     const body = await res.json()
@@ -74,4 +76,24 @@ export async function createPost(form: PostFormValues) {
         const body = await res.json()
         throw new ApiError(res.status, body)
     }
+}
+
+export async function likePost(postId: number) {
+    const requestUrl = `${API_PRIVATE_URL}/posts/likes`;
+
+    const res = await fetch(requestUrl, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId }),  // postId를 JSON 형식으로 전달
+    });
+
+    if (!res.ok) {
+        const body = await res.json();
+        throw new ApiError(res.status, body);
+    }
+
+    return await res.json(); // Returns true if liked, false if unliked
 }

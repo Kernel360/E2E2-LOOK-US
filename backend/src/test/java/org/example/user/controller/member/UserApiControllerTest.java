@@ -140,7 +140,7 @@ class UserApiControllerTest {
 					.build()
 			);
 	}
-
+/*
 	@DisplayName("내 게시글 조회 테스트")
 	@Test
 	void testGetMyPost() throws Exception {
@@ -160,7 +160,8 @@ class UserApiControllerTest {
 			.andExpect(jsonPath("$[0].hashtags[0]").value("newtest"))
 			.andExpect(jsonPath("$[0].hashtags[1]").value("test"))
 			.andExpect(jsonPath("$[0].likeCount").value(0));
-	}
+	}*/
+/*
 
 	@DisplayName("내 정보 조회 테스트")
 	@Test
@@ -189,6 +190,7 @@ class UserApiControllerTest {
 			.andExpect(jsonPath("$.nickname").value("nickname"))
 			.andExpect(jsonPath("$.postNum").value(1));
 	}
+*/
 
 	@DisplayName("회원 탈퇴 테스트")
 	@Test

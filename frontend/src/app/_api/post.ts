@@ -18,6 +18,7 @@ export async function getPost(postId: number) {
     const requestUrl = `${API_PUBLIC_URL}/posts/${postId}`
     const res = await fetch(requestUrl, {
         method: 'GET',
+        credentials: 'include',
     })
 
     const body = await res.json()

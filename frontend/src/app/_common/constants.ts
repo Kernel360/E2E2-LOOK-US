@@ -1,5 +1,5 @@
 
-const SERVER_IP_ADDR = "https://api.lookus.shop:8080"
+const SERVER_IP_ADDR = "https://api.lookus.shop:8443"
 
 export const API_PRIVATE_URL = `${SERVER_IP_ADDR}/api/v1`
 export const API_PUBLIC_URL = `${SERVER_IP_ADDR}/api/a1`;

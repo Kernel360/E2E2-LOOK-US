@@ -13,8 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.example.post.domain.dto.PostDto;
+import org.example.post.domain.entity.HashtagEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -61,17 +63,15 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			.select(
 				userEntity.nickname,
 				postEntity.postId,
-				postEntity.imageId,
 				hashtagEntity.hashtagContent,
+				postEntity.imageId,
 				postEntity.likeCount,
 				postEntity.createdAt
 			).distinct()
-			.from(postEntity).distinct()
+			.from(postEntity)
 			.leftJoin(postEntity.user, userEntity)
 			.leftJoin(postEntity.hashtags, hashtagEntity)
 			.where(builder)
-			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
 			.fetch();
 
 		// Process results to group by postId
@@ -98,11 +98,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
 		Sort sort = pageable.getSort();
 
+		List<PostDto.PostDtoResponse> sortedPosts = null;
 		if (sort.isSorted()) {
-			sortPosts(sort, content);
+			sortedPosts = sortPosts(sort, content, pageable);
 		}
-
-		return new PageImpl<>(content, pageable, total);
+		return new PageImpl<>(sortedPosts, pageable, total);
 	}
 
 	private Predicate postContentContains(String postContent) {
@@ -136,7 +136,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		return List.of(str.split(delimiter));
 	}
 
-	private List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content) {
+	private List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content, Pageable pageable) {
 		final Map<String, Function<PostDto.PostDtoResponse, Comparable>> COMPARATORS = new HashMap<>();
 		COMPARATORS.put("createdAt", PostDto.PostDtoResponse::createdAt);
 
@@ -158,7 +158,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			content.sort(comparator);
 		}
 
-		return content;
+
+		return content.stream()
+			.skip(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.collect(Collectors.toList());
 	}
 
 }

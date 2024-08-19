@@ -56,10 +56,16 @@ public class PostService {
 			storageSaveResult.resourceLocationId(),
 			0
 		);
+		postRepository.save(post);
 
-		post.addHashtags(postDto.convertHashtagContents(postDto.hashtagContents(), "#").stream()
+		List<HashtagEntity> hashtagEntities = postDto.convertHashtagContents(postDto.hashtagContents(), "#")
+			.stream()
 			.map(hashtag -> new HashtagEntity(post, hashtag))
-			.collect(Collectors.toList()));
+			.toList();
+
+		hashtagRepository.saveAll(hashtagEntities);
+
+		post.addHashtags(hashtagEntities);
 
 		PostEntity savedPost = postRepository.save(post);
 

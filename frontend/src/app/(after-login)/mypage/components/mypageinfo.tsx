@@ -1,27 +1,38 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/MeSpDnKyjpf
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
 'use client'
 import { useEffect, useState } from 'react'
-import ProfileImageModal from './ProfileImageModal' // Modal 컴포넌트 임포트
 import {
     updateProfileImg,
     myInfoAllFunction,
     myInfoAllResponse,
 } from '@/app/_api/myPage'
 import { API_PUBLIC_URL } from '@/app/_common/constants'
+import FollowListModal from './FollowListModal' // 팔로워/팔로잉 모달 임포트
+import './mypageinfo.scss' // 스타일 파일 임포트
 
 export default function MyPageInfoComponent() {
     const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null)
-    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false)
+    const [isFollowingsModalOpen, setIsFollowingsModalOpen] = useState(false)
+    const [followers, setFollowers] = useState([])
+    const [followings, setFollowings] = useState([])
 
     useEffect(() => {
         async function fetchUserInfo() {
             try {
                 const data = await myInfoAllFunction()
                 setUserInfo(data)
+
+                const followersResponse = await fetch(
+                    `${API_PUBLIC_URL}/me/follow/relation?type=followers&nickname=${data.nickname}`,
+                )
+                const followersData = await followersResponse.json()
+                setFollowers(followersData.followers)
+
+                const followingsResponse = await fetch(
+                    `${API_PUBLIC_URL}/me/follow/relation?type=followings&nickname=${data.nickname}`,
+                )
+                const followingsData = await followingsResponse.json()
+                setFollowings(followingsData.followers)
             } catch (error) {
                 console.error('Failed to fetch user info:', error)
             }
@@ -33,7 +44,7 @@ export default function MyPageInfoComponent() {
     const handleProfileImageSave = async (file: File) => {
         try {
             await updateProfileImg(file)
-            const updatedUserInfo = await myInfoAllFunction() // 업데이트된 정보 다시 가져오기
+            const updatedUserInfo = await myInfoAllFunction()
             setUserInfo(updatedUserInfo)
         } catch (error) {
             console.error('Failed to update profile image:', error)
@@ -43,37 +54,58 @@ export default function MyPageInfoComponent() {
     if (!userInfo) return <div>Loading...</div>
 
     return (
-        <div>
-            <div className='px-4 space-y-6 sm:px-6'>
-                <header className='space-y-2'>
-                    <div className='flex items-center space-x-3'>
-                        <img
-                            src={`${API_PUBLIC_URL}/image/${userInfo.imageId}`}
-                            alt='Avatar'
-                            width='96'
-                            height='96'
-                            className='rounded-full'
-                            style={{ aspectRatio: '96/96', objectFit: 'cover' }}
-                        />
-                        <div className='space-y-1'>
-                            <h1 className='text-2xl font-bold'>
-                                {userInfo.nickname}
-                            </h1>
-                            <button
-                                className='px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md'
-                                onClick={() => setIsModalOpen(true)}
-                            >
-                                프로필 이미지 변경
-                            </button>
-                        </div>
+        <div className='mypage-info'>
+            <div className='mypage-info-header'>
+                <div className='mypage-info-content'>
+                    <img
+                        src={`${API_PUBLIC_URL}/image/${userInfo.imageId}`}
+                        alt='Avatar'
+                        className='rounded-full profile-image'
+                    />
+                    <div>
+                        <h2 className='mypage-username'>{userInfo.nickname}</h2>
+                        <a
+                            href={`https://www.instagram.com/${userInfo.instaId}/`}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='mypage-instagram'
+                        >
+                            @{userInfo.instaId}
+                        </a>
                     </div>
-                </header>
+                </div>
+            </div>
+            <div className='mypage-actions'>
+                <button className='profile-edit-button'>프로필 편집</button>
+                <button className='profile-share-button'>프로필 공유</button>
+            </div>
+            <div className='mypage-stats'>
+                <span
+                    onClick={() => setIsFollowersModalOpen(true)}
+                    className='clickable'
+                >
+                    팔로워 {followers.length}명
+                </span>
+                <span
+                    onClick={() => setIsFollowingsModalOpen(true)}
+                    className='clickable'
+                >
+                    팔로잉 {followings.length}명
+                </span>
             </div>
 
-            <ProfileImageModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleProfileImageSave}
+            <FollowListModal
+                isOpen={isFollowersModalOpen}
+                onClose={() => setIsFollowersModalOpen(false)}
+                title='팔로워 목록'
+                list={followers}
+            />
+
+            <FollowListModal
+                isOpen={isFollowingsModalOpen}
+                onClose={() => setIsFollowingsModalOpen(false)}
+                title='팔로잉 목록'
+                list={followings}
             />
         </div>
     )

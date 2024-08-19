@@ -2,6 +2,8 @@
 
 import { BsFillEraserFill, BsSearch } from 'react-icons/bs'
 import { useCallback, useState } from 'react'
+import { FaPalette } from 'react-icons/fa'
+import Link from 'next/link' // next/link를 사용해요
 
 interface HeaderSearchProps {
     onSearch: (search: string) => void
@@ -38,6 +40,7 @@ const HeaderSearch = ({ onSearch }: HeaderSearchProps) => {
                 transition: 'background-color 0.3s ease',
                 height: '45px',
                 marginBottom: '20px',
+                position: 'relative', // 모달 위치 조정을 위해 relative로 설정해요 🎀
             }}
         >
             {!isFocused && <BsSearch size={20} onClick={triggerSearch} />}
@@ -84,6 +87,28 @@ const HeaderSearch = ({ onSearch }: HeaderSearchProps) => {
                     <BsFillEraserFill size={20} />
                 </div>
             )}
+            <Link href='/color-selection'>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '30px',
+                        height: '30px',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.3s ease',
+                    }}
+                    onMouseEnter={e =>
+                        (e.currentTarget.style.backgroundColor = '#cccccc')
+                    }
+                    onMouseLeave={e =>
+                        (e.currentTarget.style.backgroundColor = 'transparent')
+                    }
+                >
+                    <FaPalette size={20} />
+                </div>
+            </Link>
         </div>
     )
 }

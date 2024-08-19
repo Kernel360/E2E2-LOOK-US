@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 
+import './ProfileImageModal.scss' // 스타일 파일 임포트
+
 interface ModalProps {
     isOpen: boolean
     onClose: () => void
@@ -29,23 +31,13 @@ const ProfileImageModal: React.FC<ModalProps> = ({
     if (!isOpen) return null
 
     return (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-            <div className='bg-white rounded-lg shadow-lg w-full max-w-md p-6'>
-                <h2 className='text-lg font-bold mb-4'>프로필 이미지 변경</h2>
+        <div className='modal-overlay'>
+            <div className='modal-content'>
+                <h2 className='modal-title'>프로필 이미지 변경</h2>
                 <input type='file' onChange={handleFileChange} />
-                <div className='mt-4 flex justify-end'>
-                    <button
-                        className='mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md'
-                        onClick={onClose}
-                    >
-                        취소
-                    </button>
-                    <button
-                        className='px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md'
-                        onClick={handleSave}
-                    >
-                        저장
-                    </button>
+                <div className='modal-actions'>
+                    <button onClick={onClose}>취소</button>
+                    <button onClick={handleSave}>저장</button>
                 </div>
             </div>
         </div>

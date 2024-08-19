@@ -20,7 +20,6 @@ export default function RootLayout({
         <html lang='ko'>
             <body className={cn(inter.className)}>
                 <main className='max-w-5xl mt-8 ml-4 mr-4'>{children}</main>
-                <BottomControlBar />
             </body>
         </html>
     )

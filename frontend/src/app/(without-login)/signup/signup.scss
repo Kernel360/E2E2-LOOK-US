@@ -1,0 +1,151 @@
+.signup-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f4f8;
+}
+
+.signup-box {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.signup-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.signup-label {
+    width: 100%;
+    font-size: 1.1rem;
+    color: #333333;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.signup-input {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+
+    &:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+}
+
+.signup-button {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: #0056b3;
+    }
+}
+
+.signup-gender {
+    display: flex;
+    justify-content: space-between; /* 버튼 간격을 동일하게 분배 */
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.signup-gender-button {
+    flex: 1; /* 버튼들이 동일한 크기를 가지도록 설정 */
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 2px solid #ced4da;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin: 0 0.5rem; /* 버튼 사이 간격 추가 */
+
+    &.active {
+        background-color: #007bff;
+        color: #ffffff;
+        border-color: #007bff;
+    }
+
+    &:hover {
+        background-color: #e2e6ea;
+    }
+}
+
+/* 프로필 이미지 업로드 */
+.signup-image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.signup-image-input {
+    display: none;
+}
+
+.signup-image-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.signup-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.signup-camera-icon {
+    font-size: 2rem;
+    color: #6c757d;
+}

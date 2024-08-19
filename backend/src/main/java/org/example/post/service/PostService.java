@@ -1,5 +1,6 @@
 package org.example.post.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class PostService {
 	private final HashtagRepository hashtagRepository;
 
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
-		String email, MultipartFile image) {
+		String email, MultipartFile image) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
 		StorageSaveResult storageSaveResult = imageStorageManager.saveResource(image,
@@ -77,7 +78,7 @@ public class PostService {
 		MultipartFile image,
 		String email,
 		Long postId
-	) {
+	) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
 		PostEntity post = findPostById(postId);

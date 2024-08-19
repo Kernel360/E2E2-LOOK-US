@@ -2,6 +2,7 @@ package org.example.user.service.member;
 
 import static org.example.config.oauth.OAuth2SuccessHandler.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.example.exception.common.ApiErrorCategory;
@@ -37,7 +38,7 @@ public class UserService {
 		UserDto.UserUpdateRequest updateRequest,
 		String email,
 		MultipartFile profileImage
-	) {
+	) throws IOException {
 		UserEntity user = this.getUserByEmail(email);
 		AssertThat_UserAccountIsActive(user);
 

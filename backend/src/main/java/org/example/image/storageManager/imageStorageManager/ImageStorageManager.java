@@ -1,10 +1,14 @@
 package org.example.image.storageManager.imageStorageManager;
 
+import java.io.IOException;
+
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.storage.ApiStorageErrorSubCategory;
 import org.example.exception.storage.ApiStorageException;
 import org.example.image.resourceLocation.entity.ResourceLocationEntity;
 import org.example.image.resourceLocation.repository.ResourceLocationRepository;
+import org.example.image.service.DetectProperties;
+import org.example.image.service.VisionService;
 import org.example.image.storage.core.StoragePacket;
 import org.example.image.storage.core.StorageSaveResultInternal;
 import org.example.image.storage.core.StorageService;
@@ -25,20 +29,22 @@ public class ImageStorageManager implements StorageManager {
 
 	private final ResourceLocationRepository imageRepository;
 	private final StorageService storageService;
+	private final VisionService visionService;
 
 	public ImageStorageManager(
 		ResourceLocationRepository resourceLocationRepository,
-		StorageService storageService
+		StorageService storageService, VisionService visionService
 	) {
 		this.imageRepository = resourceLocationRepository;
 		this.storageService = storageService;
+		this.visionService = visionService;
 	}
 
 	@Override
 	public StorageSaveResult saveResource(
 		@NonNull MultipartFile file,
 		StorageType storageType
-	) {
+	) throws IOException {
 		StoragePacket packet = StoragePacket
 			.builder()
 			.fileData(file)
@@ -61,6 +67,11 @@ public class ImageStorageManager implements StorageManager {
 				.savedPath(storageSaveResult.savedPath().toString())
 				.build()
 		);
+
+		// TODO: 옷 객체 필요
+		visionService.detectLocalizedObjects(savedImageLocation.getSavedPath());
+		// TODO: 자른 옷 객체를 반복문으로 호출 (3~4개)
+		// DetectProperties.detectProperties();
 
 		return new StorageSaveResult(
 			storageSaveResult.storageType(),

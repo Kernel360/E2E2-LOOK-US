@@ -1,5 +1,7 @@
 package org.example.image.controller;
 
+import java.io.IOException;
+
 import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageFindResult;
 import org.example.image.storageManager.common.StorageSaveResult;
@@ -47,7 +49,7 @@ public class ImageApiResourceController {
 	@PostMapping("/image")
 	public ResponseEntity<Long> handleImageUpload(
 		@RequestParam("image") MultipartFile file
-	) {
+	) throws IOException {
 		StorageSaveResult result = this.imageStorageManager.saveResource(file, StorageType.LOCAL_FILE_SYSTEM);
 
 		return ResponseEntity.status(HttpStatus.CREATED)

@@ -1,5 +1,7 @@
 package org.example.image.storageManager;
 
+import java.io.IOException;
+
 import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageFindResult;
 import org.example.image.storageManager.common.StorageSaveResult;
@@ -18,7 +20,7 @@ public interface StorageManager {
 	 *
 	 * @see StorageType
 	 */
-	StorageSaveResult saveResource(MultipartFile resource, StorageType storageType);
+	StorageSaveResult saveResource(MultipartFile resource, StorageType storageType) throws IOException;
 
 	/**
 	 * <p> 리소스 식별자를 통해서 {@link MultipartFile}을 획득 합니다.</p>

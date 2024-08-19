@@ -3,7 +3,8 @@ package org.example.image.tools;
 public class ColorConverter {
 
 	// CIE XYZ tristiumulus values of the reference white D65
-	private static final float[] STANDARD_TRISTIMULUS = {95.047f, 100.000f, 108.883f};
+	private static final float[] STANDARD_TRISTIMULUS_D65 = {95.047f, 100.000f, 108.883f};
+	private static final float[] STANDARD_TRISTIMULUS_D50 = {96.42f, 100.000f, 82.49f};
 
 	/**
 	 * RGB -> CIE-LAB.
@@ -15,7 +16,7 @@ public class ColorConverter {
 	// float[] tristimulus param maybe need if more accurate converter for specific environment or lighting condition
 	public static float[] RGBtoLAB(int red, int green, int blue){
 		float[] xyz = RGBtoXYZ(red, green, blue);
-		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], STANDARD_TRISTIMULUS);
+		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], STANDARD_TRISTIMULUS_D50);
 
 		return lab;
 	}
@@ -29,7 +30,7 @@ public class ColorConverter {
 	 */
 	// float[] tristimulus param maybe need if more accurate converter for specific environment or lighting condition
 	public static int[] LABtoRGB(float l, float a, float b){
-		float[] xyz = LABtoXYZ(l, a, b, STANDARD_TRISTIMULUS);
+		float[] xyz = LABtoXYZ(l, a, b, STANDARD_TRISTIMULUS_D50);
 		return XYZtoRGB(xyz[0], xyz[1], xyz[2]);
 	}
 

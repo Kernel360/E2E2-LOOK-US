@@ -1,5 +1,6 @@
 package org.example.user.controller.member;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.example.exception.common.ApiErrorCategory;
@@ -34,7 +35,7 @@ public class UserApiController {
 	public ResponseEntity<UserDto.UserUpdateResponse> userUpdate(
 		@RequestPart(value = "updateRequest", required = false) UserDto.UserUpdateRequest updateRequest,
 		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage
-	) {
+	) throws IOException {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		if(updateRequest == null && profileImage.isEmpty()){

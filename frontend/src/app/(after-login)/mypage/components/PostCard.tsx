@@ -1,44 +1,48 @@
-// components/PostCard.tsx
 import Image from 'next/image'
-import { API_PRIVATE_URL, API_PUBLIC_URL } from '@/app/_common/constants'
 import Link from 'next/link'
+import { API_PUBLIC_URL } from '@/app/_common/constants'
+import './postcard.scss' // 스타일 파일 임포트
 
 interface PostCardProps {
     imageId: number
     postContent: string
     likeCount: number
     postId: number
+    hashtags: string[] // 추가: 해시태그 배열
 }
 
-export function PostCard({
+export default function PostCard({
     imageId,
     postContent,
     likeCount,
     postId,
+    hashtags, // 추가: 해시태그 배열
 }: PostCardProps) {
-    const truncatedContent =
-        postContent.length > 10 ? postContent.slice(0, 10) + '...' : postContent
-
-    const onClickPostCard = () => {}
     return (
-        <div className='w-[300px] space-y-3'>
-            <div className='overflow-hidden rounded-md'>
+        <div className='postcard-container'>
+            <div className='postcard-header'>
                 <Link href={`/posts/${postId}`}>
                     <Image
                         src={`${API_PUBLIC_URL}/image/${imageId}`}
-                        alt={truncatedContent}
-                        width={300}
-                        height={400}
-                        className='h-auto w-auto object-cover transition-all hover:scale-105 aspect-square'
-                        onClick={onClickPostCard}
+                        alt={postContent}
+                        width={500} // 예시로 width 설정
+                        height={500} // 예시로 height 설정
+                        className='postcard-image'
                     />
                 </Link>
+                <div className='postcard-content'>
+                    <p className='postcard-text'>{postContent}</p>
+                    <div className='postcard-hashtags'>
+                        {hashtags.map((tag, index) => (
+                            <span key={index} className='postcard-hashtag'>
+                                #{tag}
+                            </span>
+                        ))}
+                    </div>
+                </div>
             </div>
-            <div className='space-y-1 text-sm'>
-                <h3 className='font-medium leading-none'>{truncatedContent}</h3>
-                <p className='text-xs text-muted-foreground'>
-                    좋아요 {likeCount}개
-                </p>
+            <div className='postcard-footer'>
+                <p className='postcard-likes'>좋아요 {likeCount}개</p>
             </div>
         </div>
     )

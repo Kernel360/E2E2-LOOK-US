@@ -93,5 +93,10 @@ for (i in seq_len(num_clicks)) {
   elements <- remDr$findElements(using = "xpath", value = "//div[@jsname='dTDiAc']")
 }
 
+# 브라우저 창 닫기
+remDr$close()
+
+# Selenium 서버 종료
+remDr$server$stop()
 
 

@@ -10,6 +10,7 @@ data/images
 !**/src/main/**/build/
 !**/src/test/**/build/
 docker-compose.yaml
+Dockerfile
 src/main/resources/ssl/*
 backend/data/*
 ### STS ###
@@ -56,3 +57,4 @@ out/
 
 ### Google Cloud Key ###
 ../*.json
+

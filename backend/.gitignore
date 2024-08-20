@@ -56,4 +56,7 @@ out/
 
 ### Google Cloud Key ###
 ../*.json
+
+### Image Crawling ###
 ../ImageWebCrawling.R
+../images

@@ -1,4 +1,10 @@
-FROM amazoncorretto-17
-ARG JAR_FILE=build/libs/e2e2-look-us-0.0.1-SNAPSHOT-plain.jar
-ADD ${JAR_FILE} docker-e2e2lookus.jar
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/dockere2e2lookus.jar"]
+# MySQL 이미지를 기반으로 이미지 생성
+FROM mysql:8.0.39
+
+# MySQL 설정
+ENV MYSQL_ROOT_PASSWORD=
+ENV MYSQL_DATABASE=look_us_db
+ENV MYSQL_PASSWORD=
+
+# 포트 설정 (기본 MySQL 포트는 3306)
+EXPOSE 3306

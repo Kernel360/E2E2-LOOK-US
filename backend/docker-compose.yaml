@@ -1,19 +1,17 @@
 version: "3.8"
 
-name: look-us-dev
-
 networks:
   backend:
     driver: bridge
 
 services:
-  mysql:
-    image: mysql:8.0
+  database:
+    image: mysql:8.0.39
     container_name: look-us-mysql
     ports:
-      - "3306:3306"
+      - "3309:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=Alswn1858!
+      - MYSQL_ROOT_PASSWORD=
       - MYSQL_DATABASE=look_us_db
       - TZ=Asia/Seoul
     volumes:

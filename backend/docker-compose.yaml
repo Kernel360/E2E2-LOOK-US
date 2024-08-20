@@ -5,15 +5,15 @@ networks:
     driver: bridge
 
 services:
-  database:
+  mysql:
     image: mysql:8.0.39
     container_name: look-us-mysql
     ports:
       - "3309:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_ROOT_PASSWORD=123456
       - MYSQL_DATABASE=look_us_db
-      - MYSQL_PASSWORD=123456
+      - MYSQL_PASSWORD=1234
       - TZ=Asia/Seoul
     volumes:
       - ./data/mysql-data:/var/lib/mysql
@@ -28,5 +28,13 @@ services:
     container_name: look-us-redis
     ports:
       - "6379:6379"
+    networks:
+      - backend
+  app:
+    build:
+      context: .  # Dockerfile이 위치한 디렉토리
+    container_name: look-us-app
+    ports:
+      - "8080:8080"
     networks:
       - backend

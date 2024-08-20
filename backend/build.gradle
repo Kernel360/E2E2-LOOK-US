@@ -48,6 +48,10 @@ dependencies {
     implementation 'javax.xml.bind:jaxb-api:2.3.1' //xml 문서와 자바 객체 간 매핑을 자동화
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' //OAuth2 의존성 추가
 
+    // Google Cloud Vision API Client Library
+    implementation 'com.google.cloud:google-cloud-vision:3.45.0'
+    /*implementation platform("com.google.cloud:libraries-bom:25.1.0")
+    implementation("com.google.cloud:spring-cloud-gcp-vision")*/
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -76,3 +80,4 @@ tasks.named('test') {
 clean {
     delete file('src/main/generated')
 }
+

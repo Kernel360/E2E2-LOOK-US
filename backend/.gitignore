@@ -1,3 +1,6 @@
+build.gradle-prod
+src/main/resources/keystore.p12
+
 HELP.md
 .gradle
 resources/templates/data.sql
@@ -52,3 +55,7 @@ out/
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml.DS_Store
+
+
+### Google Cloud Key ###
+../*.json

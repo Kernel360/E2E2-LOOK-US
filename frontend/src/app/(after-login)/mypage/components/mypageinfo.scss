@@ -1,0 +1,76 @@
+.mypage-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+}
+
+.mypage-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.mypage-info-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.mypage-username {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.mypage-instagram {
+    color: #3b5998;
+    text-decoration: none;
+}
+
+.mypage-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 1rem;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1rem;
+}
+
+.profile-edit-button,
+.profile-share-button {
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.profile-edit-button:hover,
+.profile-share-button:hover {
+    background-color: #e0e0e0;
+}
+
+.mypage-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #333;
+}
+
+.clickable {
+    cursor: pointer;
+    text-decoration: underline;
+}

@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import '@/app/globals.css'
 import BottomControlBar from '@/components/bottom-control-bar'
 import { cn } from '@/lib/utils'
-import { Separator } from '@radix-ui/react-select'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,16 +19,16 @@ export default function RootLayout({
     return (
         <html lang='en'>
             <body className={cn(inter.className)}>
-                {/* <Separator className=' my-10' /> */}
                 <main
                     className='max-w-5xl mx-auto overflow-scroll 
-                                    border bg-background shadow-md md:shadow-md'
+                               border bg-background shadow-md md:shadow-md'
                 >
                     {children}
                 </main>
-                {/* <Separator className=' my-[7rem]' /> */}
 
-                {/* TODO: show controlbar if user logged in */}
+                {/* Adding the ColorPicker component */}
+                <div className='color-picker-container my-8'></div>
+
                 <BottomControlBar />
             </body>
         </html>

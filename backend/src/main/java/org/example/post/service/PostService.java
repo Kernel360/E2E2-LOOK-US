@@ -1,5 +1,6 @@
 package org.example.post.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class PostService {
 	private final HashtagRepository hashtagRepository;
 
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
-		String email, MultipartFile image) {
+		String email, MultipartFile image) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
 		StorageSaveResult storageSaveResult = imageStorageManager.saveResource(image,
@@ -56,10 +57,16 @@ public class PostService {
 			storageSaveResult.resourceLocationId(),
 			0
 		);
+		postRepository.save(post);
 
-		post.addHashtags(postDto.convertHashtagContents(postDto.hashtagContents(), "#").stream()
+		List<HashtagEntity> hashtagEntities = postDto.convertHashtagContents(postDto.hashtagContents(), "#")
+			.stream()
 			.map(hashtag -> new HashtagEntity(post, hashtag))
-			.collect(Collectors.toList()));
+			.toList();
+
+		hashtagRepository.saveAll(hashtagEntities);
+
+		post.addHashtags(hashtagEntities);
 
 		PostEntity savedPost = postRepository.save(post);
 
@@ -71,7 +78,7 @@ public class PostService {
 		MultipartFile image,
 		String email,
 		Long postId
-	) {
+	) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
 		PostEntity post = findPostById(postId);

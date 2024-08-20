@@ -1,5 +1,7 @@
 package org.example.post.controller;
 
+import java.io.IOException;
+
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
@@ -44,7 +46,7 @@ public class PostApiController {
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	public ResponseEntity<PostDto.CreatePostDtoResponse> createPost(
 		@Valid @RequestPart("userRequest") PostDto.CreatePostDtoRequest userRequest,
-		@RequestPart(value = "image") MultipartFile image) {
+		@RequestPart(value = "image") MultipartFile image) throws IOException {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 		PostDto.CreatePostDtoResponse post = postService.createPost(userRequest, email, image);
 
@@ -61,7 +63,7 @@ public class PostApiController {
 		@RequestPart PostDto.CreatePostDtoRequest updateRequest,
 		@RequestPart(value = "image") MultipartFile image,
 		@PathVariable Long post_id
-	) {
+	) throws IOException {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		if (updateRequest.postContent().isEmpty() &&

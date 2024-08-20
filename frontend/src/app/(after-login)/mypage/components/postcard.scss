@@ -1,0 +1,44 @@
+.postcard-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #fff;
+}
+
+.postcard-header {
+    display: flex;
+    flex-direction: column;
+}
+
+.postcard-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.postcard-content {
+    margin-bottom: 0.5rem;
+}
+
+.postcard-text {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.postcard-hashtags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.postcard-hashtag {
+    font-size: 0.875rem;
+    color: #555;
+}
+
+.postcard-footer {
+    font-size: 0.875rem;
+    color: #555;
+    text-align: right;
+}

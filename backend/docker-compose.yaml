@@ -11,8 +11,9 @@ services:
     ports:
       - "3309:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_ROOT_PASSWORD=1234
       - MYSQL_DATABASE=look_us_db
+      - MYSQL_PASSWORD=123456
       - TZ=Asia/Seoul
     volumes:
       - ./data/mysql-data:/var/lib/mysql

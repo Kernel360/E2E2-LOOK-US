@@ -1,3 +1,6 @@
+build.gradle-prod
+src/main/resources/keystore.p12
+
 HELP.md
 .gradle
 resources/templates/data.sql

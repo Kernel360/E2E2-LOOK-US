@@ -8,9 +8,9 @@ import java.util.List;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
+import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
-import org.example.image.imageStorageManager.imageStorageManagerImpl.ImageStorageStorageManagerImpl;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.enums.UserStatus;
@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
 	private final UserRepository userRepository;
-	private final ImageStorageStorageManagerImpl imageStorageManager;
+	private final ImageStorageManager imageStorageManager;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	public UserDto.UserUpdateResponse updateUser(

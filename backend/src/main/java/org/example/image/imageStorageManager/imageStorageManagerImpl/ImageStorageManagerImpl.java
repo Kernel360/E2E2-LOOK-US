@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.storage.ApiStorageErrorSubCategory;
 import org.example.exception.storage.ApiStorageException;
-import org.example.image.ImageAnalyzeManager.analyzer.repository.ClothAnalyzeDataRepository;
-import org.example.image.ImageAnalyzeManager.analyzer.service.ClothAnalyzeService;
 import org.example.image.imageStorageManager.storage.entity.ResourceLocationEntity;
 import org.example.image.imageStorageManager.storage.repository.ResourceLocationRepository;
 import org.example.image.imageStorageManager.storage.service.core.StoragePacket;
@@ -22,27 +20,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Service
-public class ImageStorageStorageManagerImpl implements ImageStorageManager {
+@RequiredArgsConstructor
+public class ImageStorageManagerImpl implements ImageStorageManager {
 
 	// 현재는 Local File System 1개만 사용하며, 추후 변경될 예정입니다.
 	private final ResourceLocationRepository imageRepository;
 	private final StorageService storageService;
 
-	public ImageStorageStorageManagerImpl(
-		ResourceLocationRepository resourceLocationRepository,
-		StorageService storageService
-	) {
-		this.imageRepository = resourceLocationRepository;
-		this.storageService = storageService;
-	}
-
 	@Override
 	public StorageSaveResult saveResource(
 		@NonNull MultipartFile file,
 		StorageType storageType
-	) throws IOException {
+	) {
 		StoragePacket packet = StoragePacket
 			.builder()
 			.fileData(file)

@@ -1,7 +1,7 @@
 package org.example.image.imageStorageManager.storage.controller;
 
+import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.type.StorageFindResult;
-import org.example.image.imageStorageManager.imageStorageManagerImpl.ImageStorageStorageManagerImpl;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +32,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/a1")
 public class ImagePublicResourceController {
 
-	private final ImageStorageStorageManagerImpl imageStorageManager;
+	private final ImageStorageManager imageStorageManager;
 
-	public ImagePublicResourceController(ImageStorageStorageManagerImpl imageStorageManager) {
+	public ImagePublicResourceController(ImageStorageManager imageStorageManager) {
 		this.imageStorageManager = imageStorageManager;
 	}
 

@@ -2,16 +2,15 @@ package org.example.post.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.image.storage.core.StorageType;
-import org.example.image.storageManager.common.StorageSaveResult;
-import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
+import org.example.image.imageStorageManager.storage.service.core.StorageType;
+import org.example.image.imageStorageManager.type.StorageSaveResult;
+import org.example.image.imageStorageManager.imageStorageManagerImpl.ImageStorageStorageManagerImpl;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.LikeEntity;
@@ -40,7 +39,7 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
-	private final ImageStorageManager imageStorageManager;
+	private final ImageStorageStorageManagerImpl imageStorageManager;
 	private final LikeRepository likeRepository;
 	private final HashtagRepository hashtagRepository;
 

@@ -3,10 +3,7 @@ package org.example.user.repository.member.custom;
 import static org.example.post.domain.entity.QPostEntity.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.example.post.domain.dto.PostDto;
-import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.PostEntity;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;

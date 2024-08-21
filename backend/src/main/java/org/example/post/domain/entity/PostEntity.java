@@ -15,7 +15,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,6 +26,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -68,17 +72,22 @@ public class PostEntity extends TimeTrackableEntity {
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<LikeEntity> likes = new ArrayList<>();
 
+	@ElementCollection
+	@CollectionTable(name = "post_category_list", joinColumns = @JoinColumn(name = "post_id"))
+	@Column(name = "category_id")
+	private List<Long> categories = new ArrayList<>();
+
 	@Column(name = "removed_at")
 	private LocalDateTime removedAt;
 
 	@Builder
-	public PostEntity(UserEntity user, String postContent, Long imageId, int likeCount) {
+	public PostEntity(UserEntity user, String postContent, Long imageId, int likeCount, List<Long> categories) {
 		this.user = user;
 		this.postContent = postContent;
 		this.imageId = imageId;
 		this.likeCount = likeCount;
+		this.categories = categories;
 	}
-
 	public void addHashtags(List<HashtagEntity> hashtags) {
 		this.hashtags.addAll(hashtags);
 	}
@@ -117,4 +126,11 @@ public class PostEntity extends TimeTrackableEntity {
 				.build();
 		}
 	}
+
+	// 카테고리 리스트를 업데이트하는 메서드
+	public void updateCategoryList(List<Long> categoryList) {
+		this.categories.clear();
+		this.categories.addAll(categoryList);
+	}
+
 }

@@ -9,4 +9,7 @@ public interface PostRepositoryCustom {
 		PostSearchCondition searchCondition, Pageable pageable
 	);
 
+	Page<PostDto.PostDtoResponse> findPostsByCategory(Long categoryId, Pageable pageable);
+
+
 }

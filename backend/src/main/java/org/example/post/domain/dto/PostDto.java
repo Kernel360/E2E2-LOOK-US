@@ -13,12 +13,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 
 public class PostDto {
+
 	public record CreatePostDtoRequest(
 		@JsonProperty("post_content")
 		String postContent,
 
 		@JsonProperty("hashtag_content")
-		String hashtagContents
+		String hashtagContents,
+
+		@JsonProperty("category_ids")
+		List<Long> categories // 카테고리 ID 리스트 추가
 	) {
 		// Split and Convert String to List<String>
 		public List<String> convertHashtagContents(String hashtagContents, String regex) {
@@ -26,13 +30,11 @@ public class PostDto {
 				.filter(s -> !s.isEmpty())
 				.collect(Collectors.toList());
 		}
-
 	}
 
 	public record CreatePostDtoResponse(
 		Long postId
 	) {
-
 		public static CreatePostDtoResponse toDto(PostEntity postEntity) {
 			return new CreatePostDtoResponse(
 				postEntity.getPostId()
@@ -40,8 +42,6 @@ public class PostDto {
 		}
 	}
 
-	// TODO: 원래 ID를 받는게 맞지만, 프론트 테스트를 위해서 Resource를 바로 던지는 것으로 변경될 예정입니다.
-	//       이후 프론트 개발이 진행될 때는 image_id를 사용합니다.
 	public record PostDetailDtoResponse(
 		String nickname,
 		Long postId,
@@ -51,7 +51,8 @@ public class PostDto {
 		int likeCount,
 		boolean likeStatus,
 		LocalDateTime createdAt,
-		LocalDateTime updatedAt
+		LocalDateTime updatedAt,
+		List<Long> categories // 카테고리 리스트 추가
 	) {
 
 		@QueryProjection
@@ -64,7 +65,8 @@ public class PostDto {
 			int likeCount,
 			boolean likeStatus,
 			LocalDateTime createdAt,
-			LocalDateTime updatedAt
+			LocalDateTime updatedAt,
+			List<Long> categories // 카테고리 리스트 추가
 		) {
 			this.nickname = nickname;
 			this.postId = postId;
@@ -75,6 +77,7 @@ public class PostDto {
 			this.likeStatus = likeStatus;
 			this.createdAt = createdAt;
 			this.updatedAt = updatedAt;
+			this.categories = categories;
 		}
 
 		public static PostDetailDtoResponse toDto(PostEntity postEntity, boolean likeStatus) {
@@ -88,7 +91,8 @@ public class PostDto {
 				postEntity.getLikeCount(),
 				likeStatus,
 				postEntity.getCreatedAt(),
-				postEntity.getUpdatedAt()
+				postEntity.getUpdatedAt(),
+				postEntity.getCategories() // 카테고리 리스트 매핑
 			);
 		}
 	}
@@ -99,7 +103,11 @@ public class PostDto {
 		Long imageId,
 		List<String> hashtags,
 		int likeCount,
+<<<<<<< Updated upstream
 		LocalDateTime createdAt
+=======
+		List<Long> categories // 카테고리 이름 리스트 추가
+>>>>>>> Stashed changes
 	) {
 
 		// Canonical Constructor
@@ -110,9 +118,15 @@ public class PostDto {
 			Long imageId,
 			String hashtagContent,
 			int likeCount,
+<<<<<<< Updated upstream
 			LocalDateTime createdAt
 		) {
 			this(nickname, postId, imageId, splitHashtags(hashtagContent), likeCount, createdAt);
+=======
+			List<Long> categories // 카테고리 이름 리스트 추가
+		) {
+			this(nickname, postId, imageId, splitHashtags(hashtagContent), likeCount, categories);
+>>>>>>> Stashed changes
 		}
 
 		// Helper Method to split hashtagContent into List<String>
@@ -124,6 +138,7 @@ public class PostDto {
 				.filter(s -> !s.isEmpty())
 				.collect(Collectors.toList());
 		}
+
 	}
 
 	public record PostIdRequest(
@@ -138,9 +153,9 @@ public class PostDto {
 		List<String> hashtagContents,
 		Integer likeCount,
 		LocalDateTime createdAt,
-		LocalDateTime updatedAt
+		LocalDateTime updatedAt,
+		List<Long> categories // 카테고리 이름 리스트 추가
 	) {
-
 		public static PostMyPageDtoResponse toDto(PostEntity postEntity) {
 			return new PostMyPageDtoResponse(
 				postEntity.getPostId(),
@@ -149,7 +164,8 @@ public class PostDto {
 				postEntity.getHashtagContents(),
 				postEntity.getLikeCount(),
 				postEntity.getCreatedAt(),
-				postEntity.getUpdatedAt()
+				postEntity.getUpdatedAt(),
+				postEntity.getCategories()
 			);
 		}
 	}

@@ -55,6 +55,20 @@ public class PostPublicController {
 			.body(postService.getPostById(post_id));
 	}
 
+	@Operation(summary = "카테고리별 게시글 조회 API", description = "특정 카테고리의 게시글을 조회한다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "ok!!"),
+		@ApiResponse(responseCode = "404", description = "Resource not found!!")
+	})
+	@GetMapping("/category/{categoryId}")
+	public ResponseEntity<Page<PostDto.PostDtoResponse>> getPostsByCategory(
+		@PathVariable Long categoryId,
+		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+	) {
+		Page<PostDto.PostDtoResponse> posts = postService.findPostsByCategory(categoryId, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(posts);
+	}
+
 	//TODO : Request Body로 날리기
 	@Operation(summary = "게시글 좋아요 수 가져오는 API", description = "게시글의 좋아요 수를 가져온다")
 	@ApiResponses({

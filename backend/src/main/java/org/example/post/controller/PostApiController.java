@@ -1,7 +1,10 @@
 package org.example.post.controller;
 
+<<<<<<< Updated upstream
 import java.io.IOException;
 
+=======
+>>>>>>> Stashed changes
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
@@ -37,7 +40,6 @@ public class PostApiController {
 	private final PostService postService;
 	private final UserService userService;
 
-	// Permit Only User
 	@Operation(summary = "게시글 작성 API", description = "사용자가 게시글을 작성할 수 있다.")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "ok!!"),
@@ -80,7 +82,6 @@ public class PostApiController {
 			.body(postService.updatePost(updateRequest, image, email, post_id));
 	}
 
-	//TODO: request body 로 날리기
 	@Operation(summary = "게시글 좋아요 API", description = "사용자가 게시글에 좋아요를 누를 수 있다")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "ok!!"),
@@ -90,7 +91,6 @@ public class PostApiController {
 	public ResponseEntity<Boolean> like(@RequestBody PostDto.PostIdRequest likeRequest,
 		Authentication authentication) {
 		Boolean like = postService.like(likeRequest.postId(), authentication.getName());
-		// String message = like ? "좋아요 완료" : "좋아요 취소";
 		return ResponseEntity.status(HttpStatus.OK).body(like);
 	}
 
@@ -101,5 +101,4 @@ public class PostApiController {
 		postService.delete(deleteRequest.postId(), authentication.getName());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
-
 }

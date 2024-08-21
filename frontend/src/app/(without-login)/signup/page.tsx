@@ -151,9 +151,9 @@ export default function SignupPage() {
                                     여자
                                 </button>
                                 <button
-                                    onClick={() => setGender('UNSELECTED')}
+                                    onClick={() => setGender('NONE')}
                                     className={`signup-gender-button ${
-                                        gender === 'UNSELECTED' ? 'active' : ''
+                                        gender === 'NONE' ? 'active' : ''
                                     }`}
                                 >
                                     선택 <br />

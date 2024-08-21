@@ -9,6 +9,7 @@ import org.example.exception.user.ApiUserException;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.service.member.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,8 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class UserApiController {
 
 	private final UserService userService;
-
-	@PatchMapping("/update")
+	@PatchMapping(value = "/update", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
 	public ResponseEntity<UserDto.UserUpdateResponse> userUpdate(
 		@RequestPart(value = "updateRequest", required = false) UserDto.UserUpdateRequest updateRequest,
 		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage

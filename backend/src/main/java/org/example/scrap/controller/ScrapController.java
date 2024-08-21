@@ -53,4 +53,5 @@ public class ScrapController {
 		return ResponseEntity.status(HttpStatus.OK)
 							 .body(scrapService.getAllScrapedPostIdByUserEmail(userEmail));
 	}
+
 }

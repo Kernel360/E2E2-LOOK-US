@@ -13,10 +13,12 @@ import org.example.image.storage.core.StorageType;
 import org.example.image.storageManager.common.StorageSaveResult;
 import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
 import org.example.post.domain.dto.PostDto;
+import org.example.post.domain.entity.CategoryEntity;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.LikeEntity;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
+import org.example.post.repository.CategoryRepository;
 import org.example.post.repository.HashtagRepository;
 import org.example.post.repository.LikeRepository;
 import org.example.post.repository.PostRepository;
@@ -43,6 +45,7 @@ public class PostService {
 	private final ImageStorageManager imageStorageManager;
 	private final LikeRepository likeRepository;
 	private final HashtagRepository hashtagRepository;
+	private final CategoryRepository categoryRepository;
 
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
 		String email, MultipartFile image) throws IOException {
@@ -55,18 +58,25 @@ public class PostService {
 			user,
 			postDto.postContent(),
 			storageSaveResult.resourceLocationId(),
-			0
+			0,
+			postDto.categories() //카테고리 리스트 추가
 		);
 		postRepository.save(post);
 
+<<<<<<< Updated upstream
 		List<HashtagEntity> hashtagEntities = postDto.convertHashtagContents(postDto.hashtagContents(), "#")
 			.stream()
+=======
+		//해시태그 추가
+		post.addHashtags(postDto.convertHashtagContents(postDto.hashtagContents(), "#").stream()
+>>>>>>> Stashed changes
 			.map(hashtag -> new HashtagEntity(post, hashtag))
 			.toList();
 
 		hashtagRepository.saveAll(hashtagEntities);
 
 		post.addHashtags(hashtagEntities);
+
 
 		PostEntity savedPost = postRepository.save(post);
 
@@ -126,6 +136,12 @@ public class PostService {
 			post.updateHashtags(hashtagEntities);
 		}
 
+		// 카테고리 업데이트
+		if (!updateRequest.categories().isEmpty()) {
+			post.updateCategoryList(updateRequest.categories()); // 카테고리 리스트 업데이트
+		}
+
+
 		return PostDto.CreatePostDtoResponse.toDto(post);
 	}
 
@@ -181,6 +197,12 @@ public class PostService {
 	@Transactional(readOnly = true)
 	public boolean existLikePost(UserEntity user, PostEntity post) {
 		return likeRepository.existsByUserAndPost(user, post);
+	}
+
+
+	@Transactional(readOnly = true)
+	public Page<PostDto.PostDtoResponse> findPostsByCategory(Long categoryId, Pageable pageable) {
+		return postRepository.findPostsByCategory(categoryId, pageable);
 	}
 
 	public int likeCount(Long postId) {

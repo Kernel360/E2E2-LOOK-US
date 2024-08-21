@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import { useRouter } from 'next/navigation'
 
@@ -23,7 +23,12 @@ const ColorSelectionPage: React.FC = () => {
     const [currentSection, setCurrentSection] = useState<string | null>(null)
     const [hoveredSection, setHoveredSection] = useState<string | null>(null)
     const [tempColor, setTempColor] = useState<string>('#ffffff')
+    const [isClient, setIsClient] = useState<boolean>(false) // 클라이언트 여부 확인 🎀
     const router = useRouter() // Next.js의 useRouter 훅을 사용해요 🎀
+
+    useEffect(() => {
+        setIsClient(true) // 컴포넌트가 클라이언트에서 렌더링된 후 설정해요 🎀
+    }, [])
 
     const handleColorChange = (color: string) => {
         setTempColor(color)
@@ -67,9 +72,11 @@ const ColorSelectionPage: React.FC = () => {
         >
             {sections.map((section, index) => {
                 const isHovered = hoveredSection === section
+
                 const isAbove =
+                    isClient &&
                     window.innerHeight / 2 <
-                    (index + 1) * (window.innerHeight / sections.length)
+                        (index + 1) * (window.innerHeight / sections.length) // 클라이언트 사이드에서만 실행 🎀
 
                 return (
                     <div

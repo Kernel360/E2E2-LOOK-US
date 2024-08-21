@@ -12,6 +12,7 @@ public class FollowDto {
 	) {}
 
 	public record FollowListResponse(
+		int totalCount,  // 총 팔로워/팔로잉 수
 		List<FollowUser> followers
 	) {}
 
@@ -19,5 +20,13 @@ public class FollowDto {
 		String nickname,
 		int followersCount,
 		Long profileImageId
+	) {}
+
+	public record FollowStatusRequest(
+		String nickname
+	) {}
+
+	public record FollowStatusResponse(
+		String followStatus
 	) {}
 }

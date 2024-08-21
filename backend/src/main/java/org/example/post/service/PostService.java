@@ -2,16 +2,16 @@ package org.example.post.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.image.storage.core.StorageType;
-import org.example.image.storageManager.common.StorageSaveResult;
-import org.example.image.storageManager.imageStorageManager.ImageStorageManager;
+import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
+import org.example.image.imageStorageManager.ImageStorageManager;
+import org.example.image.imageStorageManager.storage.service.core.StorageType;
+import org.example.image.imageStorageManager.type.StorageSaveResult;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.LikeEntity;
@@ -40,7 +40,10 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
+
 	private final ImageStorageManager imageStorageManager;
+	private final ImageAnalyzeManager imageAnalyzeManager;
+
 	private final LikeRepository likeRepository;
 	private final HashtagRepository hashtagRepository;
 
@@ -48,8 +51,12 @@ public class PostService {
 		String email, MultipartFile image) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
+		// 1. save image file
 		StorageSaveResult storageSaveResult = imageStorageManager.saveResource(image,
 			StorageType.LOCAL_FILE_SYSTEM);
+
+		// 2. analyze image
+		imageAnalyzeManager.requestAnalyze(storageSaveResult.resourceLocationId());
 
 		PostEntity post = new PostEntity(
 			user,

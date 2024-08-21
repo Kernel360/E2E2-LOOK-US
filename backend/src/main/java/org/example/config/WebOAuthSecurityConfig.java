@@ -8,7 +8,6 @@ import org.example.user.repository.token.RefreshTokenRepository;
 import org.example.user.service.member.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -45,7 +44,6 @@ public class WebOAuthSecurityConfig {
 			);
 	}
 
-
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http
@@ -63,9 +61,13 @@ public class WebOAuthSecurityConfig {
 				.anyRequest().permitAll())
 			.oauth2Login(oauth2 -> oauth2
 				.loginPage("/login")
-				.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint.authorizationRequestRepository(
-					oAuth2AuthorizationRequestBasedOnCookieRepository()))
-				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(oAuth2UserCustomService))
+				.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
+					.baseUri("/oauth2/authorization")
+					.authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository())
+				)
+				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+					.userService(oAuth2UserCustomService)
+				)
 				.successHandler(oAuth2SuccessHandler())
 			)
 			.exceptionHandling(exceptionHandling -> exceptionHandling
@@ -76,9 +78,6 @@ public class WebOAuthSecurityConfig {
 			.build();
 	}
 
-
-
-
 	@Bean
 	public OAuth2SuccessHandler oAuth2SuccessHandler() {
 		return new OAuth2SuccessHandler(tokenProvider,
@@ -88,18 +87,15 @@ public class WebOAuthSecurityConfig {
 		);
 	}
 
-
 	@Bean
 	public TokenAuthenticationFilter tokenAuthenticationFilter() {
 		return new TokenAuthenticationFilter(tokenProvider);
 	}
 
-
 	@Bean
 	public OAuth2AuthorizationRequestBasedOnCookieRepository oAuth2AuthorizationRequestBasedOnCookieRepository() {
 		return new OAuth2AuthorizationRequestBasedOnCookieRepository();
 	}
-
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
@@ -110,6 +106,8 @@ public class WebOAuthSecurityConfig {
 		corsConfiguration.addExposedHeader("Set-Cookie");
 		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.addAllowedMethod("*");
+		corsConfiguration.addAllowedOrigin("https://www.lookus.shop");
+		corsConfiguration.addAllowedOrigin("http://www.lookus.shop");
 		corsConfiguration.addAllowedOrigin("http://localhost:8080");
 		corsConfiguration.addAllowedOrigin("http://localhost:8081");
 		corsConfiguration.addAllowedOrigin("http://localhost:3000");

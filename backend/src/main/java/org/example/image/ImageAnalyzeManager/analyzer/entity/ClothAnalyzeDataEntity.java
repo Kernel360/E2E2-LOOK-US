@@ -5,6 +5,7 @@ import java.util.List;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothType;
 import org.example.image.ImageAnalyzeManager.analyzer.type.LabColor;
 import org.example.image.ImageAnalyzeManager.analyzer.type.NormalizedVertex2D;
+import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
 import org.example.image.imageStorageManager.storage.entity.ResourceLocationEntity;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -63,6 +64,13 @@ public class ClothAnalyzeDataEntity {
 	private LabColor labColor;
 
 	/**
+	 *   RGB Color Model
+	 */
+	@Column(name = "rgb_color", nullable = false)
+	@JdbcTypeCode(SqlTypes.JSON)
+	private RGBColor rgbColor;
+
+	/**
 	 * 옷 이미지를 가리키는 2개의 Normalized Point
 	 */
 	@Column(name = "bounding_box", nullable = false)
@@ -73,11 +81,13 @@ public class ClothAnalyzeDataEntity {
 	public ClothAnalyzeDataEntity(
 		ClothType clothType,
 		LabColor labColor,
+		RGBColor rgbColor,
 		List<NormalizedVertex2D> boundingBox,
 		Long resourceLocationId
 	) {
 		this.clothType = clothType;
 		this.labColor = labColor;
+		this.rgbColor = rgbColor;
 		this.boundingBox = boundingBox;
 		this.resourceLocationId = resourceLocationId;
 	}

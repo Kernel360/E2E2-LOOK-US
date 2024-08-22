@@ -1,6 +1,7 @@
 package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService;
 
-import org.example.image.ImageAnalyzeManager.analyzer.service.ClothAnalyzeResult;
+import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.type.GoogleImagenVisionDto;
+import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.clothTypeMapper.ClothTypeMapper;
 import org.example.image.ImageAnalyzeManager.analyzer.service.ClothAnalyzeService;
 import org.example.image.ImageAnalyzeManager.analyzer.tools.ImageCropper;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.Credentials;
@@ -41,7 +44,7 @@ public class GoogleImagenVisionService implements ClothAnalyzeService {
 	// ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
 
 	@Override
-	public List<ClothAnalyzeResult> analyzeImage(byte[] imgBytes) throws IOException {
+	public List<ClothAnalyzeData> analyzeImage(byte[] imgBytes) throws IOException {
 
 		// Initialize client that will be used to send requests. This client only needs to be created
 		// once, and can be reused for multiple requests. After completing all of your requests, call
@@ -49,6 +52,7 @@ public class GoogleImagenVisionService implements ClothAnalyzeService {
 
 		// Ref: https://googleapis.dev/nodejs/vision/latest/google.api.ClientLibrarySettings.html#.create
 
+		// TODO: 추후에 환경 변수로 변경해야 합니다.
 		Credentials credentials = GoogleCredentials.fromStream(
 			new FileInputStream("/home/kyeu/goinfree/kernel360/BackendApp/backend/kyeu_api_key.json")
 		);
@@ -85,7 +89,8 @@ public class GoogleImagenVisionService implements ClothAnalyzeService {
 											);
 
 											// create analyze result DTO
-											return ClothAnalyzeResult.builder()
+											return ClothAnalyzeData
+												.builder()
 												.clothType(cloth.clothType())
 												.rgbColor(rgbColor)
 												.leftTopVertex(
@@ -130,20 +135,24 @@ public class GoogleImagenVisionService implements ClothAnalyzeService {
 		List<LocalizedObjectAnnotation> entities = responses.get(0).getLocalizedObjectAnnotationsList();
 
 		// Detects image properties such as color frequency from the specified local image.
-		List<GoogleImagenVisionDto.ClothDetection> detections = new ArrayList<>();
+		Map<String, GoogleImagenVisionDto.ClothDetection> detections = new HashMap<>();
+
 		for (LocalizedObjectAnnotation entity : entities) {
 
-			ClothTypeMapper.toCategory(entity.getName())
-						   .ifPresent(category -> {
-								   detections.add(
+			String rawObjectName = entity.getName();
+			ClothTypeMapper.toCategory(rawObjectName)
+						   .ifPresent(clothType -> {
+								   detections.put(
+									   rawObjectName,
 									   new GoogleImagenVisionDto.ClothDetection(
-										   category,
+										   clothType,
 										   entity.getBoundingPoly().getNormalizedVerticesList()
 									   )
 								   );
 							   });
 		}
-		return detections;
+
+		return new ArrayList<>(detections.values());
 	}
 
 	private static RGBColor extractColorProperties(

@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-import org.example.image.ImageAnalyzeManager.type.AnalyzeData;
+import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
+import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
 import org.example.image.ImageAnalyzeManager.analyzer.entity.ClothAnalyzeDataEntity;
@@ -35,12 +36,13 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 							   clothAnalyzeDataRepository.save(
 								   ClothAnalyzeDataEntity
 									   .builder()
-									   .clothType(clothAnalyzeResult.getClothType())
-									   .labColor(ColorConverter.RGBtoLAB(clothAnalyzeResult.getRgbColor()))
+									   .clothType( clothAnalyzeResult.clothType() )
+									   .rgbColor( clothAnalyzeResult.rgbColor() )
+									   .labColor( ColorConverter.RGBtoLAB(clothAnalyzeResult.rgbColor()) )
 									   .boundingBox(
 										   List.of(
-											   clothAnalyzeResult.getLeftTopVertex(),
-											   clothAnalyzeResult.getRightBottomVertex()
+											   clothAnalyzeResult.leftTopVertex(),
+											   clothAnalyzeResult.rightBottomVertex()
 										   )
 									   )
 									   .resourceLocationId(resourceLocationId)
@@ -50,23 +52,26 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 	}
 
 	@Override
-	public AnalyzeData getAnaylzedData(Long resourceLocationId) {
-		AnalyzeData analyzeData = new AnalyzeData();
+	public ImageAnalyzeData getAnaylzedData(Long resourceLocationId) {
 
-		// 1. gather cloth data ...
-		analyzeData.clothAnalyzeDataList
+		// 1. gather pre-analyzed cloth data from db
+		List<ClothAnalyzeData> clothAnalyzeDataList
 			= this.clothAnalyzeDataRepository.findAllByResourceLocationId(resourceLocationId)
 											 .stream()
 											 .map(
-												 clothAnalyzeData -> AnalyzeData.ClothAnalyzeData.builder()
+												 clothAnalyzeData -> ClothAnalyzeData.builder()
 													 .clothType(clothAnalyzeData.getClothType())
 													 .labColor(clothAnalyzeData.getLabColor())
-													 .LeftTop(clothAnalyzeData.getBoundingBox().get(0))
-													 .RightBottom(clothAnalyzeData.getBoundingBox().get(1))
+													 .leftTopVertex(clothAnalyzeData.getBoundingBox().get(0))
+													 .rightBottomVertex(clothAnalyzeData.getBoundingBox().get(1))
 													 .build()
 											 ).toList();
-		// 2. gather other data ...
+		// 2. gather other data from db ...
+		// TODO: add more gathering logic if needed
 
-		return analyzeData;
+		// 3. return as single DTO
+		return new ImageAnalyzeData(
+			clothAnalyzeDataList
+		);
 	}
 }

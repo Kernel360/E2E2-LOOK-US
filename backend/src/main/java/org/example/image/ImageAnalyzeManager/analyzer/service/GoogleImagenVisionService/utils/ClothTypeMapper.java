@@ -1,4 +1,4 @@
-package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.clothTypeMapper;
+package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.utils;
 
 import java.util.Optional;
 

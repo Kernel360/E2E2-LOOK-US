@@ -46,11 +46,24 @@ public class ClothAnalyzeDataEntity {
 	private Long resourceLocationId;
 
 	/**
-	 * 어떤 옷 타입 인가?
+	 * 어떤 옷 타입 인가? (ex. 상의, 하의, 모자)
 	 */
 	@Column(name = "cloth_type", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private ClothType clothType;
+
+	/**
+	 * 옷의 상세 이름은 무엇 인가? (ex. 하이힐, 벨트, 자켓, etc...)
+	 */
+	@Column(name = "cloth_name", nullable = false)
+	private String clothName;
+
+	/**
+	 *   RGB Color Model
+	 */
+	@Column(name = "rgb_color", nullable = false)
+	@JdbcTypeCode(SqlTypes.JSON)
+	private RGBColor rgbColor;
 
 	/**
 	 *   Lab Color Model
@@ -64,14 +77,19 @@ public class ClothAnalyzeDataEntity {
 	private LabColor labColor;
 
 	/**
-	 *   RGB Color Model
-	 */
-	@Column(name = "rgb_color", nullable = false)
-	@JdbcTypeCode(SqlTypes.JSON)
-	private RGBColor rgbColor;
-
-	/**
-	 * 옷 이미지를 가리키는 2개의 Normalized Point
+	 * 원본 이미지 에서 옷의 위치 (0 ~ 1사이의 값 - Normalized Point)
+	 * Array : [ LT (LeftTop), RB (RightBottom) ]
+	 *
+	 *      LT
+	 *       ▕▔▔▔▔▔▔▔▔▔▔▔▔▏
+	 *       ▕▏           ▏
+	 *       ▕▏           ▏
+	 *       ▕▁▁▁▁▁▁▁▁▁▁▁▁▏
+	 *                   RB
+	 *
+	 *    Width = rb.x - lt.x
+	 *    Height = RB.y - LT.y
+	 *
 	 */
 	@Column(name = "bounding_box", nullable = false)
 	@JdbcTypeCode(SqlTypes.JSON)
@@ -80,12 +98,14 @@ public class ClothAnalyzeDataEntity {
 	@Builder
 	public ClothAnalyzeDataEntity(
 		ClothType clothType,
+		String clothName,
 		LabColor labColor,
 		RGBColor rgbColor,
 		List<NormalizedVertex2D> boundingBox,
 		Long resourceLocationId
 	) {
 		this.clothType = clothType;
+		this.clothName = clothName;
 		this.labColor = labColor;
 		this.rgbColor = rgbColor;
 		this.boundingBox = boundingBox;

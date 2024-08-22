@@ -11,6 +11,7 @@ public class GoogleImagenVisionDto {
 
 	public record ClothDetection(
 		ClothType clothType,
+		String clothName,
 		List<NormalizedVertex> normalizedVertices
 	) {}
 }

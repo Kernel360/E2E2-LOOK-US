@@ -10,7 +10,7 @@ import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
 import org.example.image.ImageAnalyzeManager.analyzer.entity.ClothAnalyzeDataEntity;
 import org.example.image.ImageAnalyzeManager.analyzer.repository.ClothAnalyzeDataRepository;
-import org.example.image.ImageAnalyzeManager.analyzer.service.ClothAnalyzeService;
+import org.example.image.ImageAnalyzeManager.analyzer.service.ImageAnalyzeVisionService;
 import org.example.image.ImageAnalyzeManager.analyzer.tools.ColorConverter;
 import org.example.image.imageStorageManager.type.StorageFindResult;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 
-	private final ClothAnalyzeService clothAnalyzeService;
+	private final ImageAnalyzeVisionService imageAnalyzeVisionService;
 	private final ClothAnalyzeDataRepository clothAnalyzeDataRepository;
 
 	private final ImageStorageManager imageStorageManager;
@@ -31,12 +31,13 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 		StorageFindResult result = imageStorageManager.findResourceById(resourceLocationId);
 		byte[] imageBytes = Files.readAllBytes(result.resource().getFile().toPath());
 
-		clothAnalyzeService.analyzeImage(imageBytes)
-						   .forEach(clothAnalyzeResult -> {
+		imageAnalyzeVisionService.analyzeImage(imageBytes)
+								 .forEach(clothAnalyzeResult -> {
 							   clothAnalyzeDataRepository.save(
 								   ClothAnalyzeDataEntity
 									   .builder()
 									   .clothType( clothAnalyzeResult.clothType() )
+									   .clothName( clothAnalyzeResult.clothName() )
 									   .rgbColor( clothAnalyzeResult.rgbColor() )
 									   .labColor( ColorConverter.RGBtoLAB(clothAnalyzeResult.rgbColor()) )
 									   .boundingBox(

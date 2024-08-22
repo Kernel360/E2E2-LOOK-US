@@ -5,6 +5,7 @@ import lombok.Builder;
 @Builder
 public record ClothAnalyzeData(
 	ClothType clothType,
+	String clothName,
 	LabColor labColor,
 	RGBColor rgbColor,
 	NormalizedVertex2D leftTopVertex,

@@ -2,8 +2,8 @@ package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisio
 
 import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.type.GoogleImagenVisionDto;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
-import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.clothTypeMapper.ClothTypeMapper;
-import org.example.image.ImageAnalyzeManager.analyzer.service.ClothAnalyzeService;
+import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.utils.ClothTypeMapper;
+import org.example.image.ImageAnalyzeManager.analyzer.service.ImageAnalyzeVisionService;
 import org.example.image.ImageAnalyzeManager.analyzer.tools.ImageCropper;
 import org.example.image.ImageAnalyzeManager.analyzer.type.NormalizedVertex2D;
 import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GoogleImagenVisionService implements ClothAnalyzeService {
+public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 
 	// ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
 
@@ -91,8 +91,9 @@ public class GoogleImagenVisionService implements ClothAnalyzeService {
 											// create analyze result DTO
 											return ClothAnalyzeData
 												.builder()
-												.clothType(cloth.clothType())
-												.rgbColor(rgbColor)
+												.clothType( cloth.clothType() )
+												.clothName( cloth.clothName() )
+												.rgbColor( rgbColor )
 												.leftTopVertex(
 													new NormalizedVertex2D(leftTopVertex.getX(), leftTopVertex.getY())
 												)
@@ -146,6 +147,7 @@ public class GoogleImagenVisionService implements ClothAnalyzeService {
 									   rawObjectName,
 									   new GoogleImagenVisionDto.ClothDetection(
 										   clothType,
+										   rawObjectName,
 										   entity.getBoundingPoly().getNormalizedVerticesList()
 									   )
 								   );

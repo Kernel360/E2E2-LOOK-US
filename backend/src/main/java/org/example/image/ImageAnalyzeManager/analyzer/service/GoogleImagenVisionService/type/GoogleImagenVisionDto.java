@@ -1,4 +1,4 @@
-package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService;
+package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.type;
 
 import java.util.List;
 
@@ -11,12 +11,7 @@ public class GoogleImagenVisionDto {
 
 	public record ClothDetection(
 		ClothType clothType,
+		String clothName,
 		List<NormalizedVertex> normalizedVertices
 	) {}
-
-	public record ColorDetection(
-		RGBColor rgbColor
-	) {}
-
-
 }

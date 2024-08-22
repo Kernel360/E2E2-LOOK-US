@@ -1,7 +1,7 @@
 package org.example.image.ImageAnalyzeManager;
 import java.io.IOException;
 
-import org.example.image.ImageAnalyzeManager.type.AnalyzeData;
+import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 
 public interface ImageAnalyzeManager {
 
@@ -9,5 +9,5 @@ public interface ImageAnalyzeManager {
 	void requestAnalyze(Long resourceLocationId) throws IOException;
 
 	// get analyzed data from DB
-	AnalyzeData getAnaylzedData(Long resourceLocationId);
+	ImageAnalyzeData getAnaylzedData(Long resourceLocationId);
 }

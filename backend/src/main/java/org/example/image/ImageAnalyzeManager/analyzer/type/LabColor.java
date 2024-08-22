@@ -2,8 +2,6 @@ package org.example.image.ImageAnalyzeManager.analyzer.type;
 
 import java.io.Serializable;
 
-import jakarta.persistence.Embeddable;
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

@@ -41,7 +41,8 @@ jobs:
     # Docker build
     - name: Docker build
       run: |
+        cd ./backend
         docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-        docker build -t kwlim1120ss/look-us .
+        docker build -t kwlim1120ss/look-us ./
         docker tag look-us kwlim1120ss/look-us:${GITHUB_SHA::7}
-        docker push kwlim1120ss/look-us:${GITHUB_SHA::7}
+        docker buildx build --push --platform linux/amd64 -t kwlim1120ss/look-us:${GITHUB_SHA::7} .

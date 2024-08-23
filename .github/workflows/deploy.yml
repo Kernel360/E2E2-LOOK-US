@@ -37,9 +37,5 @@ jobs:
         echo "${{ secrets.ENV }}" > ./env.properties
       shell: bash
       
-    # Build with Gradle
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: clean build -x test
-        gradle-executable: ./backend/gradlew
+      run: ./backend/gradlew clean build -x test

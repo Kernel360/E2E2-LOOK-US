@@ -43,5 +43,5 @@ jobs:
       run: |
         cd ./backend
         docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-        docker build -t kwlim1120ss/look-us:${GITHUB_SHA::7} .
-        docker buildx build --push --platform linux/amd64 -t kwlim1120ss/look-us:${GITHUB_SHA::7}
+        docker build -t kwlim1120ss/look-us:${GITHUB_SHA::7} ./
+        docker buildx build --push --platform linux/amd64 -t kwlim1120ss/look-us:${GITHUB_SHA::7} .

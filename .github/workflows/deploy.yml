@@ -38,10 +38,27 @@ jobs:
         cd ./backend
         ./gradlew clean build -x test
         
-    # Docker build
     - name: Docker build and push
       run: |
         cd ./backend
         docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-        docker build -t kwlim1120ss/look-us:${GITHUB_SHA::7} ./
-        docker buildx build --push --platform linux/amd64 -t kwlim1120ss/look-us:${GITHUB_SHA::7} .
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} .
+        docker buildx build --push --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} .
+
+    - name: Clean up dangling Docker images locally
+      run: |
+        sudo docker image prune -f
+
+    - name: Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: vm 인스턴스 외부ip
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        envs: GITHUB_SHA
+        script: |
+          sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
+          sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} look-us
+          sudo docker-compose up -d

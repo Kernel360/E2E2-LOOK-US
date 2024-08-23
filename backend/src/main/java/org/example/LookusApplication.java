@@ -11,9 +11,4 @@ public class LookusApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LookusApplication.class, args);
 	}
-
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
 }

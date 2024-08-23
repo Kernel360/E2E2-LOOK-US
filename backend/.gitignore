@@ -1,0 +1,66 @@
+build.gradle-prod
+src/main/resources/keystore.p12
+.env
+
+HELP.md
+.gradle
+resources/templates/data.sql
+build/
+data/mysql-data
+data/mysql-files
+data/images
+!data/images/Readme.md
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+docker-compose.yaml
+src/main/resources/ssl/*
+backend/data/*
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+*.yml
+*.properties
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+.gitattributes
+# Elastic Beanstalk Files
+#.platform/*
+#.ebextensions/*
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml.DS_Store
+
+
+### Google Cloud Key ###
+../*.json
+
+### Image Crawling ###
+../ImageWebCrawling.R
+../images/

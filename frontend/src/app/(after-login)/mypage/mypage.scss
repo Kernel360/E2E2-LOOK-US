@@ -1,0 +1,38 @@
+.mypage-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.mypage-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1rem;
+}
+
+.mypage-tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1rem;
+}
+
+.mypage-tabs button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.mypage-tabs .active {
+    font-weight: bold;
+    border-bottom: 2px solid #000;
+}
+
+.mypage-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

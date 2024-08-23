@@ -1,0 +1,83 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0' //이쁘게
+
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0' //이쁘게
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.webjars:webjars-locator-core")
+    implementation("org.webjars:sockjs-client:1.0.2")
+    implementation("org.webjars:stomp-websocket:2.3.3")
+    implementation("org.webjars:bootstrap:3.3.7")
+    implementation("org.webjars:jquery:3.1.1-1")
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0' // swagger 추가
+
+    //추가
+    implementation 'io.jsonwebtoken:jjwt:0.9.1' //자바 jwt  라이브러리
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1' //xml 문서와 자바 객체 간 매핑을 자동화
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' //OAuth2 의존성 추가
+
+    // Google Cloud Vision API Client Library
+    implementation 'com.google.cloud:google-cloud-vision:3.45.0'
+    /*implementation platform("com.google.cloud:libraries-bom:25.1.0")
+    implementation("com.google.cloud:spring-cloud-gcp-vision")*/
+
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    //test 롬복 사용
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //Querydsl 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+
+clean {
+    delete file('src/main/generated')
+}
+

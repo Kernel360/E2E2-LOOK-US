@@ -20,7 +20,7 @@ jobs:
 
     # Make gradlew executable
     - name: Run chmod to make gradlew executable
-      run: chmod +x ./gradlew 
+      run: chmod +x ./backend/gradlew 
 
     # Set up JDK 17
     - name: Set up JDK 17
@@ -32,7 +32,7 @@ jobs:
     # Set environment values
     - name: Set environment values
       run: |
-        cd ./src/main/resources
+        cd ./backend/src/main/resources
         touch ./env.properties
         echo "${{ secrets.ENV }}" > ./env.properties
       shell: bash

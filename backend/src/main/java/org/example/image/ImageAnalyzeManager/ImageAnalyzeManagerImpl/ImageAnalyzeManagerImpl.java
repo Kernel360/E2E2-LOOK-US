@@ -53,7 +53,7 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 	}
 
 	@Override
-	public ImageAnalyzeData getAnaylzedData(Long resourceLocationId) {
+	public ImageAnalyzeData getAnalyzedData(Long resourceLocationId) {
 
 		// 1. gather pre-analyzed cloth data from db
 		List<ClothAnalyzeData> clothAnalyzeDataList

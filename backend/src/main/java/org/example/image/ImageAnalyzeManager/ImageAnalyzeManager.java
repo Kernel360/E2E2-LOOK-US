@@ -9,6 +9,6 @@ public interface ImageAnalyzeManager {
 	void requestAnalyze(Long resourceLocationId) throws IOException;
 
 	// get analyzed data from DB
-	ImageAnalyzeData getAnaylzedData(Long resourceLocationId);
+	ImageAnalyzeData getAnalyzedData(Long resourceLocationId);
 
 }

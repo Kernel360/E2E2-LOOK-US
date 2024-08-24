@@ -28,13 +28,6 @@ public class ImageApiController {
 	private final ImageRedisService imageRedisService;
 	// TODO: 추후에 ROLE 설정, POST 및 request body 등 전체적인 수정 필요
 
-	@GetMapping("")
-	public ResponseEntity<List<String>> saveColorToRedis() throws JsonProcessingException {
-		List<String> savedColorNames = new ArrayList<>(imageRedisService.saveNewColor());
-
-		return ResponseEntity.status(HttpStatus.OK).body(savedColorNames);
-	}
-
 	@PatchMapping("")
 	public ResponseEntity<List<String>> updateColorToRedis(
 		@RequestBody PostPopularSearchCondition postPopularSearchCondition

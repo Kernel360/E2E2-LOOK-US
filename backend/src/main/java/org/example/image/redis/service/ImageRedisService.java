@@ -7,10 +7,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
@@ -22,7 +20,6 @@ import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.PostPopularSearchCondition;
-import org.example.post.service.PostService;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -54,56 +51,50 @@ public class ImageRedisService {
 	private static final Integer WEIGHT_LIKE = 1;
 	private static final Integer WEIGHT_VIEW = 1;
 
-	public List<String> saveNewColor() throws JsonProcessingException {
+	public List<String> saveNewColor(Long resourceLocationId) throws JsonProcessingException {
 		List<String> colorNameList = new ArrayList<>();
 		ColorApiClient client = new ColorApiClient();
 		HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
 		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
-		List<ImageAnalyzeData> imageAnalyzeDataList = new ArrayList<>();
-		List<PostEntity> postEntities = postRepository.findAll();
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		// get all posts' image analyze data
-		for (PostEntity post : postEntities) {
-			imageAnalyzeDataList.add(imageAnalyzeManager.getAnaylzedData(post.getImageId()));
-		}
+		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(resourceLocationId);
 
-		for (ImageAnalyzeData imageAnalyzeData : imageAnalyzeDataList) {                            // Images
-			for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {        // Clothes from an image
-				int[] colorRGB = {
-					clothAnalyzeData.rgbColor().getRed(),
-					clothAnalyzeData.rgbColor().getGreen(),
-					clothAnalyzeData.rgbColor().getBlue()
-				};
-				if (calcCloseColorsDist(colorRGB, 1).isEmpty()
-					|| calcCloseColorsDist(colorRGB, 1).get(0).distance() > STANDARD_DIST) {
+		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {        // Clothes from an image
+			int[] colorRGB = {
+				clothAnalyzeData.rgbColor().getRed(),
+				clothAnalyzeData.rgbColor().getGreen(),
+				clothAnalyzeData.rgbColor().getBlue()
+			};
+			if (calcCloseColorsDist(colorRGB, 1) == null
+				|| calcCloseColorsDist(colorRGB, 1).get(0).distance() > STANDARD_DIST) {
 
-					String hexColor = rgbToHex(colorRGB[0], colorRGB[1], colorRGB[2]);
+				String hexColor = rgbToHex(colorRGB[0], colorRGB[1], colorRGB[2]);
 
-					// thecolorapi API for get color name as string
-					String colorName = client.getColorInfo(hexColor);
+				// thecolorapi API for get color name as string
+				String colorName = client.getColorInfo(hexColor);
 
-					// save new color
-					if (hashOps.get(HASH_KEY, colorName) == null) {
-						colorNameList.add(colorName);
+				// save new color
+				if (hashOps.get(HASH_KEY, colorName) == null) {
+					colorNameList.add(colorName);
 
-						ColorDto.ColorSaveDtoRequest colorSaveDtoRequest
-							= new ColorDto.ColorSaveDtoRequest(
-							colorRGB[0], colorRGB[1], colorRGB[2],
-							colorRGB[0], colorRGB[1], colorRGB[2]
-						);
+					ColorDto.ColorSaveDtoRequest colorSaveDtoRequest
+						= new ColorDto.ColorSaveDtoRequest(
+						colorRGB[0], colorRGB[1], colorRGB[2],
+						colorRGB[0], colorRGB[1], colorRGB[2]
+					);
 
-						// Serialization
-						String colorSaveDtoJson = objectMapper.writeValueAsString(colorSaveDtoRequest);
+					// Serialization
+					String colorSaveDtoJson = objectMapper.writeValueAsString(colorSaveDtoRequest);
 
-						hashOps.put(HASH_KEY, colorName, colorSaveDtoJson);
+					hashOps.put(HASH_KEY, colorName, colorSaveDtoJson);
 
-						// save only color name to Redis by using ZSet
-						zSetOps.add(ZSET_KEY, colorName, 0);
-					}
+					// save only color name to Redis by using ZSet
+					zSetOps.add(ZSET_KEY, colorName, 0);
 				}
 			}
 		}
+
 		return colorNameList;
 	}
 
@@ -122,7 +113,7 @@ public class ImageRedisService {
 		// get popular color of popular ClothAnalyzeData's image analyze data to change RGB
 		HashMap<String, ColorDto.ColorSelectedDtoRequest> selectedColorHashMap = new HashMap<>();
 		for (PostEntity post : postEntities) {
-			ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnaylzedData(post.getImageId());
+			ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(post.getImageId());
 
 			// Selection Colors for updating because we can get several requests about same color
 			for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
@@ -151,7 +142,8 @@ public class ImageRedisService {
 				// Check if the existingColorRequest is not null before accessing its condition
 				if (existingColorRequest != null) {
 					// Compare scores only if existingColorRequest is not null
-					if (calcScoreOfPost(existingColorRequest.condition()) < calcScoreOfPost(postPopularSearchCondition)) {
+					if (calcScoreOfPost(existingColorRequest.condition()) < calcScoreOfPost(
+						postPopularSearchCondition)) {
 						selectedColorHashMap.put(name, colorSelectedDtoRequest);
 					}
 				} else {
@@ -188,10 +180,11 @@ public class ImageRedisService {
 			};
 
 			// Assuming storedColor is a JSON string, not a ColorSaveDtoRequest object
-			String colorJson = (String) storedColor;
+			String colorJson = (String)storedColor;
 
 			// Convert JSON string to ColorSaveDtoRequest object
-			ColorDto.ColorSaveDtoRequest storedColorRequest = objectMapper.readValue(colorJson, ColorDto.ColorSaveDtoRequest.class);
+			ColorDto.ColorSaveDtoRequest storedColorRequest = objectMapper.readValue(colorJson,
+				ColorDto.ColorSaveDtoRequest.class);
 
 			// Update the ColorSaveDtoRequest object with new RGB values
 			ColorDto.ColorSaveDtoRequest updatedColorRequest = ColorDto.ColorSaveDtoRequest.update(
@@ -222,7 +215,8 @@ public class ImageRedisService {
 			String colorJson = (String)entry.getValue();
 			String colorName = (String)entry.getKey();
 
-			ColorDto.ColorUpdateDtoRequest originalRequest = objectMapper.readValue(colorJson, ColorDto.ColorUpdateDtoRequest.class);
+			ColorDto.ColorUpdateDtoRequest originalRequest = objectMapper.readValue(colorJson,
+				ColorDto.ColorUpdateDtoRequest.class);
 			ColorDto.ColorUpdateDtoRequest colorUpdateDtoRequest = new ColorDto.ColorUpdateDtoRequest(
 				colorName,
 				originalRequest.r(),
@@ -245,12 +239,12 @@ public class ImageRedisService {
 			= closestColorZSet.rangeWithScores(COLOR_DIST_CAL_ZSET_KEY, 0, num - 1);
 
 		if (typedTuples == null || typedTuples.isEmpty()) {    // TODO: 수정 필요
-			throw new NullPointerException();
+			return null;
 		}
 
 		return typedTuples.stream()
 			.map(tuple -> {
-				String colorJson = (String) tuple.getValue(); // JSON 문자열 (ZSet value)
+				String colorJson = (String)tuple.getValue(); // JSON 문자열 (ZSet value)
 				double distance = tuple.getScore();           // 거리 (ZSet score)
 				ColorDto.ColorUpdateDtoRequest colorRequest = null;
 				try {

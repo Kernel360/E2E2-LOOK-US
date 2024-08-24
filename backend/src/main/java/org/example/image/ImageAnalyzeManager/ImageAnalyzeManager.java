@@ -10,4 +10,5 @@ public interface ImageAnalyzeManager {
 
 	// get analyzed data from DB
 	ImageAnalyzeData getAnaylzedData(Long resourceLocationId);
+
 }

@@ -5,9 +5,36 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
 
 public class ColorConverter {
 
-	// CIE XYZ tristiumulus values of the reference white D65
-	private static final float[] STANDARD_TRISTIMULUS_D65 = {95.047f, 100.000f, 108.883f};
-	private static final float[] STANDARD_TRISTIMULUS_D50 = {96.42f, 100.000f, 82.49f};
+	// CIE XYZ tristiumulus values of the reference white D65 and A
+	// private static final float[] STANDARD_TRISTIMULUS_D50 = {96.42f, 100.000f, 82.49f};
+	private static final float[] STANDARD_TRISTIMULUS_D65 = {95.047f, 100.000f, 108.883f};	// general type
+	private static final float[] STANDARD_TRISTIMULUS_A = {109.85f, 100.000f, 35.585f};		// relatively dark type
+
+	/*
+	//2o Observer (CIE 1931)
+	// X2, Y2, Z2
+	public static float[] CIE2_A = {109.850f, 100f, 35.585f}; //Incandescent
+	public static float[] CIE2_C = {98.074f, 100f, 118.232f};
+	public static float[] CIE2_D50 = {96.422f, 100f, 82.521f};
+	public static float[] CIE2_D55 = {95.682f, 100f, 92.149f};
+	public static float[] CIE2_D65 = {95.047f, 100f, 108.883f}; //Daylight
+	public static float[] CIE2_D75 = {94.972f, 100f, 122.638f};
+	public static float[] CIE2_F2 = {99.187f, 100f, 67.395f}; //Fluorescent
+	public static float[] CIE2_F7 = {95.044f, 100f, 108.755f};
+	public static float[] CIE2_F11 = {100.966f, 100f, 64.370f};
+
+	//10o Observer (CIE 1964)
+	// X2, Y2, Z2
+	public static float[] CIE10_A = {111.144f, 100f, 35.200f}; //Incandescent
+	public static float[] CIE10_C = {97.285f, 100f, 116.145f};
+	public static float[] CIE10_D50 = {96.720f, 100f, 81.427f};
+	public static float[] CIE10_D55 = {95.799f, 100f, 90.926f};
+	public static float[] CIE10_D65 = {94.811f, 100f, 107.304f}; //Daylight
+	public static float[] CIE10_D75 = {94.416f, 100f, 120.641f};
+	public static float[] CIE10_F2 = {103.280f, 100f, 69.026f}; //Fluorescent
+	public static float[] CIE10_F7 = {95.792f, 100f, 107.687f};
+	public static float[] CIE10_F11 = {103.866f, 100f, 65.627f};
+	*/
 
 	/**
 	 * RGB -> CIE-LAB.
@@ -19,14 +46,14 @@ public class ColorConverter {
 	// float[] tristimulus param maybe need if more accurate converter for specific environment or lighting condition
 	public static float[] RGBtoLAB(int red, int green, int blue){
 		float[] xyz = RGBtoXYZ(red, green, blue);
-		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], STANDARD_TRISTIMULUS_D50);
+		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], STANDARD_TRISTIMULUS_D65);
 
 		return lab;
 	}
 
 	public static LabColor RGBtoLAB(RGBColor rgbColor) {
 		float[] xyz = RGBtoXYZ(rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue());
-		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], STANDARD_TRISTIMULUS_D50);
+		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], STANDARD_TRISTIMULUS_D65);
 		return new LabColor(lab[0], lab[1], lab[2]);
 	}
 
@@ -39,7 +66,7 @@ public class ColorConverter {
 	 */
 	// float[] tristimulus param maybe need if more accurate converter for specific environment or lighting condition
 	public static int[] LABtoRGB(float l, float a, float b){
-		float[] xyz = LABtoXYZ(l, a, b, STANDARD_TRISTIMULUS_D50);
+		float[] xyz = LABtoXYZ(l, a, b, STANDARD_TRISTIMULUS_D65);
 		return XYZtoRGB(xyz[0], xyz[1], xyz[2]);
 	}
 
@@ -208,5 +235,13 @@ public class ColorConverter {
 		return rgb;
 	}
 
+	public static String rgbToHex(int red, int green, int blue) {
+		// Ensure RGB values are within the valid range
+		if (red < 0 || red > 255 || green < 0 || green > 255 || blue < 0 || blue > 255) {
+			throw new IllegalArgumentException("RGB values must be between 0 and 255");		// TODO: 수정 필요
+		}
+		// Convert RGB values to HEX and format it as a string
+		return String.format("%02x%02x%02x", red, green, blue).toUpperCase();
+	}
 
 }

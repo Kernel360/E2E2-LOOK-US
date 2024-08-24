@@ -7,6 +7,8 @@ import static org.example.user.domain.entity.member.QUserEntity.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +18,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.example.post.domain.dto.PostDto;
-import org.example.post.domain.entity.HashtagEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -131,18 +132,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
 	private List<String> splitString(String str, String delimiter) {
 		if (isEmpty(str)) {
-			return List.of();
+			return Collections.emptyList();
 		}
-		return List.of(str.split(delimiter));
+		return Arrays.stream(str.split(delimiter))
+			.filter(s -> !s.isEmpty())
+			.collect(Collectors.toList());
 	}
 
-	private List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content, Pageable pageable) {
+
+	private List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content,
+		Pageable pageable) {
 		final Map<String, Function<PostDto.PostDtoResponse, Comparable>> COMPARATORS = new HashMap<>();
 		COMPARATORS.put("createdAt", PostDto.PostDtoResponse::createdAt);
 
 		Comparator<PostDto.PostDtoResponse> comparator = null;
 
-		for (Sort.Order order : sort) {	// TODO: sort 조건 추가 입력 가능 1. createdAt, 2. ?
+		for (Sort.Order order : sort) {    // TODO: sort 조건 추가 입력 가능 1. createdAt, 2. ?
 			Comparator<PostDto.PostDtoResponse> newComparator;
 
 			newComparator = Comparator.comparing(COMPARATORS.get(order.getProperty()));
@@ -157,7 +162,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		if (comparator != null) {
 			content.sort(comparator);
 		}
-
 
 		return content.stream()
 			.skip(pageable.getOffset())

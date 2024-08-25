@@ -39,7 +39,7 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 						.clothType(clothAnalyzeResult.clothType())
 						.clothName(clothAnalyzeResult.clothName())
 						.rgbColor(clothAnalyzeResult.rgbColor())
-						.labColor(ColorConverter.RGBtoLAB(clothAnalyzeResult.rgbColor()))
+						.labColor(ColorConverter.RGBtoLAB(clothAnalyzeResult.rgbColor(), clothAnalyzeResult.tri()))
 						.boundingBox(
 							List.of(
 								clothAnalyzeResult.leftTopVertex(),

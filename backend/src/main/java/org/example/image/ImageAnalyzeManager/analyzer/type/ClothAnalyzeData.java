@@ -9,5 +9,6 @@ public record ClothAnalyzeData(
 	LabColor labColor,
 	RGBColor rgbColor,
 	NormalizedVertex2D leftTopVertex,
-	NormalizedVertex2D rightBottomVertex
+	NormalizedVertex2D rightBottomVertex,
+	float[] tri
 ) {}

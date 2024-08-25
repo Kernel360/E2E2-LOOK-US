@@ -69,7 +69,7 @@ public class ImageRedisService {
 			if (calcCloseColorsDist(colorRGB, 1) == null
 				|| calcCloseColorsDist(colorRGB, 1).get(0).distance() > STANDARD_DIST) {
 
-				String hexColor = rgbToHex(colorRGB[0], colorRGB[1], colorRGB[2]);
+				String hexColor = RGBtoHEX(colorRGB[0], colorRGB[1], colorRGB[2]);
 
 				// thecolorapi API for get color name as string
 				String colorName = client.getColorInfo(hexColor);

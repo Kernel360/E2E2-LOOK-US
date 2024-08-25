@@ -2,6 +2,7 @@ package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisio
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -92,8 +93,14 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 						double temperature = estimateColorTemperature(byteArrayToBufferedImage(croppedImage));
 						float[] tristimulus = calculateTristimulus(brightness, temperature);
 
+						// Adjust the cropped image brightness for D65
+						byte[] adjustedImageBytes = adjustImageBrightnessForD65(croppedImage, tristimulus);
+
 						// send analyze request to google api
 						RGBColor rgbColor = extractColorProperties(
+							ByteString.copyFrom(adjustedImageBytes), client
+						);
+						RGBColor rgbColor1 = extractColorProperties(
 							ByteString.copyFrom(croppedImage), client
 						);
 
@@ -255,5 +262,81 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 
 		return new float[] {(float)X, (float)Y, (float)Z};
 	}
+
+	private static byte[] adjustImageBrightnessForD65(byte[] imageBytes, float[] tristimulus) throws IOException {
+		// Convert byte array to BufferedImage
+		BufferedImage image = byteArrayToBufferedImage(imageBytes);
+
+		// Adjust image brightness based on tristimulus
+		BufferedImage adjustedImage = adjustImageBrightnessForD65(image, tristimulus);
+
+		// Convert BufferedImage back to byte array
+		return bufferedImageToByteArray(adjustedImage);
+	}
+	private static BufferedImage adjustImageBrightnessForD65(BufferedImage image, float[] tristimulus) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+
+		BufferedImage adjustedImage = new BufferedImage(width, height, image.getType());
+
+		// D65 reference values
+		double X_d65 = 95.047;
+		double Y_d65 = 100.000;
+		double Z_d65 = 108.883;
+
+		// Extract tristimulus values
+		double X = tristimulus[0];
+		double Y = tristimulus[1];
+		double Z = tristimulus[2];
+
+		// Calculate scale factor to adjust the brightness
+		double scaleFactor = Y_d65 / Y;
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				java.awt.Color color = new java.awt.Color(image.getRGB(x, y));
+
+				// Extract RGB values
+				double r = color.getRed() / 255.0;
+				double g = color.getGreen() / 255.0;
+				double b = color.getBlue() / 255.0;
+
+				// Convert RGB to XYZ
+				double X_rgb = r * 0.4124 + g * 0.3576 + b * 0.1805;
+				double Y_rgb = r * 0.2126 + g * 0.7152 + b * 0.0722;
+				double Z_rgb = r * 0.0193 + g * 0.1192 + b * 0.9505;
+
+				// Adjust XYZ values based on D65
+				X_rgb *= scaleFactor;
+				Y_rgb *= scaleFactor;
+				Z_rgb *= scaleFactor;
+
+				// Convert adjusted XYZ back to RGB
+				int red = (int) Math.min(255, (X_rgb * 3.2406 - Y_rgb * 1.5372 - Z_rgb * 0.4986) * 255);
+				int green = (int) Math.min(255, (-X_rgb * 0.9689 + Y_rgb * 1.8758 + Z_rgb * 0.0415) * 255);
+				int blue = (int) Math.min(255, (X_rgb * 0.0557 - Y_rgb * 0.2040 + Z_rgb * 1.0570) * 255);
+
+				// Ensure values are within valid RGB range
+				red = Math.max(0, Math.min(255, red));
+				green = Math.max(0, Math.min(255, green));
+				blue = Math.max(0, Math.min(255, blue));
+
+				// Set the new RGB value
+				adjustedImage.setRGB(x, y, new java.awt.Color(red, green, blue).getRGB());
+			}
+		}
+
+		return adjustedImage;
+	}
+
+
+	private static byte[] bufferedImageToByteArray(BufferedImage image) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(image, "jpg", baos);
+		return baos.toByteArray();
+	}
+
+
+
 
 }

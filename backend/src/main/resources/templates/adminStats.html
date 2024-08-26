@@ -37,32 +37,41 @@
     var labelsByPostId = /*[[${labelsByPostId}]]*/ {};
     var hitsDataByPostId = /*[[${hitsDataByPostId}]]*/ {};
     var likeDataByPostId = /*[[${likeDataByPostId}]]*/ {};
+    var todayHitsByPostId = /*[[${todayHitsByPostId}]]*/ {};
+    var todayLikesByPostId = /*[[${todayLikesByPostId}]]*/ {};
 
     // 게시글 선택에 따라 차트 업데이트
     function showSelectedPost() {
         var selectedPostId = $('#postSelect').val();
         if (selectedPostId) {
-            var labels = labelsByPostId[selectedPostId];
-            var hitsData = hitsDataByPostId[selectedPostId];
-            var likeData = likeDataByPostId[selectedPostId];
+            var labels = labelsByPostId[selectedPostId] || [];
+            var hitsData = hitsDataByPostId[selectedPostId] || [];
+            var likeData = likeDataByPostId[selectedPostId] || [];
+            var todayHitsData = todayHitsByPostId[selectedPostId] || [];
+            var todayLikesData = todayLikesByPostId[selectedPostId] || [];
+
+            // 데이터가 없는 경우 에러 방지 및 로그 출력
+            if (labels.length === 0 && hitsData.length === 0 && likeData.length === 0 && todayHitsData.length === 0 && todayLikesData.length === 0) {
+                console.error('선택한 게시글 ID에 해당하는 데이터가 없습니다:', selectedPostId);
+                $('#postStatsContainer').hide();
+                return;
+            }
 
             $('#selectedPostTitle').text('게시글 ' + selectedPostId + ' 통계');
 
             var ctx = document.getElementById('postStatsChart').getContext('2d');
 
-            // 차트가 이미 존재하고, Chart.js의 인스턴스가 맞다면 삭제
             if (window.postStatsChart instanceof Chart) {
                 window.postStatsChart.destroy();
             }
 
-            // 새 차트를 생성하고 window.postStatsChart에 할당
             window.postStatsChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
                         {
-                            label: '조회수',
+                            label: '전체 조회수',
                             data: hitsData,
                             borderColor: 'rgba(75, 192, 192, 1)',
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -70,10 +79,26 @@
                             fill: true
                         },
                         {
-                            label: '좋아요 수',
+                            label: '전체 좋아요 수',
                             data: likeData,
                             borderColor: 'rgba(255, 99, 132, 1)',
                             backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: '오늘의 조회수',
+                            data: todayHitsData,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: '오늘의 좋아요 수',
+                            data: todayLikesData,
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
                             borderWidth: 2,
                             fill: true
                         }
@@ -106,5 +131,6 @@
 
 
 </script>
+
 </body>
 </html>

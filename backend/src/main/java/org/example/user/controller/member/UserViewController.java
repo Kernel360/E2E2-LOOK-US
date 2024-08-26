@@ -71,6 +71,8 @@ public class UserViewController {
 		Map<Long, List<String>> labelsByPostId = new HashMap<>();
 		Map<Long, List<Integer>> hitsDataByPostId = new HashMap<>();
 		Map<Long, List<Integer>> likeDataByPostId = new HashMap<>();
+		Map<Long, List<Integer>> todayHitsByPostId = new HashMap<>();
+		Map<Long, List<Integer>> todayLikesByPostId = new HashMap<>();
 
 		for (Map.Entry<Long, List<PostStats>> entry : statsByPostId.entrySet()) {
 			List<PostStats> postStatsList = entry.getValue();
@@ -83,10 +85,18 @@ public class UserViewController {
 			List<Integer> likeData = postStatsList.stream()
 				.map(PostStats::getLikeCount)
 				.collect(Collectors.toList());
+			List<Integer> todayHitsData = postStatsList.stream()
+				.map(PostStats::getTodayHits)
+				.collect(Collectors.toList());
+			List<Integer> todayLikesData = postStatsList.stream()
+				.map(PostStats::getTodayLikes)
+				.collect(Collectors.toList());
 
 			labelsByPostId.put(entry.getKey(), labels);
 			hitsDataByPostId.put(entry.getKey(), hitsData);
 			likeDataByPostId.put(entry.getKey(), likeData);
+			todayHitsByPostId.put(entry.getKey(), todayHitsData);
+			todayLikesByPostId.put(entry.getKey(), todayLikesData);
 		}
 
 		// 모델에 데이터 추가
@@ -94,9 +104,12 @@ public class UserViewController {
 		model.addAttribute("labelsByPostId", labelsByPostId);
 		model.addAttribute("hitsDataByPostId", hitsDataByPostId);
 		model.addAttribute("likeDataByPostId", likeDataByPostId);
+		model.addAttribute("todayHitsByPostId", todayHitsByPostId);
+		model.addAttribute("todayLikesByPostId", todayLikesByPostId);
 
 		return "adminStats"; // Thymeleaf 템플릿 이름
 	}
+
 
 	@GetMapping("/signup")
 	public String signup() {

@@ -37,6 +37,7 @@ spring:
           min-idle: 0
           max-wait: -1ms
 
+
 jwt:
   issuer: ${MY_JWT_ISSUER}
   secret_key: ${MY_JWT_SECRET_KEY}

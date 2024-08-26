@@ -59,7 +59,7 @@ public class WebOAuthSecurityConfig {
 				.requestMatchers("/api/token").permitAll()
 				.requestMatchers("/api/a1/**").permitAll()
 				.requestMatchers("/api/v1/**").hasRole("USER")
-				.requestMatchers("/api/i1/**").hasRole("USER")	// TODO: ADMIN 수정 필요
+				.requestMatchers("/api/i1/**").hasRole("ADMIN")	// TODO: ADMIN 수정 필요
 				.anyRequest().permitAll())
 			.oauth2Login(oauth2 -> oauth2
 				.loginPage("/login")

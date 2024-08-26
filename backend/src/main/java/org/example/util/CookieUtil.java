@@ -14,8 +14,11 @@ public class CookieUtil {
 	public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
 		Cookie cookie = new Cookie(name, value);
 		cookie.setPath("/");
-		cookie.setHttpOnly(true);
+		cookie.setDomain("lookus.shop");
 		cookie.setMaxAge(maxAge);
+		cookie.setHttpOnly(true);
+		cookie.setSecure(true);
+		cookie.setAttribute("SameSite", "None");
 		response.addCookie(cookie);
 	}
 
@@ -30,6 +33,7 @@ public class CookieUtil {
 		for (Cookie cookie : cookies) {
 			if (name.equals(cookie.getName())) {
 				cookie.setValue("");
+				cookie.setDomain("lookus.shop");
 				cookie.setPath("/");
 				cookie.setMaxAge(0);
 				cookie.setHttpOnly(true);

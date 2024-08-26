@@ -3,7 +3,6 @@ package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisio
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -20,6 +20,8 @@ import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.PostPopularSearchCondition;
+import org.example.post.repository.custom.UpdateScoreType;
+import org.example.post.service.PostService;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -47,8 +49,8 @@ public class ImageRedisService {
 	private static final String ZSET_KEY = "ColorZSet";
 	private static final String COLOR_DIST_CAL_ZSET_KEY = "ColorDistCalZSet";
 	private static final Integer STANDARD_DIST = 10;
-	private static final Integer WEIGHT_LDT = 1;
-	private static final Integer WEIGHT_LIKE = 1;
+	private static final Integer WEIGHT_LDT = 3;
+	private static final Integer WEIGHT_LIKE = 2;
 	private static final Integer WEIGHT_VIEW = 1;
 
 	public List<String> saveNewColor(Long resourceLocationId) throws JsonProcessingException {
@@ -104,10 +106,11 @@ public class ImageRedisService {
 		HashOperations<String, String, Object> hashOps = redisTemplate.opsForHash();
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		List<PostEntity> postEntities = postRepository.findAllByPostStatusAndCreatedAtAfterAndLikeCountGreaterThanEqual(
+		List<PostEntity> postEntities = postRepository.findAllByPostStatusAndCreatedAtAfterAndLikeCountGreaterThanEqualAndHitsGreaterThanEqual(
 			PostStatus.PUBLISHED,
 			postPopularSearchCondition.getCreatedAt(),
-			postPopularSearchCondition.getLikeCount()
+			postPopularSearchCondition.getLikeCount(),
+			postPopularSearchCondition.getViewCount()
 		);
 
 		// get popular color of popular ClothAnalyzeData's image analyze data to change RGB
@@ -129,6 +132,7 @@ public class ImageRedisService {
 				PostPopularSearchCondition condition = new PostPopularSearchCondition();
 				condition.setCreatedAt(post.getCreatedAt());
 				condition.setLikeCount(post.getLikeCount());
+				condition.setViewCount(post.getHits());
 
 				ColorDto.ColorSelectedDtoRequest colorSelectedDtoRequest = new ColorDto.ColorSelectedDtoRequest(
 					post.getPostId(),
@@ -204,6 +208,28 @@ public class ImageRedisService {
 		return savedColorNameList;
 	}
 
+	public void updateZSetColorScore(Long resourceLocationId, UpdateScoreType updateScoreType) throws JsonProcessingException {
+		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
+
+		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(resourceLocationId);
+		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
+			int[] rgbColor = {
+				clothAnalyzeData.rgbColor().getRed(),
+				clothAnalyzeData.rgbColor().getBlue(),
+				clothAnalyzeData.rgbColor().getGreen()
+			};
+			String colorName = calcCloseColorsDist(rgbColor, 1).get(0).name();
+
+			Double currentScore = zSetOps.score(ZSET_KEY, colorName);
+			if(currentScore == null){
+				currentScore = 0.0;
+			}
+			currentScore += updateScoreType.getValue();
+
+			zSetOps.add(ZSET_KEY, colorName, currentScore);
+		}
+	}
+
 	public List<ColorDto.ColorDistanceResponse> calcCloseColorsDist(int[] rgb, int num) throws JsonProcessingException {
 		HashOperations<String, Object, Object> hashOps = redisTemplate.opsForHash();
 		Map<Object, Object> colorMembers = hashOps.entries(HASH_KEY);
@@ -273,7 +299,7 @@ public class ImageRedisService {
 		return colorInfoHashMap;
 	}
 
-	public double calcScoreOfPost(PostPopularSearchCondition condition) {    // TODO: 옷 타입에 따른 weight 추가 되어야 함
+	public double calcScoreOfPost(PostPopularSearchCondition condition) {
 		double score = 0.0;
 
 		Duration duration = Duration.between(condition.getCreatedAt(), LocalDateTime.now());
@@ -283,8 +309,8 @@ public class ImageRedisService {
 		int likeCount = condition.getLikeCount();
 		score += likeCount * WEIGHT_LIKE;
 
-		// int viewCount = condition.getViewCount();
-		// score += viewCount * WEIGHT_VIEW;
+		int viewCount = condition.getViewCount();
+		score += viewCount * WEIGHT_VIEW;
 
 		return score;
 	}

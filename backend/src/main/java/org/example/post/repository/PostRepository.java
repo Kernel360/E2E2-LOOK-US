@@ -15,10 +15,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<PostEntity, Long>, PostRepositoryCustom {
 
-	List<PostEntity> findAllByPostStatusAndCreatedAtAfterAndLikeCountGreaterThanEqual(
+	List<PostEntity> findAllByPostStatusAndCreatedAtAfterAndLikeCountGreaterThanEqualAndHitsGreaterThanEqual(
 		PostStatus postStatus,
 		LocalDateTime localDateTime,
-		int likeCount
+		int likeCount,
+		int hits
 	);
 
 	// @Query("SELECT DISTINCT p FROM PostEntity p JOIN p.hashtags h WHERE p.postContent LIKE %:postContent% AND h.hashtagContent IN :hashtags AND p.postStatus = :postStatus")

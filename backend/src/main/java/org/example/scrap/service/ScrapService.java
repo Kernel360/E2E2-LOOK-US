@@ -8,8 +8,10 @@ import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
+import org.example.image.redis.service.ImageRedisService;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.repository.PostRepository;
+import org.example.post.repository.custom.UpdateScoreType;
 import org.example.scrap.domain.dto.ScrapDto;
 import org.example.scrap.domain.entity.ScrapEntity;
 import org.example.scrap.repository.ScrapRepository;
@@ -18,12 +20,15 @@ import org.example.user.repository.member.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
 @Transactional
 public class ScrapService {
+	private final ImageRedisService imageRedisService;
 
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
@@ -40,7 +45,7 @@ public class ScrapService {
 		);
 	}
 
-	public void scrapPostByPostId(Long postId, String email) {
+	public void scrapPostByPostId(Long postId, String email) throws JsonProcessingException {
 		Optional<ScrapEntity> scrap = scrapRepository.findByPost_PostIdAndUser_Email(postId, email);
 
 		if (scrap.isPresent()) {
@@ -50,7 +55,7 @@ public class ScrapService {
 				.subCategory(ApiUserErrorSubCategory.USER_SCRAP_DUPLICATION)
 				.build();
 		}
-
+		imageRedisService.updateZSetColorScore(findPost(postId).getImageId(), UpdateScoreType.SCRAP);
 		scrapRepository.save(
 			ScrapEntity.builder()
 				.post(this.findPost(postId))
@@ -59,7 +64,8 @@ public class ScrapService {
 		);
 	}
 
-	public void unscrapPostByPostId(Long postId, String userEmail) {
+	public void unscrapPostByPostId(Long postId, String userEmail) throws JsonProcessingException {
+		imageRedisService.updateZSetColorScore(findPost(postId).getImageId(), UpdateScoreType.SCRAP_CANCEL);
 		scrapRepository.deleteByPostAndUser(
 			this.findPost(postId),
 			this.findUserByEmail(userEmail)

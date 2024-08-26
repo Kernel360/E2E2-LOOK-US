@@ -27,7 +27,7 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 	private final ImageStorageManager imageStorageManager;
 
 	@Override
-	public void requestAnalyze(Long resourceLocationId) throws IOException {
+	public void analyze(Long resourceLocationId) throws IOException {
 		StorageFindResult result = imageStorageManager.findResourceById(resourceLocationId);
 		byte[] imageBytes = Files.readAllBytes(result.resource().getFile().toPath());
 

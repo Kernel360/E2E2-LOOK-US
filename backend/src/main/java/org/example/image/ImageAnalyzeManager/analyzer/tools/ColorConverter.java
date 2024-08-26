@@ -5,9 +5,10 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
 
 public class ColorConverter {
 
-	// CIE XYZ tristiumulus values of the reference white D65
-	private static final float[] STANDARD_TRISTIMULUS_D65 = {95.047f, 100.000f, 108.883f};
-	private static final float[] STANDARD_TRISTIMULUS_D50 = {96.42f, 100.000f, 82.49f};
+	// CIE XYZ tristimulus values of the reference white D65 and A
+	// private static final float[] STANDARD_TRISTIMULUS_D50 = {96.42f, 100.000f, 82.49f};
+	private static final float[] STANDARD_TRISTIMULUS_D65 = {95.047f, 100.000f, 108.883f};	// general type
+	private static final float[] STANDARD_TRISTIMULUS_A = {109.85f, 100.000f, 35.585f};		// relatively dark type
 
 	/**
 	 * RGB -> CIE-LAB.
@@ -17,16 +18,16 @@ public class ColorConverter {
 	 * @return CIE-LAB color space.
 	 */
 	// float[] tristimulus param maybe need if more accurate converter for specific environment or lighting condition
-	public static float[] RGBtoLAB(int red, int green, int blue){
+	public static float[] RGBtoLAB(int red, int green, int blue, float[] tri){
 		float[] xyz = RGBtoXYZ(red, green, blue);
-		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], STANDARD_TRISTIMULUS_D50);
+		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], tri);
 
 		return lab;
 	}
 
-	public static LabColor RGBtoLAB(RGBColor rgbColor) {
+	public static LabColor RGBtoLAB(RGBColor rgbColor, float[] tri) {
 		float[] xyz = RGBtoXYZ(rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue());
-		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], STANDARD_TRISTIMULUS_D50);
+		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], tri);
 		return new LabColor(lab[0], lab[1], lab[2]);
 	}
 
@@ -38,8 +39,8 @@ public class ColorConverter {
 	 * @return RGB color space.
 	 */
 	// float[] tristimulus param maybe need if more accurate converter for specific environment or lighting condition
-	public static int[] LABtoRGB(float l, float a, float b){
-		float[] xyz = LABtoXYZ(l, a, b, STANDARD_TRISTIMULUS_D50);
+	public static int[] LABtoRGB(float l, float a, float b, float[] tri){
+		float[] xyz = LABtoXYZ(l, a, b, tri);
 		return XYZtoRGB(xyz[0], xyz[1], xyz[2]);
 	}
 
@@ -208,5 +209,13 @@ public class ColorConverter {
 		return rgb;
 	}
 
+	public static String RGBtoHEX(int red, int green, int blue) {
+		// Ensure RGB values are within the valid range
+		if (red < 0 || red > 255 || green < 0 || green > 255 || blue < 0 || blue > 255) {
+			throw new IllegalArgumentException("RGB values must be between 0 and 255");		// TODO: 수정 필요
+		}
+		// Convert RGB values to HEX and format it as a string
+		return String.format("%02x%02x%02x", red, green, blue).toUpperCase();
+	}
 
 }

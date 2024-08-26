@@ -27,8 +27,8 @@ public class LabColorSimilarity {
 	 * @param blue  The blue component of the input RGB color.
 	 * @return A sorted list of LabColorCode based on similarity.
 	 */
-	public static List<ColorDistance> getSortedLabColors(int red, int green, int blue) {
-		float[] rgbLab = ColorConverter.RGBtoLAB(red, green, blue);
+	public static List<ColorDistance> getSortedLabColors(int red, int green, int blue, float[] tri) {
+		float[] rgbLab = ColorConverter.RGBtoLAB(red, green, blue, tri);
 		List<LabColorCode> colorList = List.of(LabColorCode.values());
 
 		return colorList.stream()

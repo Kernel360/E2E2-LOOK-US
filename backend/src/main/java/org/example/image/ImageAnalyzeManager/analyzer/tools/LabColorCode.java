@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public enum LabColorCode {
-
+	// TODO: 삭제 예정
 	// Define colors with their LAB values
 	WHITE(100, 0, 0),
 	BLACK(0, 0, 0),

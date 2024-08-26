@@ -118,6 +118,9 @@ export default function Page({ params, searchParams }: Props) {
                     </span>
                 ))}
             </div>
+            <div className={styles.hitsContainer}>
+                <span className={styles.hits}>조회수: {post.hits}</span> {/* 조회수 위치 변경 */}
+            </div>
         </div>
     );
 }

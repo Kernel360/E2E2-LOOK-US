@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "post_stats_record")
+@Table(name = "report_post_stats_record")
 @Getter
 @NoArgsConstructor
 public class PostStats {

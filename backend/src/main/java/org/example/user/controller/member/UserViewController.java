@@ -1,13 +1,16 @@
 package org.example.user.controller.member;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.example.config.jwt.TokenProvider;
 import org.example.post.domain.entity.PostStats;
 import org.example.post.repository.PostStatsRepository;
 import org.example.user.domain.dto.UserDto;
+import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.service.member.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +32,7 @@ public class UserViewController {
 
 	private final UserService userService;
 	private final PostStatsRepository postStatsRepository;
+	private final TokenProvider tokenProvider;
 
 	@GetMapping("/")
 	public String hello() {
@@ -40,19 +45,26 @@ public class UserViewController {
 	}
 
 	@PostMapping("/login")
-	public String login(@ModelAttribute UserDto.UserLoginRequest loginRequest, Model model) {
-		UserDto.UserResponse user = userService.loginUser(loginRequest);
-
+	public String login(@ModelAttribute UserDto.UserLoginRequest loginRequest, Model model, HttpServletResponse response) {
+		UserDto.UserResponse userResponse = userService.loginUser(loginRequest);
+		UserEntity user = userService.getUserByEmail(userResponse.email());
 		if (user != null) {
-			if ("ROLE_ADMIN".equals(user.role())) {
-				// 로그인 성공 시 관리자는 관리자 페이지로 이동
+			// JWT 토큰 생성
+			String token = tokenProvider.generateToken(user, Duration.ofHours(1));
+
+			// 토큰을 쿠키에 저장
+			Cookie jwtCookie = new Cookie("token", token);
+			jwtCookie.setHttpOnly(true);
+			jwtCookie.setPath("/");
+			jwtCookie.setMaxAge(24 * 60 * 60); // 24시간
+			response.addCookie(jwtCookie);
+
+			if ("ROLE_ADMIN".equals(userResponse.role())) {
 				return "redirect:/admin/stats";
 			} else {
-				// 로그인 성공 시 일반 사용자는 홈 페이지로 이동
 				return "redirect:/home";
 			}
 		} else {
-			// 로그인 실패 시 다시 로그인 페이지로 리다이렉트
 			return "redirect:/login?error=true";
 		}
 	}
@@ -126,6 +138,12 @@ public class UserViewController {
 
 	@GetMapping("/logout")
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
+		Cookie cookie = new Cookie("token", null);
+		cookie.setHttpOnly(true);
+		cookie.setMaxAge(0);
+		cookie.setPath("/");
+		response.addCookie(cookie);
+
 		new SecurityContextLogoutHandler().logout(request, response,
 			SecurityContextHolder.getContext().getAuthentication());
 		return "redirect:/login";

@@ -22,7 +22,7 @@ public class BatchScheduler {
 		this.postStatsJob = postStatsJob;
 	}
 
-	@Scheduled(cron = "0 05 15 * * *") // 매일 24시에 실행
+	@Scheduled(cron = "0 0 0 * * *") // 매일 24시에 실행
 	public void runUpdatePostStatsJob() throws Exception {
 		log.info("batch 시작");
 		jobLauncher.run(postStatsJob, new JobParametersBuilder()

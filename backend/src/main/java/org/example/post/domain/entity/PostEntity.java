@@ -62,6 +62,9 @@ public class PostEntity extends TimeTrackableEntity {
 	@Column(name = "like_count", nullable = false)
 	private int likeCount = 0;
 
+	@Column(columnDefinition = "integer default 0", nullable = false)
+	private int hits;
+
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	private List<HashtagEntity> hashtags = new ArrayList<>();
 

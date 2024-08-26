@@ -30,6 +30,11 @@ spring:
               - email
               - profile
 
+  servlet:
+    multipart:
+      max-file-size: 1MB # 요청 파일 1개의 사이즈
+      max-request-size: 3MB # 요청 파일 전체 사이즈
+
   data:
     redis:
       host: ${REDIS_HOST}

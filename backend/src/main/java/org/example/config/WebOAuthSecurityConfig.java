@@ -108,11 +108,11 @@ public class WebOAuthSecurityConfig {
 		corsConfiguration.addExposedHeader("Set-Cookie");
 		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.addAllowedMethod("*");
-		corsConfiguration.addAllowedOrigin("https://www.lookus.shop");
-		corsConfiguration.addAllowedOrigin("http://www.lookus.shop");
-		corsConfiguration.addAllowedOrigin("http://localhost:8080");
-		corsConfiguration.addAllowedOrigin("http://localhost:8081");
-		corsConfiguration.addAllowedOrigin("http://localhost:3000");
+		corsConfiguration.addAllowedOrigin(System.getenv("WEBSITE_DOMAIN"));
+		corsConfiguration.addAllowedOrigin(System.getenv("API_DOMAIN"));
+		corsConfiguration.addAllowedOrigin("http://localhost:8080"); // JUST FOR LOCAL DEV
+		corsConfiguration.addAllowedOrigin("http://localhost:8081"); // JUST FOR LOCAL DEV
+		corsConfiguration.addAllowedOrigin("http://localhost:3000"); // JUST FOR LOCAL DEV
 		corsConfiguration.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

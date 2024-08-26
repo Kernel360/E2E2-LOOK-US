@@ -55,6 +55,7 @@ public class ClothTypeConfig {
 		new ClothMappingTable(
 			ClothType.SKIRT,
 			List.of(
+				"Skirt"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(

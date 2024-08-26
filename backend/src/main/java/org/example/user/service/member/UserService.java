@@ -3,6 +3,7 @@ package org.example.user.service.member;
 import static org.example.config.oauth.OAuth2SuccessHandler.*;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.example.exception.common.ApiErrorCategory;
@@ -13,9 +14,16 @@ import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
+import org.example.user.domain.enums.Role;
 import org.example.user.domain.enums.UserStatus;
 import org.example.user.repository.member.UserRepository;
 import org.example.util.CookieUtil;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,21 +73,35 @@ public class UserService {
 	}
 
 	public void signupUser(UserDto.UserCreateRequest addUserRequest) {
-		UserEntity user = this.getUserByEmail_internal(addUserRequest.email());
-
-		// 이미 탈퇴한 사용자가 기존 이메일로 재가입 할 경우를 처리합니다
-		if (user.getUserStatus() == UserStatus.USER_STATUS_DEACTIVATE) {
-			user.updateUserStatus(UserStatus.USER_STATUS_ACTIVATE);
-			userRepository.save(user);
-
-			return;
-		}
 
 		userRepository.save(UserEntity.builder()
 			.email(addUserRequest.email())
 			.password(bCryptPasswordEncoder.encode(addUserRequest.password()))
+			.role(Role.ROLE_ADMIN)
 			.build());
 	}
+
+	public UserDto.UserResponse loginUser(UserDto.UserLoginRequest loginRequest) {
+			UserEntity user = getUserByEmail(loginRequest.email());
+
+			if (user != null && bCryptPasswordEncoder.matches(loginRequest.password(), user.getPassword())) {
+				// 로그인 성공 시 SecurityContextHolder에 권한 부여
+				Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
+				Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);
+				SecurityContext context = SecurityContextHolder.getContext();
+
+				context.setAuthentication(authentication);
+
+				System.out.println("context = " + context);
+
+
+
+				return new UserDto.UserResponse(user.getEmail(), user.getRole().name());
+			}
+
+			return null; // 로그인 실패 시 null 반환
+		}
+
 
 	@Transactional(readOnly = true)
 	public UserDto.UserGetInfoResponse getMyInfo(String email) {

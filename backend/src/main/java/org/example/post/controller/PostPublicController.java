@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -49,10 +52,41 @@ public class PostPublicController {
 	})
 	@GetMapping("/{post_id}")
 	public ResponseEntity<PostDto.PostDetailDtoResponse> getPostById(
-		@PathVariable Long post_id
+		@PathVariable Long post_id, HttpServletRequest request, HttpServletResponse response
 	) {
+		/* 조회수 로직 */
+		viewCount(post_id, request, response);
+
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(postService.getPostById(post_id));
+	}
+
+	private void viewCount(Long post_id, HttpServletRequest request, HttpServletResponse response) {
+		Cookie oldCookie = null;
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("postView")) {
+					oldCookie = cookie;
+				}
+			}
+		}
+
+		if (oldCookie != null) {
+			if (!oldCookie.getValue().contains("["+ post_id.toString() +"]")) {
+				postService.updateView(post_id);
+				oldCookie.setValue(oldCookie.getValue() + "_[" + post_id + "]");
+				oldCookie.setPath("/");
+				oldCookie.setMaxAge(60 * 60 * 24); 							// 쿠키 시간
+				response.addCookie(oldCookie);
+			}
+		} else {
+			postService.updateView(post_id);
+			Cookie newCookie = new Cookie("postView", "[" + post_id + "]");
+			newCookie.setPath("/");
+			newCookie.setMaxAge(60 * 60 * 24); 								// 쿠키 시간
+			response.addCookie(newCookie);
+		}
 	}
 
 	//TODO : Request Body로 날리기

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 public class RedisConfig {
 
 	@Value("${spring.data.redis.host}")
-	private String host = "localhost";
+	private String host;
 
 	@Value("${spring.data.redis.port}")
 	private int port;

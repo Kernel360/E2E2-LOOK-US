@@ -8,12 +8,15 @@ import org.example.user.domain.enums.Gender;
 import com.querydsl.core.annotations.QueryProjection;
 
 public class UserDto {
+
+	// 회원 가입 요청 DTO
 	public record UserCreateRequest(
 		String email,
 		String password
 	) {
 	}
 
+	// 회원 정보 수정 요청 DTO
 	public record UserUpdateRequest(
 		String birth,
 		String instaId,
@@ -22,6 +25,7 @@ public class UserDto {
 	) {
 	}
 
+	// 회원 정보 수정 응답 DTO
 	public record UserUpdateResponse(
 		Long userId
 	) {
@@ -32,6 +36,7 @@ public class UserDto {
 		}
 	}
 
+	// 회원 정보 조회 응답 DTO
 	public record UserGetInfoResponse(
 		String username,
 		String email,
@@ -41,9 +46,7 @@ public class UserDto {
 		String instaId,
 		Long imageId,
 		int postNum
-
 	) {
-
 		public static UserGetInfoResponse toDto(UserEntity userEntity, Integer postNum) {
 			return new UserGetInfoResponse(
 				userEntity.getUsername(),
@@ -56,9 +59,9 @@ public class UserDto {
 				postNum
 			);
 		}
-
 	}
 
+	// 회원이 작성한 게시글 조회 응답 DTO
 	public record UserGetPostsResponse(
 		Long imageId,
 		String postContent,
@@ -66,7 +69,6 @@ public class UserDto {
 		Integer likeCount,
 		Long postId
 	) {
-
 		@QueryProjection
 		public UserGetPostsResponse(
 			Long imageId,
@@ -80,6 +82,26 @@ public class UserDto {
 			this.hashtags = hashtags;
 			this.likeCount = likeCount;
 			this.postId = postId;
+		}
+	}
+
+	// 로그인 요청 DTO
+	public record UserLoginRequest(
+		String email,
+		String password
+	) {
+	}
+
+	// 사용자 정보 응답 DTO
+	public record UserResponse(
+		String email,
+		String role
+	) {
+		public static UserResponse fromEntity(UserEntity userEntity) {
+			return new UserResponse(
+				userEntity.getEmail(),
+				userEntity.getRole().name()
+			);
 		}
 	}
 }

@@ -50,32 +50,10 @@ public class PostDto {
 		List<String> hashtagContents,
 		int likeCount,
 		boolean likeStatus,
+		int hits,
 		LocalDateTime createdAt,
 		LocalDateTime updatedAt
 	) {
-
-		@QueryProjection
-		public PostDetailDtoResponse(
-			String nickname,
-			Long postId,
-			Long imageId,
-			String postContent,
-			List<String> hashtagContents,
-			int likeCount,
-			boolean likeStatus,
-			LocalDateTime createdAt,
-			LocalDateTime updatedAt
-		) {
-			this.nickname = nickname;
-			this.postId = postId;
-			this.imageId = imageId;
-			this.postContent = postContent;
-			this.hashtagContents = hashtagContents;
-			this.likeCount = likeCount;
-			this.likeStatus = likeStatus;
-			this.createdAt = createdAt;
-			this.updatedAt = updatedAt;
-		}
 
 		public static PostDetailDtoResponse toDto(PostEntity postEntity, boolean likeStatus) {
 
@@ -87,6 +65,7 @@ public class PostDto {
 				postEntity.getHashtagContents() != null ? postEntity.getHashtagContents() : Collections.emptyList(),
 				postEntity.getLikeCount(),
 				likeStatus,
+				postEntity.getHits(),
 				postEntity.getCreatedAt(),
 				postEntity.getUpdatedAt()
 			);
@@ -99,6 +78,7 @@ public class PostDto {
 		Long imageId,
 		List<String> hashtags,
 		int likeCount,
+		int hits,
 		LocalDateTime createdAt
 	) {
 
@@ -110,9 +90,10 @@ public class PostDto {
 			Long imageId,
 			String hashtagContent,
 			int likeCount,
+			int hits,
 			LocalDateTime createdAt
 		) {
-			this(nickname, postId, imageId, splitHashtags(hashtagContent), likeCount, createdAt);
+			this(nickname, postId, imageId, splitHashtags(hashtagContent), likeCount, hits, createdAt);
 		}
 
 		// Helper Method to split hashtagContent into List<String>

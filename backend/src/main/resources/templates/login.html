@@ -7,34 +7,88 @@
 
     <style>
         .gradient-custom {
-            background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
+            background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+        }
+
+        .card-custom {
+            border-radius: 1rem;
+            max-width: 400px;
+        }
+
+        .form-label {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .btn-primary {
+            background-color: #ff6f61;
+            border-color: #ff6f61;
+        }
+
+        .btn-primary:hover {
+            background-color: #ff5a4c;
+            border-color: #ff5a4c;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        .btn-google {
+            background-color: #db4437;
+            border-color: #db4437;
+            color: white;
+        }
+
+        .btn-google:hover {
+            background-color: #c33d2e;
+            border-color: #c33d2e;
+        }
+
+        .btn-github {
+            background-color: #24292e;
+            border-color: #24292e;
+            color: white;
+        }
+
+        .btn-github:hover {
+            background-color: #1b1f23;
+            border-color: #1b1f23;
         }
     </style>
 </head>
 <body class="gradient-custom">
 <section class="d-flex vh-100">
-    <div class="container-fluid row justify-content-center align-content-center">
-        <div class="card bg-dark" style="border-radius: 1rem;">
+    <div class="container d-flex justify-content-center align-items-center">
+        <div class="card bg-dark card-custom text-white">
             <div class="card-body p-5 text-center">
-                <h2 class="text-white">LOGIN</h2>
+                <h2>LOGIN</h2>
                 <p class="text-white-50 mt-2 mb-5">서비스를 사용하려면 로그인을 해주세요!</p>
 
-                <div class = "mb-2">
-                    <form action="/login" method="POST">
-                        <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
-                        <div class="mb-3">
-                            <label class="form-label text-white">Email address</label>
-                            <input type="email" class="form-control" name="username">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-white">Password</label>
-                            <input type="password" class="form-control" name="password">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+                <form action="/login" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Email address</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                </form>
 
-                    <button type="button" class="btn btn-secondary mt-3" onclick="location.href='/signup'">회원가입</button>
-                </div>
+                <hr class="my-4">
+
+                <a href="/oauth2/authorization/google" class="btn btn-google btn-block">Sign in with Google</a>
+                <a href="/oauth2/authorization/github" class="btn btn-github btn-block mt-2">Sign in with GitHub</a>
+
+                <button type="button" class="btn btn-secondary btn-block mt-3" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </div>

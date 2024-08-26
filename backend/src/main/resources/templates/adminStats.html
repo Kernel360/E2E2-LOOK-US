@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container mt-5">
+    <h1>관리자 페이지</h1>
+    <p>이 페이지는 관리자만 접근할 수 있습니다.</p>
+
+    <div class="mt-4">
+        <a href="/" class="btn btn-primary">홈으로 이동</a>
+        <a href="/logout" class="btn btn-danger">로그아웃</a>
+    </div>
+
+    <div class="mt-5">
+        <h3>게시글 선택</h3>
+        <select id="postSelect" class="form-control" onchange="showSelectedPost()">
+            <option value="">게시글을 선택하세요</option>
+            <option th:each="entry : ${statsByPostId}" th:value="${entry.key}" th:text="'게시글 ' + ${entry.key}"></option>
+        </select>
+
+        <!-- 선택된 게시글의 차트를 표시 -->
+        <div id="postStatsContainer" class="mt-5" style="display: none;">
+            <h3 id="selectedPostTitle"></h3>
+            <canvas id="postStatsChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // 모델에서 데이터 가져오기
+    var labelsByPostId = /*[[${labelsByPostId}]]*/ {};
+    var hitsDataByPostId = /*[[${hitsDataByPostId}]]*/ {};
+    var likeDataByPostId = /*[[${likeDataByPostId}]]*/ {};
+
+    // 게시글 선택에 따라 차트 업데이트
+    function showSelectedPost() {
+        var selectedPostId = $('#postSelect').val();
+        if (selectedPostId) {
+            var labels = labelsByPostId[selectedPostId];
+            var hitsData = hitsDataByPostId[selectedPostId];
+            var likeData = likeDataByPostId[selectedPostId];
+
+            $('#selectedPostTitle').text('게시글 ' + selectedPostId + ' 통계');
+
+            var ctx = document.getElementById('postStatsChart').getContext('2d');
+
+            // 차트가 이미 존재하고, Chart.js의 인스턴스가 맞다면 삭제
+            if (window.postStatsChart instanceof Chart) {
+                window.postStatsChart.destroy();
+            }
+
+            // 새 차트를 생성하고 window.postStatsChart에 할당
+            window.postStatsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '조회수',
+                            data: hitsData,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: '좋아요 수',
+                            data: likeData,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderWidth: 2,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+
+            $('#postStatsContainer').show();
+        } else {
+            $('#postStatsContainer').hide();
+        }
+    }
+
+
+</script>
+</body>
+</html>

@@ -15,8 +15,8 @@ public class CookieUtil {
 		Cookie cookie = new Cookie(name, value);
 		cookie.setPath("/");
 		cookie.setDomain("lookus.shop");
-		cookie.setHttpOnly(true);
 		cookie.setMaxAge(maxAge);
+		cookie.setHttpOnly(true);
 		cookie.setSecure(true);
 		cookie.setAttribute("SameSite", "None");
 		response.addCookie(cookie);

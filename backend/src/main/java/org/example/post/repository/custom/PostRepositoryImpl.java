@@ -115,9 +115,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		return Math.toIntExact(queryFactory
 			.update(postEntity)
 			.set(postEntity.hits, postEntity.hits.add(1))
+			.set(postEntity.todayHits, postEntity.todayHits.add(1))  // 오늘의 조회수도 증가
 			.where(postEntity.postId.eq(postId))
 			.execute());
 	}
+
 
 	@Override
 	public List<PostStatsDto> findPostStatsByType() {

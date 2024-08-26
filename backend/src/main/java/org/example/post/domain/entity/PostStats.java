@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "post_stats")
+@Table(name = "report_post_stats_record")
 @Getter
 @NoArgsConstructor
 public class PostStats {
@@ -36,14 +36,22 @@ public class PostStats {
 	@Column(name = "hits", nullable = false)
 	private int hits;
 
+	@Column(name = "today_likes", nullable = false)
+	private int todayLikes;  // 오늘의 좋아요 수
+
+	@Column(name = "today_hits", nullable = false)
+	private int todayHits;   // 오늘의 조회수
+
 	@Column(name = "recorded_at", nullable = false)
 	private LocalDateTime recordedAt;
 
 	@Builder
-	public PostStats(PostEntity post, int likeCount, int hits, LocalDateTime recordedAt) {
+	public PostStats(PostEntity post, int likeCount, int hits, int todayLikes, int todayHits, LocalDateTime recordedAt) {
 		this.post = post;
 		this.likeCount = likeCount;
 		this.hits = hits;
+		this.todayLikes = todayLikes;
+		this.todayHits = todayHits;
 		this.recordedAt = recordedAt;
 	}
 }

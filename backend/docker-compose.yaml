@@ -6,15 +6,17 @@ networks:
   backend:
     driver: bridge
 
+
 services:
+
   mysql:
     image: mysql:8.0
     container_name: look-us-mysql
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=Alswn1858!
-      - MYSQL_DATABASE=look_us_db
+      - MYSQL_ROOT_PASSWORD=${MY_DATA_PASSWORD}
+      - MYSQL_DATABASE=${MY_DATA_DB_NAME}
       - TZ=Asia/Seoul
     volumes:
       - ./data/mysql-data:/var/lib/mysql
@@ -23,3 +25,10 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --lower_case_table_names=1
+  redis:
+    image: redis:latest
+    container_name: look-us-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend

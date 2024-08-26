@@ -31,7 +31,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Entity
 @Table(name = "post")
 @SQLDelete(sql = "UPDATE post SET removed_at = CURRENT_TIMESTAMP WHERE post_id=?")
@@ -64,6 +66,12 @@ public class PostEntity extends TimeTrackableEntity {
 
 	@Column(columnDefinition = "integer default 0", nullable = false)
 	private int hits;
+
+	@Column(name = "today_likes", nullable = false)
+	private int todayLikes;  // 오늘의 좋아요 수
+
+	@Column(name = "today_hits", nullable = false)
+	private int todayHits;   // 오늘의 조회수
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
 	private List<HashtagEntity> hashtags = new ArrayList<>();
@@ -105,14 +113,26 @@ public class PostEntity extends TimeTrackableEntity {
 			.collect(Collectors.toList());
 	}
 
-	public void increaseLikeCount() {
-		this.likeCount++;
+	// 오늘의 통계 초기화
+	public void resetTodayStats() {
+		this.todayHits = 0;
+		this.todayLikes = 0;
 	}
 
+	// 좋아요 수 증가
+	public void increaseLikeCount() {
+		this.likeCount++;
+		this.todayLikes++;  // 오늘의 좋아요 수도 증가
+	}
+
+	// 좋아요 수 감소
 	public void decreaseLikeCount() {
 		this.likeCount--;
-		if (likeCount < 0) {
+		this.todayLikes--;
+		if (likeCount < 0 || todayLikes < 0) {
 			this.likeCount = 0;
+			this.todayLikes = 0;
+			log.warn("좋아요 감소 시도에서 오류 발생: 게시글 ID={}, 좋아요 수={}, 오늘의 좋아요 수={}", this.postId, this.likeCount, this.todayLikes);
 			throw ApiPostException
 				.builder()
 				.category(ApiErrorCategory.RESOURCE_BAD_REQUEST)
@@ -121,3 +141,4 @@ public class PostEntity extends TimeTrackableEntity {
 		}
 	}
 }
+

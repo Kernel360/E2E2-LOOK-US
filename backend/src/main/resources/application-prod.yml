@@ -2,7 +2,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect # MySQL 버전에 맞게 설정하세요
+        dialect: org.hibernate.dialect.MySQLDialect # MySQL8Dialect는 deprecated되었습니다.
         format_sql: true
     hibernate:
       ddl-auto: update
@@ -24,20 +24,18 @@ spring:
             scope:
               - email
               - profile
+
   data:
     redis:
-#      host: ${REDIS_HOST}
-#      port: ${REDIS_PORT} # Redis 서버 포트
-#      password: ${REDIS_PASSWORD} # 비밀번호 설정이 없는 경우 빈 문자열로 둠
-#      #      timeout: 5000 # 타임아웃 설정 (밀리초)
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD} # 비밀번호 설정이 없는 경우 빈 문자열로 둡니다
       lettuce:
         pool:
           max-active: 8
           max-idle: 8
           min-idle: 0
           max-wait: -1ms
-      sentinel:
-        username: 'default'
 
 jwt:
   issuer: ${MY_JWT_ISSUER}

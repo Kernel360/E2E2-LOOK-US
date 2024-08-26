@@ -110,7 +110,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+		return List.of(new SimpleGrantedAuthority(this.role.name()));
 	}
 
 	// NOTE: security의 username을 email로 처리하도록 하기 위함입니다.

@@ -18,6 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.example.post.domain.dto.PostDto;
+import org.example.post.domain.dto.PostStatsDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
@@ -67,6 +69,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 				hashtagEntity.hashtagContent,
 				postEntity.imageId,
 				postEntity.likeCount,
+				postEntity.hits,
 				postEntity.createdAt
 			).distinct()
 			.from(postEntity)
@@ -85,9 +88,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			String hashtagContent = tuple.get(hashtagEntity.hashtagContent);
 			LocalDateTime createdAt = tuple.get(postEntity.createdAt);
 			int likeCount = Optional.ofNullable(tuple.get(postEntity.likeCount)).orElse(0);
+			int hits = Optional.ofNullable(tuple.get(postEntity.hits)).orElse(0);
 
 			PostDto.PostDtoResponse dto = postDtoMap.computeIfAbsent(postId, id ->
-				new PostDto.PostDtoResponse(nickname, id, imageId, new ArrayList<>(), likeCount, createdAt)
+				new PostDto.PostDtoResponse(nickname, id, imageId, new ArrayList<>(), likeCount, hits, createdAt)
 			);
 
 			if (hashtagContent != null && !dto.hashtags().contains(hashtagContent)) {
@@ -104,6 +108,27 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			sortedPosts = sortPosts(sort, content, pageable);
 		}
 		return new PageImpl<>(sortedPosts, pageable, total);
+	}
+
+	@Override
+	public int updateView(Long postId) {
+		return Math.toIntExact(queryFactory
+			.update(postEntity)
+			.set(postEntity.hits, postEntity.hits.add(1))
+			.where(postEntity.postId.eq(postId))
+			.execute());
+	}
+
+	@Override
+	public List<PostStatsDto> findPostStatsByType() {
+		return queryFactory
+			.select(Projections.constructor(PostStatsDto.class,
+				postEntity.postStatus,
+				postEntity.hits.sum(),
+				postEntity.likeCount.sum()))
+			.from(postEntity)
+			.groupBy(postEntity.postStatus)
+			.fetch();
 	}
 
 	private Predicate postContentContains(String postContent) {

@@ -193,6 +193,10 @@ public class PostService {
 		}
 	}
 
+	public int updateView(Long postId) {
+		return postRepository.updateView(postId);
+	}
+
 	@Transactional(readOnly = true)
 	public boolean existLikePost(UserEntity user, PostEntity post) {
 		return likeRepository.existsByUserAndPost(user, post);

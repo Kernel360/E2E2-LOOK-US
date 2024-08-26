@@ -12,6 +12,7 @@ import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
+import org.example.image.redis.service.ImageRedisService;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.LikeEntity;
@@ -32,11 +33,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Transactional
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class PostService {
+	private final ImageRedisService imageRedisService;
 
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
@@ -57,6 +61,10 @@ public class PostService {
 
 		// 2. analyze image
 		imageAnalyzeManager.requestAnalyze(storageSaveResult.resourceLocationId());
+
+		// 3. save color to Redis
+		List<String> savedColorList = imageRedisService.saveNewColor(storageSaveResult.resourceLocationId());
+		log.info("Saved Color List : {}", savedColorList.stream().toList());
 
 		PostEntity post = new PostEntity(
 			user,

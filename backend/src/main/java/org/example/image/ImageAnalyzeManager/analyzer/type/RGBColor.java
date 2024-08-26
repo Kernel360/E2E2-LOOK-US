@@ -3,7 +3,9 @@ package org.example.image.ImageAnalyzeManager.analyzer.type;
 import java.awt.*;
 import java.beans.ConstructorProperties;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties({
 	"colorSpace",
@@ -14,7 +16,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class RGBColor extends Color {
 
 	@ConstructorProperties({"red", "green", "blue"})
-	public RGBColor(int r, int g, int b) {
+	@JsonCreator
+	public RGBColor(
+		@JsonProperty("red") int r,
+		@JsonProperty("green") int g,
+		@JsonProperty("blue") int b
+	) {
 		super( r, g, b );
 	}
 

@@ -116,7 +116,7 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 							.rightBottomVertex(
 								new NormalizedVertex2D(rightBottomVertex.getX(), rightBottomVertex.getY())
 							)
-							.tri(tristimulus)
+							.tristimulus(tristimulus)
 							.build();
 
 					} catch (IOException e) {

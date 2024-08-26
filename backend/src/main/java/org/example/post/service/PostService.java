@@ -22,6 +22,7 @@ import org.example.post.repository.HashtagRepository;
 import org.example.post.repository.LikeRepository;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.PostSearchCondition;
+import org.example.post.repository.custom.UpdateScoreType;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -173,27 +179,59 @@ public class PostService {
 		return PostDto.PostDetailDtoResponse.toDto(post, existLikePost);
 	}
 
-	public Boolean like(Long postId, String email) {
+	public Boolean like(Long postId, String email) throws JsonProcessingException {
 		PostEntity post = findPostById(postId);
-
 		UserEntity user = findUserByEmail(email);
+		Long resourceLocationId = post.getImageId();
 
 		// user 는 like 을 한번 만 누를 수 있다.
 		if (existLikePost(user, post)) {
 			// 좋아요를 누른 상태이면, 좋아요 취소를 위해 DB 삭제
 			LikeEntity currentLikePost = likeRepository.findByUserAndPost(user, post);
+			imageRedisService.updateZSetColorScore(resourceLocationId, UpdateScoreType.LIKE_CANCEL);
 			post.decreaseLikeCount();
 			likeRepository.delete(currentLikePost);
 			return false;
 		} else {
 			// 좋아요를 누르지 않을 경우 DB에 저장
+			imageRedisService.updateZSetColorScore(resourceLocationId, UpdateScoreType.LIKE);
 			post.increaseLikeCount();
 			likeRepository.save(LikeEntity.toEntity(user, post));
 			return true;
 		}
 	}
 
-	public int updateView(Long postId) {
+	public void viewCount(Long post_id, HttpServletRequest request, HttpServletResponse response) throws
+		JsonProcessingException {
+		Cookie oldCookie = null;
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("postView")) {
+					oldCookie = cookie;
+				}
+			}
+		}
+
+		if (oldCookie != null) {
+			if (!oldCookie.getValue().contains("["+ post_id.toString() +"]")) {
+				updateView(post_id);
+				oldCookie.setValue(oldCookie.getValue() + "_[" + post_id + "]");
+				oldCookie.setPath("/");
+				oldCookie.setMaxAge(60 * 60 * 24); 							// 쿠키 시간
+				response.addCookie(oldCookie);
+			}
+		} else {
+			updateView(post_id);
+			Cookie newCookie = new Cookie("postView", "[" + post_id + "]");
+			newCookie.setPath("/");
+			newCookie.setMaxAge(60 * 60 * 24); 								// 쿠키 시간
+			response.addCookie(newCookie);
+		}
+	}
+
+	public int updateView(Long postId) throws JsonProcessingException {
+		imageRedisService.updateZSetColorScore(findPostById(postId).getImageId(), UpdateScoreType.VIEW);
 		return postRepository.updateView(postId);
 	}
 

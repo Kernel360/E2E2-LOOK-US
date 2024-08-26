@@ -10,5 +10,5 @@ public record ClothAnalyzeData(
 	RGBColor rgbColor,
 	NormalizedVertex2D leftTopVertex,
 	NormalizedVertex2D rightBottomVertex,
-	float[] tri
+	float[] tristimulus
 ) {}

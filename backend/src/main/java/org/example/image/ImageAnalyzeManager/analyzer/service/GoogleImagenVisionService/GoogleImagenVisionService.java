@@ -3,7 +3,6 @@ package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisio
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +13,7 @@ import javax.imageio.ImageIO;
 
 import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.type.GoogleImagenVisionDto;
 import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.utils.ClothTypeMapper;
+import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisionService.utils.GoogleApiCredentialRoller;
 import org.example.image.ImageAnalyzeManager.analyzer.service.ImageAnalyzeVisionService;
 import org.example.image.ImageAnalyzeManager.analyzer.tools.ImageCropper;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
@@ -22,8 +22,6 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
 import org.springframework.stereotype.Service;
 
 import com.google.api.gax.core.FixedCredentialsProvider;
-import com.google.auth.Credentials;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.AnnotateImageRequest;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
@@ -46,7 +44,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 
-	// ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
+	private final GoogleApiCredentialRoller apiKeyRoller
+		= GoogleApiCredentialRoller.fromEnv("GOOGLE_VISION_API_KEYS");
 
 	@Override
 	public List<ClothAnalyzeData> analyzeImage(byte[] imgBytes) throws IOException {
@@ -57,14 +56,10 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 
 		// Ref: https://googleapis.dev/nodejs/vision/latest/google.api.ClientLibrarySettings.html#.create
 
-		// TODO: 추후에 환경 변수로 변경해야 합니다.
-		Credentials credentials = GoogleCredentials.fromStream(
-			new FileInputStream("C://Users/kyrae/Works/Kernel360/E2E2-LOOK-US/backend/yr.json")
-		);
 
 		ImageAnnotatorSettings settings = ImageAnnotatorSettings.newBuilder()
 			.setCredentialsProvider(
-				FixedCredentialsProvider.create(credentials)
+				FixedCredentialsProvider.create( apiKeyRoller.getCredential() )
 			).build();
 
 		try (ImageAnnotatorClient client = ImageAnnotatorClient.create(settings)) {
@@ -329,14 +324,9 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 		return adjustedImage;
 	}
 
-
 	private static byte[] bufferedImageToByteArray(BufferedImage image) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ImageIO.write(image, "jpg", baos);
 		return baos.toByteArray();
 	}
-
-
-
-
 }

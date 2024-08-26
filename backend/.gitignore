@@ -3,6 +3,8 @@ src/main/resources/keystore.p12
 .env
 
 
+*.env
+
 HELP.md
 .gradle
 resources/templates/data.sql

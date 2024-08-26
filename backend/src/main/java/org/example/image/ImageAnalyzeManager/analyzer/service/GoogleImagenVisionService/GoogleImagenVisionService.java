@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -18,6 +19,7 @@ import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVision
 import org.example.image.ImageAnalyzeManager.analyzer.service.ImageAnalyzeVisionService;
 import org.example.image.ImageAnalyzeManager.analyzer.tools.ImageCropper;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
+import org.example.image.ImageAnalyzeManager.analyzer.type.ClothType;
 import org.example.image.ImageAnalyzeManager.analyzer.type.NormalizedVertex2D;
 import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
 import org.springframework.stereotype.Service;
@@ -154,17 +156,21 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 		for (LocalizedObjectAnnotation entity : entities) {
 
 			String rawObjectName = entity.getName();
-			ClothTypeMapper.toCategory(rawObjectName)
-				.ifPresent(clothType -> {
-					detections.put(
+			Optional<ClothType> clothTypeOptional = ClothTypeMapper.toCategory(rawObjectName);
+
+			if (clothTypeOptional.isPresent()) {
+				ClothType clothType = clothTypeOptional.get();
+				detections.put(
+					rawObjectName,
+					new GoogleImagenVisionDto.ClothDetection(
+						clothType,
 						rawObjectName,
-						new GoogleImagenVisionDto.ClothDetection(
-							clothType,
-							rawObjectName,
-							entity.getBoundingPoly().getNormalizedVerticesList()
-						)
-					);
-				});
+						entity.getBoundingPoly().getNormalizedVerticesList()
+					)
+				);
+			} else if(!rawObjectName.equals("Person")){
+				log.warn("Cloth type not found for object name: {}", rawObjectName);
+			}
 		}
 
 		return new ArrayList<>(detections.values());

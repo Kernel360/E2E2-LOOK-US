@@ -39,16 +39,22 @@ public class UserViewController {
 		return "index";
 	}
 
+	// NOTE: admin login page
 	@GetMapping("/login")
 	public String login() {
 		return "login";
 	}
 
-	@PostMapping("/login")
+	@PostMapping("/login") // NOTE: --------- ADMIN REPORT PAGE --------------
 	public String login(@ModelAttribute UserDto.UserLoginRequest loginRequest, Model model, HttpServletResponse response) {
 		UserDto.UserResponse userResponse = userService.loginUser(loginRequest);
 		UserEntity user = userService.getUserByEmail(userResponse.email());
+
 		if (user != null) {
+			// NOTE: 현재 구현된 것은 일반 사용자 로그인만 access token이 발급 됩니다.
+			//       따라서 개발 단에서 간단히 admin에게도 token을 줘서 게시물 생성 가능하게 처리하려고
+			//       아래와 같이 admin에게 토큰을 주게 되었습니다...
+
 			// JWT 토큰 생성
 			String token = tokenProvider.generateToken(user, Duration.ofHours(1));
 
@@ -59,11 +65,12 @@ public class UserViewController {
 			jwtCookie.setMaxAge(24 * 60 * 60); // 24시간
 			response.addCookie(jwtCookie);
 
-			if ("ROLE_ADMIN".equals(userResponse.role())) {
-				return "redirect:/admin/stats";
-			} else {
-				return "redirect:/home";
-			}
+			// if ("ROLE_ADMIN".equals(userResponse.role())) {
+			// 	return "redirect:/admin/stats";
+			// } else {
+			// 	return "redirect:/home";
+			// }
+			return "redirect:/admin/stats";
 		} else {
 			return "redirect:/login?error=true";
 		}

@@ -2,6 +2,7 @@ package org.example.post.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
@@ -41,7 +42,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Transactional
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -65,13 +65,23 @@ public class PostService {
 		StorageSaveResult storageSaveResult = imageStorageManager.saveResource(image,
 			StorageType.LOCAL_FILE_SYSTEM);
 
-		// 2. analyze image
-		imageAnalyzeManager.requestAnalyze(storageSaveResult.resourceLocationId());
+		// 2. run image analyze async
+		CompletableFuture.runAsync(() -> {
+			try {
+				imageAnalyzeManager.analyze(storageSaveResult.resourceLocationId());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}).thenRunAsync(() -> {
+			try {
+				List<String> savedColorList = imageRedisService.saveNewColor(storageSaveResult.resourceLocationId());
+				log.info("Saved Color List : {}", savedColorList.stream().toList());
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		});
 
-		// 3. save color to Redis
-		List<String> savedColorList = imageRedisService.saveNewColor(storageSaveResult.resourceLocationId());
-		log.info("Saved Color List : {}", savedColorList.stream().toList());
-
+		// 3. save post
 		PostEntity post = new PostEntity(
 			user,
 			postDto.postContent(),

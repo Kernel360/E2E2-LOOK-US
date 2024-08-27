@@ -6,7 +6,6 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.ClothType;
 import org.example.image.ImageAnalyzeManager.analyzer.type.LabColor;
 import org.example.image.ImageAnalyzeManager.analyzer.type.NormalizedVertex2D;
 import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
-import org.example.image.imageStorageManager.storage.entity.ResourceLocationEntity;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -14,12 +13,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -42,8 +38,8 @@ public class ClothAnalyzeDataEntity {
 	/**
 	 * 분석한 대상 리소스 id
 	 */
-	@Column(name = "resouce_location_id", nullable = false)
-	private Long resourceLocationId;
+	@Column(name = "image_location_id", nullable = false)
+	private Long imageLocationId;
 
 	/**
 	 * 어떤 옷 타입 인가? (ex. 상의, 하의, 모자)
@@ -102,13 +98,13 @@ public class ClothAnalyzeDataEntity {
 		LabColor labColor,
 		RGBColor rgbColor,
 		List<NormalizedVertex2D> boundingBox,
-		Long resourceLocationId
+		Long imageLocationId
 	) {
 		this.clothType = clothType;
 		this.clothName = clothName;
 		this.labColor = labColor;
 		this.rgbColor = rgbColor;
 		this.boundingBox = boundingBox;
-		this.resourceLocationId = resourceLocationId;
+		this.imageLocationId = imageLocationId;
 	}
 }

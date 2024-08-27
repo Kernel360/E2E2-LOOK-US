@@ -44,9 +44,9 @@ public class ImageApiResourceController {
 	public ResponseEntity<Long> handleImageUpload(
 		@RequestParam("image") MultipartFile file
 	) throws IOException {
-		StorageSaveResult result = this.imageStorageManager.saveResource(file, StorageType.LOCAL_FILE_SYSTEM);
+		StorageSaveResult result = this.imageStorageManager.saveImage(file, StorageType.LOCAL_FILE_SYSTEM);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-							 .body(result.resourceLocationId());
+							 .body(result.imageLocationId());
 	}
 }

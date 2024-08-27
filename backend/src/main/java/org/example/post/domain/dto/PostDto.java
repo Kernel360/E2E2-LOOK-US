@@ -45,7 +45,7 @@ public class PostDto {
 	public record PostDetailDtoResponse(
 		String nickname,
 		Long postId,
-		Long imageId,
+		Long imageLocationId,
 		String postContent,
 		List<String> hashtagContents,
 		int likeCount,
@@ -60,7 +60,7 @@ public class PostDto {
 			return new PostDetailDtoResponse(
 				postEntity.getUser().getNickname(),
 				postEntity.getPostId(),
-				postEntity.getImageId(),
+				postEntity.getImageLocationId(),
 				postEntity.getPostContent(),
 				postEntity.getHashtagContents() != null ? postEntity.getHashtagContents() : Collections.emptyList(),
 				postEntity.getLikeCount(),
@@ -75,7 +75,7 @@ public class PostDto {
 	public record PostDtoResponse(
 		String nickname,
 		Long postId,
-		Long imageId,
+		Long imageLocationId,
 		List<String> hashtags,
 		int likeCount,
 		int hits,
@@ -87,13 +87,13 @@ public class PostDto {
 		public PostDtoResponse(
 			String nickname,
 			Long postId,
-			Long imageId,
+			Long imageLocationId,
 			String hashtagContent,
 			int likeCount,
 			int hits,
 			LocalDateTime createdAt
 		) {
-			this(nickname, postId, imageId, splitHashtags(hashtagContent), likeCount, hits, createdAt);
+			this(nickname, postId, imageLocationId, splitHashtags(hashtagContent), likeCount, hits, createdAt);
 		}
 
 		// Helper Method to split hashtagContent into List<String>
@@ -114,7 +114,7 @@ public class PostDto {
 
 	public record PostMyPageDtoResponse(
 		Long postId,
-		Long imageId,
+		Long imageLocationId,
 		String postContent,
 		List<String> hashtagContents,
 		Integer likeCount,
@@ -125,7 +125,7 @@ public class PostDto {
 		public static PostMyPageDtoResponse toDto(PostEntity postEntity) {
 			return new PostMyPageDtoResponse(
 				postEntity.getPostId(),
-				postEntity.getImageId(),
+				postEntity.getImageLocationId(),
 				postEntity.getPostContent(),
 				postEntity.getHashtagContents(),
 				postEntity.getLikeCount(),

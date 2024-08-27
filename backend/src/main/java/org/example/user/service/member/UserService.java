@@ -53,11 +53,11 @@ public class UserService {
 		// TODO: image storage는 ApiException이 아닌 자체적 Exception을 던지도록
 		//       변경될 예정입니다. 후추 try-catch로 변경해야 합니다.
 		if (profileImage != null && !profileImage.isEmpty()) {
-			StorageSaveResult storageSaveResult = imageStorageManager.saveResource(
+			StorageSaveResult storageSaveResult = imageStorageManager.saveImage(
 				profileImage, StorageType.LOCAL_FILE_SYSTEM
 			);
 
-			user.updateProfileImage(storageSaveResult.resourceLocationId());
+			user.updateProfileImage(storageSaveResult.imageLocationId());
 		}
 
 		if(updateRequest != null) {

@@ -59,7 +59,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	@Enumerated(EnumType.STRING)
 	private Role role;
 
-	private Long profileImageId;
+	private Long profileImageLocationId;
 
 	private String provider;
 
@@ -70,7 +70,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 
 	@Builder
 	public UserEntity(String username, String password, String email, Gender gender, String birth, String nickname,
-		String instaId, Role role, Long profileImageId, String provider, String providerId) {
+		String instaId, Role role, Long profileImageLocationId, String provider, String providerId) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
@@ -79,7 +79,7 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 		this.nickname = nickname;
 		this.instaId = instaId;
 		this.role = role;
-		this.profileImageId = profileImageId;
+		this.profileImageLocationId = profileImageLocationId;
 		this.provider = provider;
 		this.providerId = providerId;
 	}
@@ -104,8 +104,8 @@ public class UserEntity extends BaseEntity implements UserDetails { // UserDetai
 	}
 
 	// 이미지도 업데이트
-	public void updateProfileImage(Long profileImageId) {
-		this.profileImageId = profileImageId;
+	public void updateProfileImage(Long profileImageLocationId) {
+		this.profileImageLocationId = profileImageLocationId;
 	}
 
 	@Override

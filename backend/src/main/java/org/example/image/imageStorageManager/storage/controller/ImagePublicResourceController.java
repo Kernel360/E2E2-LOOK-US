@@ -1,7 +1,7 @@
 package org.example.image.imageStorageManager.storage.controller;
 
 import org.example.image.imageStorageManager.ImageStorageManager;
-import org.example.image.imageStorageManager.type.StorageFindResult;
+import org.example.image.imageStorageManager.type.StorageLoadResult;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -38,12 +38,12 @@ public class ImagePublicResourceController {
 		this.imageStorageManager = imageStorageManager;
 	}
 
-	@GetMapping("/image/{resourceId}")
+	@GetMapping("/image/{imageLocationId}")
 	@ResponseBody
 	public ResponseEntity<Resource> serveFile(
-		@PathVariable Long resourceId
+		@PathVariable Long imageLocationId
 	) {
-		StorageFindResult result = this.imageStorageManager.findResourceById(resourceId);
+		StorageLoadResult result = this.imageStorageManager.loadImageByLocationId(imageLocationId);
 
 		return ResponseEntity.ok().header(
 			HttpHeaders.CONTENT_DISPOSITION,

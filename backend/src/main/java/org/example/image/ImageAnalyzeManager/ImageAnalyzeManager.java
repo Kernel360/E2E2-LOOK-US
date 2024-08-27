@@ -6,9 +6,9 @@ import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 public interface ImageAnalyzeManager {
 
 	// analyze image and store to DB
-	void analyze(Long resourceLocationId) throws IOException;
+	void analyze(Long imageLocationId) throws IOException;
 
 	// get analyzed data from DB
-	ImageAnalyzeData getAnalyzedData(Long resourceLocationId);
+	ImageAnalyzeData getAnalyzedData(Long imageLocationId);
 
 }

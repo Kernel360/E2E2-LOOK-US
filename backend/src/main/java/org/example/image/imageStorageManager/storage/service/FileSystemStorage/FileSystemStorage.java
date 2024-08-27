@@ -13,7 +13,7 @@ import org.example.image.imageStorageManager.storage.service.core.StoragePacket;
 import org.example.image.imageStorageManager.storage.service.core.StorageSaveResultInternal;
 import org.example.image.imageStorageManager.storage.service.core.StorageService;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
-import org.example.image.imageStorageManager.type.StorageFindResult;
+import org.example.image.imageStorageManager.type.StorageLoadResult;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -75,7 +75,7 @@ public class FileSystemStorage implements StorageService {
 	}
 
 	@Override
-	public StorageFindResult load(@NonNull String filePath) {
+	public StorageLoadResult load(@NonNull String filePath) {
 		try {
 			Path fullPath = this.rootLocation.resolve(filePath).normalize().toAbsolutePath();
 			Resource resource = new UrlResource(fullPath.toUri());
@@ -88,7 +88,7 @@ public class FileSystemStorage implements StorageService {
 					.build();
 			}
 
-			return new StorageFindResult(
+			return new StorageLoadResult(
 				StorageType.LOCAL_FILE_SYSTEM,
 				resource
 			);

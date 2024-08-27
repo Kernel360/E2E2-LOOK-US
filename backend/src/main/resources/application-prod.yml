@@ -5,7 +5,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect # MySQL 버전에 맞게 설정하세요
         format_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
 
   datasource:

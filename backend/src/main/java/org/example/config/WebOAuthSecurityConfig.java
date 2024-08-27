@@ -9,12 +9,13 @@ import org.example.user.service.member.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -58,9 +59,11 @@ public class WebOAuthSecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/token").permitAll()
 				.requestMatchers("/api/a1/**").permitAll()
-				.requestMatchers("/api/v1/**").hasRole("USER")
-				.requestMatchers("/api/i1/**").hasRole("USER")	// TODO: ADMIN 수정 필요
-				.anyRequest().permitAll())
+				.requestMatchers("/api/v1/**").hasRole("USER") // hasRole method inserts ROLE_* prefix
+				.requestMatchers("/api/i1/**").hasRole("ADMIN")
+				.requestMatchers("/admin/**").hasRole("ADMIN") // Simple admin page, just for development
+				.anyRequest().permitAll()
+			)
 			.oauth2Login(oauth2 -> oauth2
 				.loginPage("/login")
 				.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
@@ -78,6 +81,15 @@ public class WebOAuthSecurityConfig {
 					new AntPathRequestMatcher("/api/**")
 				))
 			.build();
+	}
+
+	@Bean
+	static RoleHierarchy roleHierarchy() {
+		return RoleHierarchyImpl.withDefaultRolePrefix() // spring security inserts ROLE_* prefix
+								.role("ADMIN").implies("INFLUENCER")
+								.role("INFLUENCER").implies("USER")
+								.role("USER").implies("GUEST")
+								.build();
 	}
 
 	@Bean

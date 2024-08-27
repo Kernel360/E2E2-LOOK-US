@@ -17,16 +17,16 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Entity
-@Table(name = "resource_location")
+@Table(name = "image_location")
 @Getter
 @NoArgsConstructor(access = AccessLevel.NONE)
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class ResourceLocationEntity {
+public class ImageLocationEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "resource_location_id")
-	private Long resourceLocationId;
+	@Column(name = "image_location_id")
+	private Long imageLocationId;
 
 	@Column(name = "storage_type", nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -36,7 +36,7 @@ public class ResourceLocationEntity {
 	private String savedPath;
 
 	@Builder
-	protected ResourceLocationEntity(
+	protected ImageLocationEntity(
 		StorageType storageType,
 		String savedPath
 	) {

@@ -7,12 +7,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.example.config.jwt.TokenProvider;
-import org.example.post.domain.entity.PostStats;
-import org.example.post.repository.PostStatsRepository;
+import org.example.post.domain.entity.PostDailyStats;
+import org.example.post.domain.entity.PostEntity;
+import org.example.post.domain.entity.PostTotalStats;
+import org.example.post.repository.PostRepository;
+import org.example.post.service.PostStatsService;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.service.member.UserService;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
@@ -31,7 +33,8 @@ import lombok.RequiredArgsConstructor;
 public class UserViewController {
 
 	private final UserService userService;
-	private final PostStatsRepository postStatsRepository;
+	private final PostStatsService postStatsService;
+	private final PostRepository postRepository;
 	private final TokenProvider tokenProvider;
 
 	@GetMapping("/")
@@ -39,16 +42,22 @@ public class UserViewController {
 		return "index";
 	}
 
+	// NOTE: admin login page
 	@GetMapping("/login")
 	public String login() {
 		return "login";
 	}
 
-	@PostMapping("/login")
+	@PostMapping("/login") // NOTE: --------- ADMIN REPORT PAGE --------------
 	public String login(@ModelAttribute UserDto.UserLoginRequest loginRequest, Model model, HttpServletResponse response) {
 		UserDto.UserResponse userResponse = userService.loginUser(loginRequest);
 		UserEntity user = userService.getUserByEmail(userResponse.email());
+
 		if (user != null) {
+			// NOTE: 현재 구현된 것은 일반 사용자 로그인만 access token이 발급 됩니다.
+			//       따라서 개발 단에서 간단히 admin에게도 token을 줘서 게시물 생성 가능하게 처리하려고
+			//       아래와 같이 admin에게 토큰을 주게 되었습니다...
+
 			// JWT 토큰 생성
 			String token = tokenProvider.generateToken(user, Duration.ofHours(1));
 
@@ -59,11 +68,12 @@ public class UserViewController {
 			jwtCookie.setMaxAge(24 * 60 * 60); // 24시간
 			response.addCookie(jwtCookie);
 
-			if ("ROLE_ADMIN".equals(userResponse.role())) {
-				return "redirect:/admin/stats";
-			} else {
-				return "redirect:/home";
-			}
+			// if ("ROLE_ADMIN".equals(userResponse.role())) {
+			// 	return "redirect:/admin/stats";
+			// } else {
+			// 	return "redirect:/home";
+			// }
+			return "redirect:/admin/stats";
 		} else {
 			return "redirect:/login?error=true";
 		}
@@ -73,46 +83,42 @@ public class UserViewController {
 	@GetMapping("/admin/stats")
 	public String getPostStats(Model model) {
 		// 데이터 조회
-		List<PostStats> stats = postStatsRepository.findAll();
+		List<PostEntity> posts = postRepository.findAll();
 
-		// 게시글별로 데이터를 그룹화
-		Map<Long, List<PostStats>> statsByPostId = stats.stream()
-			.collect(Collectors.groupingBy(stat -> stat.getPost().getPostId()));
-
-		// 각 게시글에 대한 레이블과 데이터를 미리 가공하여 모델에 추가
 		Map<Long, List<String>> labelsByPostId = new HashMap<>();
 		Map<Long, List<Integer>> hitsDataByPostId = new HashMap<>();
 		Map<Long, List<Integer>> likeDataByPostId = new HashMap<>();
 		Map<Long, List<Integer>> todayHitsByPostId = new HashMap<>();
 		Map<Long, List<Integer>> todayLikesByPostId = new HashMap<>();
 
-		for (Map.Entry<Long, List<PostStats>> entry : statsByPostId.entrySet()) {
-			List<PostStats> postStatsList = entry.getValue();
-			List<String> labels = postStatsList.stream()
+		for (PostEntity post : posts) {
+			List<PostDailyStats> dailyStats = postStatsService.getDailyStatsByPost(post);
+			List<PostTotalStats> totalStats = postStatsService.getTotalStatsByPost(post);
+
+			List<String> labels = dailyStats.stream()
 				.map(stat -> stat.getRecordedAt().toString())
 				.collect(Collectors.toList());
-			List<Integer> hitsData = postStatsList.stream()
-				.map(PostStats::getHits)
-				.collect(Collectors.toList());
-			List<Integer> likeData = postStatsList.stream()
-				.map(PostStats::getLikeCount)
-				.collect(Collectors.toList());
-			List<Integer> todayHitsData = postStatsList.stream()
-				.map(PostStats::getTodayHits)
-				.collect(Collectors.toList());
-			List<Integer> todayLikesData = postStatsList.stream()
-				.map(PostStats::getTodayLikes)
+
+			List<Integer> todayHitsData = dailyStats.stream()
+				.map(PostDailyStats::getTodayHits)
 				.collect(Collectors.toList());
 
-			labelsByPostId.put(entry.getKey(), labels);
-			hitsDataByPostId.put(entry.getKey(), hitsData);
-			likeDataByPostId.put(entry.getKey(), likeData);
-			todayHitsByPostId.put(entry.getKey(), todayHitsData);
-			todayLikesByPostId.put(entry.getKey(), todayLikesData);
+			List<Integer> todayLikesData = dailyStats.stream()
+				.map(PostDailyStats::getTodayLikes)
+				.collect(Collectors.toList());
+
+			int totalHits = !totalStats.isEmpty() ? totalStats.get(0).getHits() : 0;
+			int totalLikes = !totalStats.isEmpty() ? totalStats.get(0).getLikeCount() : 0;
+
+			labelsByPostId.put(post.getPostId(), labels);
+			todayHitsByPostId.put(post.getPostId(), todayHitsData);
+			todayLikesByPostId.put(post.getPostId(), todayLikesData);
+			hitsDataByPostId.put(post.getPostId(), List.of(totalHits)); // 전체 조회수
+			likeDataByPostId.put(post.getPostId(), List.of(totalLikes)); // 전체 좋아요 수
 		}
 
 		// 모델에 데이터 추가
-		model.addAttribute("statsByPostId", statsByPostId);
+		model.addAttribute("posts", posts);
 		model.addAttribute("labelsByPostId", labelsByPostId);
 		model.addAttribute("hitsDataByPostId", hitsDataByPostId);
 		model.addAttribute("likeDataByPostId", likeDataByPostId);

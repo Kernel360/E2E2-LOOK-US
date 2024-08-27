@@ -21,7 +21,7 @@
         <h3>게시글 선택</h3>
         <select id="postSelect" class="form-control" onchange="showSelectedPost()">
             <option value="">게시글을 선택하세요</option>
-            <option th:each="entry : ${statsByPostId}" th:value="${entry.key}" th:text="'게시글 ' + ${entry.key}"></option>
+            <option th:each="post : ${posts}" th:value="${post.postId}" th:text="'게시글 ' + ${post.postId}"></option>
         </select>
 
         <!-- 선택된 게시글의 차트를 표시 -->
@@ -128,8 +128,6 @@
             $('#postStatsContainer').hide();
         }
     }
-
-
 </script>
 
 </body>

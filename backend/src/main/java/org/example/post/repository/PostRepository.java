@@ -15,10 +15,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<PostEntity, Long>, PostRepositoryCustom {
 
-	List<PostEntity> findAllByPostStatusAndCreatedAtAfterAndLikeCountGreaterThanEqual(
+	List<PostEntity> findAllByPostStatusAndCreatedAtAfterAndLikeCountGreaterThanEqualAndHitsGreaterThanEqual(
 		PostStatus postStatus,
 		LocalDateTime localDateTime,
-		int likeCount
+		int likeCount,
+		int hits
 	);
 
 	// @Query("SELECT DISTINCT p FROM PostEntity p JOIN p.hashtags h WHERE p.postContent LIKE %:postContent% AND h.hashtagContent IN :hashtags AND p.postStatus = :postStatus")
@@ -29,4 +30,9 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, PostRep
 		Pageable pageable
 	);
 
+	List<PostEntity> findAllByImageLocationId(Long imageId);
+
+	// 특정 카테고리에 속한 모든 게시글을 조회하는 메서드
+	@Query("SELECT p FROM PostEntity p JOIN p.categories c WHERE c.categoryId = :categoryId")
+	List<PostEntity> findAllByCategoryId(@Param("categoryId") Long categoryId);
 }

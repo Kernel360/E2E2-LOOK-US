@@ -37,7 +37,7 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST}
+      host: localhost
       port: ${REDIS_PORT} # Redis 서버 포트
       password: ${REDIS_PASSWORD} # 비밀번호 설정이 없는 경우 빈 문자열로 둠
       #      timeout: 5000 # 타임아웃 설정 (밀리초)

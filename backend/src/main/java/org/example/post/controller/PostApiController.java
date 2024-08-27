@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -88,7 +90,7 @@ public class PostApiController {
 	})
 	@PatchMapping("/likes")
 	public ResponseEntity<Boolean> like(@RequestBody PostDto.PostIdRequest likeRequest,
-		Authentication authentication) {
+		Authentication authentication) throws JsonProcessingException {
 		Boolean like = postService.like(likeRequest.postId(), authentication.getName());
 		// String message = like ? "좋아요 완료" : "좋아요 취소";
 		return ResponseEntity.status(HttpStatus.OK).body(like);
@@ -101,5 +103,6 @@ public class PostApiController {
 		postService.delete(deleteRequest.postId(), authentication.getName());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
+
 
 }

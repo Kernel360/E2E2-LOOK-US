@@ -20,6 +20,7 @@ import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.PostPopularSearchCondition;
+import org.example.post.repository.custom.UpdateScoreType;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -51,14 +52,14 @@ public class ImageRedisService {
 	private static final Integer WEIGHT_LIKE = 1;
 	private static final Integer WEIGHT_VIEW = 1;
 
-	public List<String> saveNewColor(Long resourceLocationId) throws JsonProcessingException {
+	public List<String> saveNewColor(Long imageLocationId) throws JsonProcessingException {
 		List<String> colorNameList = new ArrayList<>();
 		ColorApiClient client = new ColorApiClient();
 		HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
 		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(resourceLocationId);
+		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(imageLocationId);
 
 		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {        // Clothes from an image
 			int[] colorRGB = {
@@ -104,16 +105,17 @@ public class ImageRedisService {
 		HashOperations<String, String, Object> hashOps = redisTemplate.opsForHash();
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		List<PostEntity> postEntities = postRepository.findAllByPostStatusAndCreatedAtAfterAndLikeCountGreaterThanEqual(
+		List<PostEntity> postEntities = postRepository.findAllByPostStatusAndCreatedAtAfterAndLikeCountGreaterThanEqualAndHitsGreaterThanEqual(
 			PostStatus.PUBLISHED,
 			postPopularSearchCondition.getCreatedAt(),
-			postPopularSearchCondition.getLikeCount()
+			postPopularSearchCondition.getLikeCount(),
+			postPopularSearchCondition.getViewCount()
 		);
 
 		// get popular color of popular ClothAnalyzeData's image analyze data to change RGB
 		HashMap<String, ColorDto.ColorSelectedDtoRequest> selectedColorHashMap = new HashMap<>();
 		for (PostEntity post : postEntities) {
-			ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(post.getImageId());
+			ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(post.getImageLocationId());
 
 			// Selection Colors for updating because we can get several requests about same color
 			for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
@@ -129,6 +131,7 @@ public class ImageRedisService {
 				PostPopularSearchCondition condition = new PostPopularSearchCondition();
 				condition.setCreatedAt(post.getCreatedAt());
 				condition.setLikeCount(post.getLikeCount());
+				condition.setViewCount(post.getHits());
 
 				ColorDto.ColorSelectedDtoRequest colorSelectedDtoRequest = new ColorDto.ColorSelectedDtoRequest(
 					post.getPostId(),
@@ -204,6 +207,28 @@ public class ImageRedisService {
 		return savedColorNameList;
 	}
 
+	public void updateZSetColorScore(Long imageLocationId, UpdateScoreType updateScoreType) throws JsonProcessingException {
+		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
+
+		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(imageLocationId);
+		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
+			int[] rgbColor = {
+				clothAnalyzeData.rgbColor().getRed(),
+				clothAnalyzeData.rgbColor().getBlue(),
+				clothAnalyzeData.rgbColor().getGreen()
+			};
+			String colorName = calcCloseColorsDist(rgbColor, 1).get(0).name();
+
+			Double currentScore = zSetOps.score(ZSET_KEY, colorName);
+			if(currentScore == null){
+				currentScore = 0.0;
+			}
+			currentScore += updateScoreType.getValue();
+
+			zSetOps.add(ZSET_KEY, colorName, currentScore);
+		}
+	}
+
 	public List<ColorDto.ColorDistanceResponse> calcCloseColorsDist(int[] rgb, int num) throws JsonProcessingException {
 		HashOperations<String, Object, Object> hashOps = redisTemplate.opsForHash();
 		Map<Object, Object> colorMembers = hashOps.entries(HASH_KEY);
@@ -257,34 +282,47 @@ public class ImageRedisService {
 			.toList();
 	}
 
-	public HashMap<int[], List<ColorDto.ColorDistanceResponse>> getCloseColorNameList(
-		ImageAnalyzeData imageAnalyzeData) throws JsonProcessingException {
-		HashMap<int[], List<ColorDto.ColorDistanceResponse>> colorInfoHashMap = new HashMap<>();
+	public List<int[]> getCloseColorList(int[] rgb, int num)
+		throws JsonProcessingException {
+		HashOperations<String, String, Object> hashOps = redisTemplate.opsForHash();
+		ObjectMapper objectMapper = new ObjectMapper();
 
-		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
-			int[] colorRGB = {
-				clothAnalyzeData.rgbColor().getRed(),
-				clothAnalyzeData.rgbColor().getGreen(),
-				clothAnalyzeData.rgbColor().getBlue()
-			};
-			colorInfoHashMap.put(colorRGB, calcCloseColorsDist(colorRGB, 10));
+		List<String> closetsColorName = calcCloseColorsDist(rgb, num)
+			.stream()
+			.map(ColorDto.ColorDistanceResponse::name)
+			.toList();
+
+		List<int[]> rgbList = new ArrayList<>();
+		for (String color : closetsColorName) {
+			// Check whether new color is enough close to originRGB
+			Object storedColor = hashOps.get(HASH_KEY, color);
+			// JSON Parsing
+			JsonNode rootNode = objectMapper.readTree(storedColor.toString());
+
+			rgbList.add(new int[] {
+				rootNode.get("r").asInt(),
+				rootNode.get("g").asInt(),
+				rootNode.get("b").asInt()
+			});
 		}
 
-		return colorInfoHashMap;
+		return rgbList;
 	}
 
-	public double calcScoreOfPost(PostPopularSearchCondition condition) {    // TODO: 옷 타입에 따른 weight 추가 되어야 함
+	public double calcScoreOfPost(PostPopularSearchCondition condition) {
 		double score = 0.0;
 
 		Duration duration = Duration.between(condition.getCreatedAt(), LocalDateTime.now());
 		long durationDays = duration.toDays();
-		score += (12.0 - (durationDays / 7.0)) * WEIGHT_LDT;    // 3 month over post can't get score about duration
+
+		score += (Math.max((12.0 - (durationDays / 7.0)), 0))
+			* WEIGHT_LDT;    // 3 month over post can't get score about duration
 
 		int likeCount = condition.getLikeCount();
 		score += likeCount * WEIGHT_LIKE;
 
-		// int viewCount = condition.getViewCount();
-		// score += viewCount * WEIGHT_VIEW;
+		int viewCount = condition.getViewCount();
+		score += viewCount * WEIGHT_VIEW;
 
 		return score;
 	}

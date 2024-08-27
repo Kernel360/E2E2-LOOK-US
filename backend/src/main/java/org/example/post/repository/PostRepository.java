@@ -30,4 +30,9 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, PostRep
 		Pageable pageable
 	);
 
+	List<PostEntity> findAllByImageLocationId(Long imageId);
+
+	// 특정 카테고리에 속한 모든 게시글을 조회하는 메서드
+	@Query("SELECT p FROM PostEntity p JOIN p.categories c WHERE c.categoryId = :categoryId")
+	List<PostEntity> findAllByCategoryId(@Param("categoryId") Long categoryId);
 }

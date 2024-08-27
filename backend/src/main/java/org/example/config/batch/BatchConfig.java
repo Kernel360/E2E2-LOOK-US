@@ -1,7 +1,8 @@
 package org.example.config.batch;
 
+import org.example.post.repository.PostDailyStatsRepository;
 import org.example.post.repository.PostRepository;
-import org.example.post.repository.PostStatsRepository;
+import org.example.post.repository.PostTotalStatsRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -19,14 +20,17 @@ public class BatchConfig {
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
 	private final PostRepository postRepository;
-	private final PostStatsRepository postStatsRepository;
+	private final PostDailyStatsRepository postDailyStatsRepository;
+	private final PostTotalStatsRepository postTotalStatsRepository;
 
 	public BatchConfig(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-		PostRepository postRepository, PostStatsRepository postStatsRepository) {
+		PostRepository postRepository, PostDailyStatsRepository postDailyStatsRepository,
+		PostTotalStatsRepository postTotalStatsRepository) {
 		this.jobRepository = jobRepository;
 		this.transactionManager = transactionManager;
 		this.postRepository = postRepository;
-		this.postStatsRepository = postStatsRepository;
+		this.postDailyStatsRepository = postDailyStatsRepository;
+		this.postTotalStatsRepository = postTotalStatsRepository;
 	}
 
 	@Bean
@@ -45,7 +49,7 @@ public class BatchConfig {
 
 	@Bean
 	public UpdatePostStatsTasklet updatePostStatsTasklet() {
-		return new UpdatePostStatsTasklet(postRepository, postStatsRepository);
+		return new UpdatePostStatsTasklet(postDailyStatsRepository, postTotalStatsRepository, postRepository);
 	}
 
 	@Bean

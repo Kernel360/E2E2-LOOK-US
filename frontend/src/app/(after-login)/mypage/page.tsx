@@ -1,17 +1,46 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import MyPageInfoComponent from './components/mypageinfo'
-import { getMyPosts, myPostAllResponse } from '@/app/_api/myPage'
-import PostCard from './components/PostCard' // 이름을 PostCard로 변경
+import {
+    getMyPosts,
+    myInfoAllFunction,
+    myInfoAllResponse,
+    myPostAllResponse,
+} from '@/app/_api/myPage'
+import PostCard from './components/PostCard'
 import './mypage.scss'
+import { useRouter } from 'next/navigation'
+import { parseCookies } from 'nookies' // 쿠키 파싱을 위해 nookies 라이브러리 사용
+import Modal from '@/components/modal-accesscontrol'
 
 export default function MyPage() {
     const [myPosts, setMyPosts] = useState<myPostAllResponse[]>([])
+    const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null)
+    const [showModal, setShowModal] = useState<boolean>(false)
+
+    const router = useRouter()
 
     useEffect(() => {
-        async function fetchPosts() {
+        const cookies = parseCookies() // 쿠키 파싱
+        const userId = cookies.userId
+
+        if (!userId) {
+            setShowModal(true)
+            return
+        }
+
+        async function fetchData() {
             try {
                 const posts = await getMyPosts()
+                const data = await myInfoAllFunction()
+                setUserInfo(data)
+
+                // Gender가 null일 경우 회원가입 페이지로 리다이렉트
+                if (data.gender === null) {
+                    router.push('/signup')
+                }
+
                 // 이미지 ID가 큰 순서로 정렬
                 const sortedPosts = posts.sort((a, b) => b.imageId - a.imageId)
                 setMyPosts(sortedPosts)
@@ -19,8 +48,14 @@ export default function MyPage() {
                 console.error('Failed to fetch posts:', error)
             }
         }
-        fetchPosts()
-    }, [])
+
+        fetchData()
+    }, [router])
+
+    const handleCloseModal = () => {
+        setShowModal(false)
+        router.push('/posts')
+    }
 
     return (
         <div className='mypage-container'>
@@ -38,18 +73,20 @@ export default function MyPage() {
                 {myPosts.length > 0 ? (
                     myPosts.map(post => (
                         <PostCard
-                            key={post.postId} // 수정: postId를 key로 사용
+                            key={post.postId}
                             imageId={post.imageId}
                             postContent={post.postContent}
                             likeCount={post.likeCount}
-                            postId={post.postId} // 추가: postId 전달
-                            hashtags={post.hashtags} // 추가: 해시태그 전달
+                            postId={post.postId}
+                            hashtags={post.hashtags}
                         />
                     ))
                 ) : (
                     <p>아직 업로드된 글이 없습니다.</p>
                 )}
             </div>
+
+            <Modal show={showModal} onClose={handleCloseModal} />
         </div>
     )
 }

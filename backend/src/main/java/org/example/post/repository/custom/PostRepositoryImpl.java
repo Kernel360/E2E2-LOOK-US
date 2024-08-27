@@ -1,6 +1,7 @@
 package org.example.post.repository.custom;
 
 import static org.apache.logging.log4j.util.Strings.*;
+import static org.example.post.domain.entity.QCategoryEntity.*;
 import static org.example.post.domain.entity.QHashtagEntity.*;
 import static org.example.post.domain.entity.QPostEntity.*;
 import static org.example.user.domain.entity.member.QUserEntity.*;
@@ -46,12 +47,16 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		BooleanBuilder builder = new BooleanBuilder();
 		Predicate postContentCondition = postContentContains(searchCondition.getPostContent());
 		Predicate hashtagContentCondition = hashtagContentEq(searchCondition.getHashtags());
+		Predicate categoryContentCondition = categoryContentEq(searchCondition.getCategory());
 
 		if (postContentCondition != null) {
 			builder.and(postContentCondition);
 		}
 		if (hashtagContentCondition != null) {
 			builder.and(hashtagContentCondition);
+		}
+		if (categoryContentCondition != null) {
+			builder.and(categoryContentCondition);
 		}
 
 		long total = queryFactory
@@ -70,11 +75,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 				postEntity.imageLocationId,
 				postEntity.likeCount,
 				postEntity.hits,
-				postEntity.createdAt
+				postEntity.createdAt,
+				categoryEntity.categoryContent
 			).distinct()
 			.from(postEntity)
 			.leftJoin(postEntity.user, userEntity)
 			.leftJoin(postEntity.hashtags, hashtagEntity)
+			.leftJoin(postEntity.categories, categoryEntity)
 			.where(builder)
 			.fetch();
 
@@ -86,12 +93,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			Long postId = tuple.get(postEntity.postId);
 			Long imageLocationId = tuple.get(postEntity.imageLocationId);
 			String hashtagContent = tuple.get(hashtagEntity.hashtagContent);
+			String categoryContent = tuple.get(categoryEntity.categoryContent);
 			LocalDateTime createdAt = tuple.get(postEntity.createdAt);
 			int likeCount = Optional.ofNullable(tuple.get(postEntity.likeCount)).orElse(0);
 			int hits = Optional.ofNullable(tuple.get(postEntity.hits)).orElse(0);
 
 			PostDto.PostDtoResponse dto = postDtoMap.computeIfAbsent(postId, id ->
-				new PostDto.PostDtoResponse(nickname, id, imageLocationId, new ArrayList<>(), likeCount, hits, createdAt)
+				new PostDto.PostDtoResponse(nickname, id, imageLocationId, new ArrayList<>(), splitString(categoryContent, ","), likeCount, hits, createdAt)
 			);
 
 			if (hashtagContent != null && !dto.hashtags().contains(hashtagContent)) {
@@ -157,6 +165,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		return hBuilder;
 	}
 
+	private Predicate categoryContentEq(String categoryContent) {
+		if (isEmpty(categoryContent)) {
+			return null;
+		}
+		return categoryEntity.categoryContent.eq(categoryContent);
+	}
+
 	private List<String> splitString(String str, String delimiter) {
 		if (isEmpty(str)) {
 			return Collections.emptyList();
@@ -167,7 +182,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	}
 
 
-	private List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content,
+	public static List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content,
 		Pageable pageable) {
 		final Map<String, Function<PostDto.PostDtoResponse, Comparable>> COMPARATORS = new HashMap<>();
 		COMPARATORS.put("createdAt", PostDto.PostDtoResponse::createdAt);

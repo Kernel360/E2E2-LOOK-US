@@ -9,7 +9,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -42,9 +40,14 @@ public class PostPublicController {
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
 		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
 		PostSearchCondition postSearchCondition
-	) {
-		return ResponseEntity.status(HttpStatus.OK)
-			.body(postService.findAllPosts(postSearchCondition, pageable));
+	) throws JsonProcessingException {
+		if (postSearchCondition.getRgbColor() == null) {
+			return ResponseEntity.status(HttpStatus.OK)
+				.body(postService.findAllPosts(postSearchCondition, pageable));
+		} else {
+			return ResponseEntity.status(HttpStatus.OK)
+				.body(postService.findAllPostsByRGB(postSearchCondition.getRgbColor(), pageable));
+		}
 	}
 
 	// Permit All
@@ -77,4 +80,20 @@ public class PostPublicController {
 		return ResponseEntity.status(HttpStatus.OK).body(likeCount);
 	}
 
+	@Operation(summary = "카테고리별 게시글 가져오는 API", description = "카테고리 ID를 통해 해당하는 카테고리 게시글 반환")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "ok!!"),
+		@ApiResponse(responseCode = "404", description = "Resource not found!!")
+	})
+	@GetMapping("/category")
+	public ResponseEntity<Page<PostDto.PostDtoResponse>> getPostsByCategory(
+		@PathVariable Long categoryId,
+		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+	) {
+		Page<PostDto.PostDtoResponse> posts = postService.findAllPostsByCategory(categoryId, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(posts);
+
+	}
+
 }
+

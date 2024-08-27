@@ -1,32 +1,45 @@
 package org.example.post.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
+import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
+import org.example.image.ImageAnalyzeManager.analyzer.entity.ClothAnalyzeDataEntity;
+import org.example.image.ImageAnalyzeManager.analyzer.repository.ClothAnalyzeDataRepository;
+import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
 import org.example.image.AsyncImageAnalyzer;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
 import org.example.image.redis.service.ImageRedisService;
 import org.example.post.domain.dto.PostDto;
+import org.example.post.domain.entity.CategoryEntity;
 import org.example.post.domain.entity.HashtagEntity;
 import org.example.post.domain.entity.LikeEntity;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
+import org.example.post.repository.CategoryRepository;
 import org.example.post.repository.HashtagRepository;
 import org.example.post.repository.LikeRepository;
 import org.example.post.repository.PostRepository;
+import org.example.post.repository.custom.PostRepositoryImpl;
 import org.example.post.repository.custom.PostSearchCondition;
 import org.example.post.repository.custom.UpdateScoreType;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -53,12 +66,13 @@ public class PostService {
 
 	private final LikeRepository likeRepository;
 	private final HashtagRepository hashtagRepository;
+	private final ClothAnalyzeDataRepository clothAnalyzeDataRepository;
+	private final CategoryRepository categoryRepository;
 
-	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
-		String email, MultipartFile image) throws IOException {
+	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto, String email,
+		MultipartFile image) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
-		// 1. save image file
 		StorageSaveResult storageSaveResult = imageStorageManager.saveImage(
 			image, StorageType.LOCAL_FILE_SYSTEM
 		);
@@ -75,26 +89,35 @@ public class PostService {
 		);
 		postRepository.save(post);
 
-		List<HashtagEntity> hashtagEntities = postDto.convertHashtagContents(postDto.hashtagContents(), "#")
+		List<HashtagEntity> hashtagEntities = postDto.convertContents(postDto.hashtagContents(), "#")
 			.stream()
 			.map(hashtag -> new HashtagEntity(post, hashtag))
 			.toList();
+		List<CategoryEntity> categoryEntities = postDto
+			.convertContents(postDto.categoryContents(), ",")
+			.stream()
+			.map(category -> new CategoryEntity(category))
+			.toList();
 
 		hashtagRepository.saveAll(hashtagEntities);
+		categoryRepository.saveAll(categoryEntities);
 
 		post.addHashtags(hashtagEntities);
+		post.addCategories(categoryEntities);
 
 		PostEntity savedPost = postRepository.save(post);
 
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
 	}
 
+	@Transactional
 	public PostDto.CreatePostDtoResponse updatePost(
 		PostDto.CreatePostDtoRequest updateRequest,
 		MultipartFile image,
 		String email,
 		Long postId
 	) throws IOException {
+
 		UserEntity user = findUserByEmail(email);
 
 		PostEntity post = findPostById(postId);
@@ -132,23 +155,40 @@ public class PostService {
 			for (HashtagEntity he : hashtagEntity) {
 				hashtagRepository.deleteById(he.getHashtagId());
 			}
-			List<HashtagEntity> hashtagEntities = updateRequest.convertHashtagContents(updateRequest.hashtagContents(),
-					"#")
-				.stream()
-				.map(hashtag -> new HashtagEntity(post, hashtag))
-				.toList();
+			List<HashtagEntity> hashtagEntities = updateRequest.convertContents(updateRequest.hashtagContents(),
+				"#").stream().map(hashtag -> new HashtagEntity(post, hashtag)).toList();
 
 			hashtagRepository.saveAll(hashtagEntities);
 			post.updateHashtags(hashtagEntities);
+		}
+
+		// 카테고리 수정 처리
+		if (!updateRequest.categoryContents().isEmpty()) {
+			List<String> newCategoryContents = updateRequest.convertContents(updateRequest.categoryContents(), ",");
+
+			List<CategoryEntity> newCategories = newCategoryContents.stream()
+				.map(categoryContent -> {
+					//새로운 카테고리 내용 바탕 기존 카테고리 조회
+					List<CategoryEntity> existingCategories = categoryRepository.findAllByCategoryContent(
+						categoryContent);
+					//존재하는 카테고리 있으면 재사용, 없으면 새로 생성하기
+					if (!existingCategories.isEmpty()) {
+						return existingCategories.get(0);
+					} else {
+						return new CategoryEntity(categoryContent);
+					}
+				})
+				.collect(Collectors.toList());
+
+			// 새로운 카테고리들로 갱신
+			post.updateCategories(newCategories);
 		}
 
 		return PostDto.CreatePostDtoResponse.toDto(post);
 	}
 
 	@Transactional(readOnly = true)
-	public Page<PostDto.PostDtoResponse> findAllPosts(
-		PostSearchCondition postSearchCondition, Pageable pageable
-	) {
+	public Page<PostDto.PostDtoResponse> findAllPosts(PostSearchCondition postSearchCondition, Pageable pageable) {
 		return postRepository.search(postSearchCondition, pageable);
 	}
 
@@ -174,6 +214,7 @@ public class PostService {
 		return PostDto.PostDetailDtoResponse.toDto(post, existLikePost);
 	}
 
+	@Transactional
 	public Boolean like(Long postId, String email) throws JsonProcessingException {
 		PostEntity post = findPostById(postId);
 		UserEntity user = findUserByEmail(email);
@@ -202,35 +243,37 @@ public class PostService {
 		}
 	}
 
-	public void viewCount(Long post_id, HttpServletRequest request, HttpServletResponse response) throws
-		JsonProcessingException {
-		Cookie oldCookie = null;
+	public void viewCount(Long post_id, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
+		Cookie viewCookie = null;
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if (cookie.getName().equals("postView")) {
-					oldCookie = cookie;
+					viewCookie = cookie;
+					break;
 				}
 			}
 		}
 
-		if (oldCookie != null) {
-			if (!oldCookie.getValue().contains("["+ post_id.toString() +"]")) {
+		if (viewCookie != null) {
+			if (!viewCookie.getValue().contains("[" + post_id + "]")) {
 				updateView(post_id);
-				oldCookie.setValue(oldCookie.getValue() + "_[" + post_id + "]");
-				oldCookie.setPath("/");
-				oldCookie.setMaxAge(60 * 60 * 24); 							// 쿠키 시간
-				response.addCookie(oldCookie);
+				String newValue = viewCookie.getValue() + "_[" + post_id + "]";
+				viewCookie.setValue(newValue);
+				viewCookie.setPath("/");
+				viewCookie.setMaxAge(60 * 60 * 24);  // 쿠키 유효기간 1일
+				response.addCookie(viewCookie);
 			}
 		} else {
 			updateView(post_id);
 			Cookie newCookie = new Cookie("postView", "[" + post_id + "]");
 			newCookie.setPath("/");
-			newCookie.setMaxAge(60 * 60 * 24); 								// 쿠키 시간
+			newCookie.setMaxAge(60 * 60 * 24);  // 쿠키 유효기간 1일
 			response.addCookie(newCookie);
 		}
 	}
 
+	@Transactional
 	public int updateView(Long postId) throws JsonProcessingException {
 		asyncImageAnalyzer.updateScore(
 			findPostById(postId).getImageLocationId(),
@@ -244,12 +287,14 @@ public class PostService {
 		return likeRepository.existsByUserAndPost(user, post);
 	}
 
+	@Transactional(readOnly = true)
 	public int likeCount(Long postId) {
 		PostEntity post = findPostById(postId);
 
 		return likeRepository.likeCount(post);
 	}
 
+	@Transactional
 	public void delete(Long postId, String email) {
 		UserEntity user = findUserByEmail(email);
 
@@ -266,6 +311,7 @@ public class PostService {
 		postRepository.delete(post);
 	}
 
+	@Transactional(readOnly = true)
 	public PostEntity findPostById(Long postId) {
 
 		return postRepository.findById(postId)
@@ -279,6 +325,7 @@ public class PostService {
 
 	}
 
+	@Transactional(readOnly = true)
 	public UserEntity findUserByEmail(String email) {
 		return userRepository.findByEmail(email)
 			.orElseThrow(
@@ -286,7 +333,62 @@ public class PostService {
 					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 					.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
 					.setErrorData(() -> ("존재하는 사용자가 없습니다" + email))
-					.build()
-			);
+					.build());
+	}
+
+	public Page<PostDto.PostDtoResponse> findAllPostsByRGB(int[] rgbColor, Pageable pageable) throws
+		JsonProcessingException {
+		Set<Long> imageIdSet =
+			clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(rgbColor[0], rgbColor[1], rgbColor[2]))
+				.stream()
+				.map(ClothAnalyzeDataEntity::getImageLocationId)
+				.collect(Collectors.toSet());
+
+		List<int[]> similarColorList = imageRedisService.getCloseColorList(rgbColor, 2);
+		for (int[] color : similarColorList) {
+			imageIdSet.addAll(clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(color[0], color[1], color[2]))
+				.stream()
+				.map(ClothAnalyzeDataEntity::getImageLocationId)
+				.collect(Collectors.toSet()));
+		}
+
+		List<PostDto.PostDtoResponse> postDtoResponses = new ArrayList<>();
+		for (Long imageId : imageIdSet) {
+			postRepository.findAllByImageLocationId(imageId)
+				.forEach(postEntity -> postDtoResponses.add(
+					new PostDto.PostDtoResponse(postEntity.getUser().getNickname(), postEntity.getPostId(),
+						postEntity.getImageLocationId(), postEntity.getHashtagContents(), postEntity.getCategoryContents(), postEntity.getLikeCount(),
+						postEntity.getHits(), postEntity.getCreatedAt())));
+		}
+		Sort sort = pageable.getSort();
+
+		List<PostDto.PostDtoResponse> sortedPosts = new ArrayList<>();
+		if (sort.isSorted()) {
+			sortedPosts = PostRepositoryImpl.sortPosts(sort, postDtoResponses, pageable);
+		}
+
+		return new PageImpl<>(sortedPosts, pageable, postDtoResponses.size());
+	}
+
+	@Transactional(readOnly = true)
+	public Page<PostDto.PostDtoResponse> findAllPostsByCategory(Long categoryId, Pageable pageable) {
+		// 카테고리 ID를 통해 해당 카테고리에 속한 게시글들을 조회합니다.
+		List<PostEntity> posts = postRepository.findAllByCategoryId(categoryId);
+
+		// 각 게시글을 DTO로 변환하여 반환할 리스트를 생성합니다.
+		List<PostDto.PostDtoResponse> postDtoResponses = posts.stream()
+			.map(postEntity -> new PostDto.PostDtoResponse(
+				postEntity.getUser().getNickname(),
+				postEntity.getPostId(),
+				postEntity.getImageLocationId(),
+				postEntity.getHashtagContents(),
+				postEntity.getCategoryContents(),
+				postEntity.getLikeCount(),
+				postEntity.getHits(),
+				postEntity.getCreatedAt()))
+			.collect(Collectors.toList());
+
+		// 페이지네이션을 적용하여 결과를 반환합니다.
+		return new PageImpl<>(postDtoResponses, pageable, postDtoResponses.size());
 	}
 }

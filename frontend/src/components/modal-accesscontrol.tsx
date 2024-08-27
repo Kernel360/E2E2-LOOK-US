@@ -22,6 +22,9 @@ const Modal: React.FC<ModalProps> = ({ show, onClose }) => {
                 >
                     닫기
                 </button>
+                <a href='/login' className='block mt-4 text-blue-500 underline'>
+                    로그인/회원가입 페이지로 연결하기
+                </a>
                 <a href='/posts' className='block mt-4 text-blue-500 underline'>
                     포스트 페이지로 연결하기
                 </a>

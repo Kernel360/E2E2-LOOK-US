@@ -3,6 +3,9 @@ package org.example.post.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.concurrent.CompletableFuture;
 
 import org.example.exception.common.ApiErrorCategory;
@@ -57,13 +60,13 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
-	private final ClothAnalyzeDataRepository clothAnalyzeDataRepository;
 
 	private final ImageStorageManager imageStorageManager;
 	private final ImageAnalyzeManager imageAnalyzeManager;
 
 	private final LikeRepository likeRepository;
 	private final HashtagRepository hashtagRepository;
+	private final ClothAnalyzeDataRepository clothAnalyzeDataRepository;
 
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto, String email,
 		MultipartFile image) throws IOException {
@@ -286,48 +289,49 @@ public class PostService {
 	public PostEntity findPostById(Long postId) {
 
 		return postRepository.findById(postId)
-			.orElseThrow(() -> ApiPostException.builder()
-				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
-				.subCategory(ApiPostErrorSubCategory.POST_NOT_FOUND)
-				.setErrorData(() -> ("잘못된 게시글 조회 요청입니다."))
-				.build());
+			.orElseThrow(
+				() -> ApiPostException.builder()
+					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+					.subCategory(ApiPostErrorSubCategory.POST_NOT_FOUND)
+					.setErrorData(() -> ("잘못된 게시글 조회 요청입니다."))
+					.build()
+			);
 
 	}
 
 	@Transactional(readOnly = true)
 	public UserEntity findUserByEmail(String email) {
 		return userRepository.findByEmail(email)
-			.orElseThrow(() -> ApiUserException.builder()
-				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
-				.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
-				.setErrorData(() -> ("존재하는 사용자가 없습니다" + email))
-				.build());
+			.orElseThrow(
+				() -> ApiUserException.builder()
+					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+					.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+					.setErrorData(() -> ("존재하는 사용자가 없습니다" + email))
+					.build());
 	}
 
 	public Page<PostDto.PostDtoResponse> findAllPostsByRGB(int[] rgbColor, Pageable pageable) throws
 		JsonProcessingException {
-		List<int[]> similarColorList = imageRedisService.getCloseColorList(rgbColor, 3);
-
-		List<Long> imageIdList = new ArrayList<>(
+		Set<Long> imageIdSet =
 			clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(rgbColor[0], rgbColor[1], rgbColor[2]))
 				.stream()
-				.map(ClothAnalyzeDataEntity::getResourceLocationId)
-				.distinct()
-				.toList());
+				.map(ClothAnalyzeDataEntity::getImageLocationId)
+				.collect(Collectors.toSet());
 
+		List<int[]> similarColorList = imageRedisService.getCloseColorList(rgbColor, 2);
 		for (int[] color : similarColorList) {
-			imageIdList.addAll(clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(color[0], color[1], color[2]))
+			imageIdSet.addAll(clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(color[0], color[1], color[2]))
 				.stream()
-				.map(ClothAnalyzeDataEntity::getResourceLocationId)
-				.toList());
+				.map(ClothAnalyzeDataEntity::getImageLocationId)
+				.collect(Collectors.toSet()));
 		}
 
 		List<PostDto.PostDtoResponse> postDtoResponses = new ArrayList<>();
-		for (Long imageId : imageIdList) {
-			postRepository.findAllByImageId(imageId)
+		for (Long imageId : imageIdSet) {
+			postRepository.findAllByImageLocationId(imageId)
 				.forEach(postEntity -> postDtoResponses.add(
 					new PostDto.PostDtoResponse(postEntity.getUser().getNickname(), postEntity.getPostId(),
-						postEntity.getImageId(), postEntity.getHashtagContents(), postEntity.getLikeCount(),
+						postEntity.getImageLocationId(), postEntity.getHashtagContents(), postEntity.getLikeCount(),
 						postEntity.getHits(), postEntity.getCreatedAt())));
 		}
 		Sort sort = pageable.getSort();

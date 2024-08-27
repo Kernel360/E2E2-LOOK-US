@@ -61,7 +61,7 @@ public class ImageRedisService {
 
 		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(imageLocationId);
 
-		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {    // Clothes from an image
+		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {        // Clothes from an image
 			int[] colorRGB = {
 				clothAnalyzeData.rgbColor().getRed(),
 				clothAnalyzeData.rgbColor().getGreen(),
@@ -220,7 +220,7 @@ public class ImageRedisService {
 			String colorName = calcCloseColorsDist(rgbColor, 1).get(0).name();
 
 			Double currentScore = zSetOps.score(ZSET_KEY, colorName);
-			if (currentScore == null) {
+			if(currentScore == null){
 				currentScore = 0.0;
 			}
 			currentScore += updateScoreType.getValue();

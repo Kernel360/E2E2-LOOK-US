@@ -167,7 +167,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	}
 
 
-	private List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content,
+	public static List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content,
 		Pageable pageable) {
 		final Map<String, Function<PostDto.PostDtoResponse, Comparable>> COMPARATORS = new HashMap<>();
 		COMPARATORS.put("createdAt", PostDto.PostDtoResponse::createdAt);

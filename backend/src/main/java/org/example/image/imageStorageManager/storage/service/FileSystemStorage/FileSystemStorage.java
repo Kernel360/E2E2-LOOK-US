@@ -27,7 +27,7 @@ import lombok.NonNull;
 @Service
 public class FileSystemStorage implements StorageService {
 
-	private final Path rootLocation = Paths.get("data/images");
+	private final Path rootLocation = Paths.get(System.getenv("IMAGE_STORAGE_PATH"));
 
 	@Override
 	public StorageSaveResultInternal save(@NonNull StoragePacket packet) {

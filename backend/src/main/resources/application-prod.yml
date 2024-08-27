@@ -5,7 +5,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect # MySQL8Dialect는 deprecated되었습니다.
         format_sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     show-sql: true
 
   datasource:
@@ -25,17 +25,17 @@ spring:
               - email
               - profile
 
-#  data:
-#    redis:
-#      host: ${REDIS_HOST}
-#      port: ${REDIS_PORT}
-#      password: ${REDIS_PASSWORD} # 비밀번호 설정이 없는 경우 빈 문자열로 둡니다
-#      lettuce:
-#        pool:
-#          max-active: 8
-#          max-idle: 8
-#          min-idle: 0
-#          max-wait: -1ms
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD} # 비밀번호 설정이 없는 경우 빈 문자열로 둡니다
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
 
 
 jwt:

@@ -9,17 +9,12 @@ import java.util.stream.Collectors;
 import org.example.config.jwt.TokenProvider;
 import org.example.post.domain.entity.PostDailyStats;
 import org.example.post.domain.entity.PostEntity;
-import org.example.post.domain.entity.PostStats;
 import org.example.post.domain.entity.PostTotalStats;
-import org.example.post.repository.PostDailyStatsRepository;
 import org.example.post.repository.PostRepository;
-import org.example.post.repository.PostStatsRepository;
-import org.example.post.repository.PostTotalStatsRepository;
 import org.example.post.service.PostStatsService;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.service.member.UserService;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
@@ -123,6 +118,7 @@ public class UserViewController {
 		}
 
 		// 모델에 데이터 추가
+		model.addAttribute("posts", posts);
 		model.addAttribute("labelsByPostId", labelsByPostId);
 		model.addAttribute("hitsDataByPostId", hitsDataByPostId);
 		model.addAttribute("likeDataByPostId", likeDataByPostId);

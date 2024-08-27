@@ -2,14 +2,13 @@ package org.example.post.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
+import org.example.image.AsyncImageAnalyzer;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
@@ -46,13 +45,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class PostService {
-	private final ImageRedisService imageRedisService;
-
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
 
 	private final ImageStorageManager imageStorageManager;
-	private final ImageAnalyzeManager imageAnalyzeManager;
+	private final AsyncImageAnalyzer asyncImageAnalyzer;
 
 	private final LikeRepository likeRepository;
 	private final HashtagRepository hashtagRepository;
@@ -66,21 +63,8 @@ public class PostService {
 			image, StorageType.LOCAL_FILE_SYSTEM
 		);
 
-		// 2. run image analyze async
-		CompletableFuture.runAsync(() -> {
-			try {
-				imageAnalyzeManager.analyze(storageSaveResult.imageLocationId());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}).thenRunAsync(() -> {
-			try {
-				List<String> savedColorList = imageRedisService.saveNewColor(storageSaveResult.imageLocationId());
-				log.info("Saved Color List : {}", savedColorList.stream().toList());
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException(e);
-			}
-		});
+		// 2. run image analyze pipeline
+		asyncImageAnalyzer.run(storageSaveResult.imageLocationId());
 
 		// 3. save post
 		PostEntity post = new PostEntity(
@@ -199,13 +183,19 @@ public class PostService {
 		if (existLikePost(user, post)) {
 			// 좋아요를 누른 상태이면, 좋아요 취소를 위해 DB 삭제
 			LikeEntity currentLikePost = likeRepository.findByUserAndPost(user, post);
-			imageRedisService.updateZSetColorScore(imageLocationId, UpdateScoreType.LIKE_CANCEL);
+			asyncImageAnalyzer.updateScore(
+				imageLocationId,
+				UpdateScoreType.LIKE_CANCEL
+			);
 			post.decreaseLikeCount();
 			likeRepository.delete(currentLikePost);
 			return false;
 		} else {
 			// 좋아요를 누르지 않을 경우 DB에 저장
-			imageRedisService.updateZSetColorScore(imageLocationId, UpdateScoreType.LIKE);
+			asyncImageAnalyzer.updateScore(
+				imageLocationId,
+				UpdateScoreType.LIKE
+			);
 			post.increaseLikeCount();
 			likeRepository.save(LikeEntity.toEntity(user, post));
 			return true;
@@ -242,7 +232,10 @@ public class PostService {
 	}
 
 	public int updateView(Long postId) throws JsonProcessingException {
-		imageRedisService.updateZSetColorScore(findPostById(postId).getImageLocationId(), UpdateScoreType.VIEW);
+		asyncImageAnalyzer.updateScore(
+			findPostById(postId).getImageLocationId(),
+			UpdateScoreType.VIEW
+		);
 		return postRepository.updateView(postId);
 	}
 

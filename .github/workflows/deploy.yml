@@ -38,10 +38,11 @@ jobs:
         
     - name: Docker build and push
       run: |
-        sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
         cd ./backend
-        sudo docker build -t ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }} .
-        sudo docker buildx build --push --platform linux/amd64 -t ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:latest .
+        # Log in to Docker Hub
+        echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+        sudo docker build -t ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} .
+        sudo docker buildx build --push --platform linux/amd64 -t ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} .
 
     - name: Clean up dangling Docker images locally
       run: |

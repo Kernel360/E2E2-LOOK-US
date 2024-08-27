@@ -7,6 +7,7 @@ import { updateProfileInfo } from '@/app/_api/myPage' // updateProfileInfo í•¨ìˆ
 import { getMimeType } from 'advanced-cropper/extensions/mimes'
 import './signup.scss'
 import { on } from 'process'
+import { parseCookies } from 'nookies'
 
 export interface ProfileImage {
     blob: Blob
@@ -22,6 +23,7 @@ export default function SignupPage() {
     const [profileImage, setProfileImage] = useState<ProfileImage | null>(null)
     const [previewImage, setPreviewImage] = useState<string | null>(null)
     const router = useRouter()
+    const cookies = parseCookies()
 
     const handleNextStep = () => {
         if (step < 4) {

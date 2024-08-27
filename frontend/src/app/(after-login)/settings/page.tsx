@@ -11,11 +11,11 @@ import {
 import ProfileImageModal from '@/components/profile-image-modal'
 import './profileEdit.scss' // 스타일 파일 임포트
 import { API_PUBLIC_URL } from '@/app/_common/constants'
-import { parseCookies } from 'nookies'
 import Modal from '@/components/modal-accesscontrol'
+import { useAuth } from '@/app/_api/useAuth'
 
 export default function ProfileEditPage() {
-    const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null)
+    const { userInfo, showModal, handleCloseModal } = useAuth() // useAuth 훅 사용
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [previewImage, setPreviewImage] = useState<string | null>(null)
     const [profileImage, setProfileImage] = useState<File | null>(null)
@@ -23,34 +23,17 @@ export default function ProfileEditPage() {
     const [gender, setGender] = useState('UNSELECTED')
     const [birth, setBirth] = useState('')
     const [instaId, setInstaId] = useState('')
-    const [showModal, setShowModal] = useState(false)
 
     const router = useRouter()
 
     useEffect(() => {
-        const cookies = parseCookies()
-        // const token = cookies.token
-
-        if (!cookies) {
-            setShowModal(true)
-            return
+        if (userInfo) {
+            setNickname(userInfo.nickname)
+            setGender(userInfo.gender)
+            setBirth(userInfo.birth)
+            setInstaId(userInfo.instaId)
         }
-
-        async function fetchUserInfo() {
-            try {
-                const data = await myInfoAllFunction()
-                setUserInfo(data)
-                setNickname(data.nickname)
-                setGender(data.gender)
-                setBirth(data.birth)
-                setInstaId(data.instaId)
-            } catch (error) {
-                console.error('Failed to fetch user info:', error)
-            }
-        }
-
-        fetchUserInfo()
-    }, [router])
+    }, [userInfo])
 
     const handleProfileImageChange = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -81,11 +64,6 @@ export default function ProfileEditPage() {
         } catch (error) {
             console.error('Failed to update profile:', error)
         }
-    }
-
-    const handleCloseModal = () => {
-        setShowModal(false)
-        router.push('/posts')
     }
 
     return (

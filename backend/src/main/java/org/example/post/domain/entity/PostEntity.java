@@ -24,6 +24,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -79,6 +81,14 @@ public class PostEntity extends TimeTrackableEntity {
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<LikeEntity> likes = new ArrayList<>();
 
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+		name = "post_category",
+		joinColumns = @JoinColumn(name = "post_id"),
+		inverseJoinColumns = @JoinColumn(name = "category_id")
+	)
+	private List<CategoryEntity> categories = new ArrayList<>();
+
 	@Column(name = "removed_at")
 	private LocalDateTime removedAt;
 
@@ -93,6 +103,9 @@ public class PostEntity extends TimeTrackableEntity {
 	public void addHashtags(List<HashtagEntity> hashtags) {
 		this.hashtags.addAll(hashtags);
 	}
+	public void addCategories(List<CategoryEntity> categories) {
+		this.categories.addAll(categories);
+	}
 
 	public void updatePostContent(String postContent) {
 		this.postContent = postContent;
@@ -106,10 +119,20 @@ public class PostEntity extends TimeTrackableEntity {
 		this.hashtags.clear();
 		this.hashtags.addAll(hashtags);
 	}
+	public void updateCategories(List<CategoryEntity> newCategories) {
+		this.categories.clear();
+		this.categories.addAll(newCategories);
+	}
 
 	public List<String> getHashtagContents() {
 		return hashtags.stream()
 			.map(HashtagEntity::getHashtagContent)
+			.collect(Collectors.toList());
+	}
+
+	public List<String> getCategoryContents() {
+		return categories.stream()
+			.map(CategoryEntity::getCategoryContent)
 			.collect(Collectors.toList());
 	}
 

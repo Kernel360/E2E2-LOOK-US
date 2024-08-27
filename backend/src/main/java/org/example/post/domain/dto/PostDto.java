@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.example.post.domain.entity.CategoryEntity;
 import org.example.post.domain.entity.PostEntity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,11 +19,14 @@ public class PostDto {
 		String postContent,
 
 		@JsonProperty("hashtag_content")
-		String hashtagContents
+		String hashtagContents,
+
+		@JsonProperty("category_content")
+		String categoryContents
 	) {
 		// Split and Convert String to List<String>
-		public List<String> convertHashtagContents(String hashtagContents, String regex) {
-			return Arrays.stream(hashtagContents.split(regex))
+		public List<String> convertContents(String contents, String regex) {
+			return Arrays.stream(contents.split(regex))
 				.filter(s -> !s.isEmpty())
 				.collect(Collectors.toList());
 		}
@@ -48,6 +52,7 @@ public class PostDto {
 		Long imageLocationId,
 		String postContent,
 		List<String> hashtagContents,
+		List<String> categories,
 		int likeCount,
 		boolean likeStatus,
 		int hits,
@@ -63,6 +68,7 @@ public class PostDto {
 				postEntity.getImageLocationId(),
 				postEntity.getPostContent(),
 				postEntity.getHashtagContents() != null ? postEntity.getHashtagContents() : Collections.emptyList(),
+				postEntity.getCategories() != null ? postEntity.getCategories().stream().map(CategoryEntity::getCategoryContent).toList() : Collections.emptyList(),
 				postEntity.getLikeCount(),
 				likeStatus,
 				postEntity.getHits(),
@@ -77,6 +83,7 @@ public class PostDto {
 		Long postId,
 		Long imageLocationId,
 		List<String> hashtags,
+		List<String> categories,
 		int likeCount,
 		int hits,
 		LocalDateTime createdAt
@@ -89,22 +96,24 @@ public class PostDto {
 			Long postId,
 			Long imageLocationId,
 			String hashtagContent,
+			String categoryContent,
 			int likeCount,
 			int hits,
 			LocalDateTime createdAt
 		) {
-			this(nickname, postId, imageLocationId, splitHashtags(hashtagContent), likeCount, hits, createdAt);
+			this(nickname, postId, imageLocationId, splitStrings(hashtagContent, "#"), splitStrings(categoryContent, ","), likeCount, hits, createdAt);
 		}
 
 		// Helper Method to split hashtagContent into List<String>
-		private static List<String> splitHashtags(String hashtagContent) {
+		private static List<String> splitStrings(String hashtagContent, String regExp) {
 			if (hashtagContent == null || hashtagContent.isEmpty()) {
 				return List.of();
 			}
-			return Stream.of(hashtagContent.split("#"))
+			return Stream.of(hashtagContent.split(regExp))
 				.filter(s -> !s.isEmpty())
 				.collect(Collectors.toList());
 		}
+
 	}
 
 	public record PostIdRequest(
@@ -117,6 +126,7 @@ public class PostDto {
 		Long imageLocationId,
 		String postContent,
 		List<String> hashtagContents,
+		List<String> categories,
 		Integer likeCount,
 		LocalDateTime createdAt,
 		LocalDateTime updatedAt
@@ -128,6 +138,8 @@ public class PostDto {
 				postEntity.getImageLocationId(),
 				postEntity.getPostContent(),
 				postEntity.getHashtagContents(),
+				postEntity.getCategories().stream()
+					.map(CategoryEntity::getCategoryContent).toList(),
 				postEntity.getLikeCount(),
 				postEntity.getCreatedAt(),
 				postEntity.getUpdatedAt()

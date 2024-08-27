@@ -16,8 +16,8 @@ public class CookieUtil {
 		cookie.setPath("/");
 		cookie.setDomain("lookus.shop");
 		cookie.setMaxAge(maxAge);
-		cookie.setHttpOnly(true);
 		cookie.setSecure(true);
+		cookie.setHttpOnly(true);
 		cookie.setAttribute("SameSite", "None");
 		response.addCookie(cookie);
 	}

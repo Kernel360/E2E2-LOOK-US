@@ -39,7 +39,7 @@ public class PostPublicController {
 	@GetMapping("")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
 		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-		@RequestBody PostSearchCondition postSearchCondition
+		PostSearchCondition postSearchCondition
 	) throws JsonProcessingException {
 		if (postSearchCondition.getRgbColor() == null) {
 			return ResponseEntity.status(HttpStatus.OK)

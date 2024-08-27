@@ -70,7 +70,7 @@ public class FollowService {
 							.map((following) -> new FollowDto.FollowUser(
 								following.getNickname(),
 								this.getFollowerCountOfUser(following),
-								following.getProfileImageId()
+								following.getProfileImageLocationId()
 							)).toList()
 		);
 	}
@@ -85,7 +85,7 @@ public class FollowService {
 							.map((follower) -> new FollowDto.FollowUser(
 								follower.getNickname(),
 								this.getFollowerCountOfUser(follower),
-								follower.getProfileImageId()
+								follower.getProfileImageLocationId()
 							)).toList()
 		);
 	}

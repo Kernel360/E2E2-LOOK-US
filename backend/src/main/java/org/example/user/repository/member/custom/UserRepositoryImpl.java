@@ -37,7 +37,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
 		return posts.stream()
 			.map(postEntity1 -> new UserDto.UserGetPostsResponse(
-				postEntity1.getImageId(),
+				postEntity1.getImageLocationId(),
 				postEntity1.getPostContent(),
 				postEntity1.getHashtagContents(),
 				postEntity1.getLikeCount(),

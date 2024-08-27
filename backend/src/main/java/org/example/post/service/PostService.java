@@ -1,8 +1,8 @@
 package org.example.post.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
@@ -10,9 +10,6 @@ import org.example.exception.post.ApiPostException;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
-import org.example.image.ImageAnalyzeManager.analyzer.entity.ClothAnalyzeDataEntity;
-import org.example.image.ImageAnalyzeManager.analyzer.repository.ClothAnalyzeDataRepository;
-import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
@@ -25,15 +22,12 @@ import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.HashtagRepository;
 import org.example.post.repository.LikeRepository;
 import org.example.post.repository.PostRepository;
-import org.example.post.repository.custom.PostRepositoryImpl;
 import org.example.post.repository.custom.PostSearchCondition;
 import org.example.post.repository.custom.UpdateScoreType;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -48,7 +42,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Transactional
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -57,7 +50,6 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
-	private final ClothAnalyzeDataRepository clothAnalyzeDataRepository;
 
 	private final ImageStorageManager imageStorageManager;
 	private final ImageAnalyzeManager imageAnalyzeManager;
@@ -65,21 +57,38 @@ public class PostService {
 	private final LikeRepository likeRepository;
 	private final HashtagRepository hashtagRepository;
 
-	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto, String email,
-		MultipartFile image) throws IOException {
+	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
+		String email, MultipartFile image) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
 		// 1. save image file
-		StorageSaveResult storageSaveResult = imageStorageManager.saveResource(image, StorageType.LOCAL_FILE_SYSTEM);
+		StorageSaveResult storageSaveResult = imageStorageManager.saveImage(
+			image, StorageType.LOCAL_FILE_SYSTEM
+		);
 
-		// 2. analyze image
-		imageAnalyzeManager.requestAnalyze(storageSaveResult.resourceLocationId());
+		// 2. run image analyze async
+		CompletableFuture.runAsync(() -> {
+			try {
+				imageAnalyzeManager.analyze(storageSaveResult.imageLocationId());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}).thenRunAsync(() -> {
+			try {
+				List<String> savedColorList = imageRedisService.saveNewColor(storageSaveResult.imageLocationId());
+				log.info("Saved Color List : {}", savedColorList.stream().toList());
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		});
 
-		// 3. save color to Redis
-		List<String> savedColorList = imageRedisService.saveNewColor(storageSaveResult.resourceLocationId());
-		log.info("Saved Color List : {}", savedColorList.stream().toList());
-
-		PostEntity post = new PostEntity(user, postDto.postContent(), storageSaveResult.resourceLocationId(), 0);
+		// 3. save post
+		PostEntity post = new PostEntity(
+			user,
+			postDto.postContent(),
+			storageSaveResult.imageLocationId(),
+			0
+		);
 		postRepository.save(post);
 
 		List<HashtagEntity> hashtagEntities = postDto.convertHashtagContents(postDto.hashtagContents(), "#")
@@ -96,8 +105,12 @@ public class PostService {
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
 	}
 
-	public PostDto.CreatePostDtoResponse updatePost(PostDto.CreatePostDtoRequest updateRequest, MultipartFile image,
-		String email, Long postId) throws IOException {
+	public PostDto.CreatePostDtoResponse updatePost(
+		PostDto.CreatePostDtoRequest updateRequest,
+		MultipartFile image,
+		String email,
+		Long postId
+	) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
 		PostEntity post = findPostById(postId);
@@ -119,9 +132,11 @@ public class PostService {
 		}
 
 		if (!image.isEmpty()) {
-			StorageSaveResult storageSaveResult = imageStorageManager.saveResource(image,
-				StorageType.LOCAL_FILE_SYSTEM);
-			post.updateImage(storageSaveResult.resourceLocationId());
+			StorageSaveResult storageSaveResult = imageStorageManager.saveImage(
+				image,
+				StorageType.LOCAL_FILE_SYSTEM
+			);
+			post.updateImage(storageSaveResult.imageLocationId());
 		}
 
 		if (!updateRequest.postContent().isEmpty()) {
@@ -134,7 +149,10 @@ public class PostService {
 				hashtagRepository.deleteById(he.getHashtagId());
 			}
 			List<HashtagEntity> hashtagEntities = updateRequest.convertHashtagContents(updateRequest.hashtagContents(),
-				"#").stream().map(hashtag -> new HashtagEntity(post, hashtag)).toList();
+					"#")
+				.stream()
+				.map(hashtag -> new HashtagEntity(post, hashtag))
+				.toList();
 
 			hashtagRepository.saveAll(hashtagEntities);
 			post.updateHashtags(hashtagEntities);
@@ -144,7 +162,9 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<PostDto.PostDtoResponse> findAllPosts(PostSearchCondition postSearchCondition, Pageable pageable) {
+	public Page<PostDto.PostDtoResponse> findAllPosts(
+		PostSearchCondition postSearchCondition, Pageable pageable
+	) {
 		return postRepository.search(postSearchCondition, pageable);
 	}
 
@@ -173,19 +193,19 @@ public class PostService {
 	public Boolean like(Long postId, String email) throws JsonProcessingException {
 		PostEntity post = findPostById(postId);
 		UserEntity user = findUserByEmail(email);
-		Long resourceLocationId = post.getImageId();
+		Long imageLocationId = post.getImageLocationId();
 
 		// user 는 like 을 한번 만 누를 수 있다.
 		if (existLikePost(user, post)) {
 			// 좋아요를 누른 상태이면, 좋아요 취소를 위해 DB 삭제
 			LikeEntity currentLikePost = likeRepository.findByUserAndPost(user, post);
-			imageRedisService.updateZSetColorScore(resourceLocationId, UpdateScoreType.LIKE_CANCEL);
+			imageRedisService.updateZSetColorScore(imageLocationId, UpdateScoreType.LIKE_CANCEL);
 			post.decreaseLikeCount();
 			likeRepository.delete(currentLikePost);
 			return false;
 		} else {
 			// 좋아요를 누르지 않을 경우 DB에 저장
-			imageRedisService.updateZSetColorScore(resourceLocationId, UpdateScoreType.LIKE);
+			imageRedisService.updateZSetColorScore(imageLocationId, UpdateScoreType.LIKE);
 			post.increaseLikeCount();
 			likeRepository.save(LikeEntity.toEntity(user, post));
 			return true;
@@ -205,24 +225,24 @@ public class PostService {
 		}
 
 		if (oldCookie != null) {
-			if (!oldCookie.getValue().contains("[" + post_id.toString() + "]")) {
+			if (!oldCookie.getValue().contains("["+ post_id.toString() +"]")) {
 				updateView(post_id);
 				oldCookie.setValue(oldCookie.getValue() + "_[" + post_id + "]");
 				oldCookie.setPath("/");
-				oldCookie.setMaxAge(60 * 60 * 24);                            // 쿠키 시간
+				oldCookie.setMaxAge(60 * 60 * 24); 							// 쿠키 시간
 				response.addCookie(oldCookie);
 			}
 		} else {
 			updateView(post_id);
 			Cookie newCookie = new Cookie("postView", "[" + post_id + "]");
 			newCookie.setPath("/");
-			newCookie.setMaxAge(60 * 60 * 24);                                // 쿠키 시간
+			newCookie.setMaxAge(60 * 60 * 24); 								// 쿠키 시간
 			response.addCookie(newCookie);
 		}
 	}
 
 	public int updateView(Long postId) throws JsonProcessingException {
-		imageRedisService.updateZSetColorScore(findPostById(postId).getImageId(), UpdateScoreType.VIEW);
+		imageRedisService.updateZSetColorScore(findPostById(postId).getImageLocationId(), UpdateScoreType.VIEW);
 		return postRepository.updateView(postId);
 	}
 
@@ -256,56 +276,24 @@ public class PostService {
 	public PostEntity findPostById(Long postId) {
 
 		return postRepository.findById(postId)
-			.orElseThrow(() -> ApiPostException.builder()
-				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
-				.subCategory(ApiPostErrorSubCategory.POST_NOT_FOUND)
-				.setErrorData(() -> ("잘못된 게시글 조회 요청입니다."))
-				.build());
+			.orElseThrow(
+				() -> ApiPostException.builder()
+					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+					.subCategory(ApiPostErrorSubCategory.POST_NOT_FOUND)
+					.setErrorData(() -> ("잘못된 게시글 조회 요청입니다."))
+					.build()
+			);
 
 	}
 
 	public UserEntity findUserByEmail(String email) {
 		return userRepository.findByEmail(email)
-			.orElseThrow(() -> ApiUserException.builder()
-				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
-				.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
-				.setErrorData(() -> ("존재하는 사용자가 없습니다" + email))
-				.build());
-	}
-
-	public Page<PostDto.PostDtoResponse> findAllPostsByRGB(int[] rgbColor, Pageable pageable) throws
-		JsonProcessingException {
-		List<int[]> similarColorList = imageRedisService.getCloseColorList(rgbColor, 3);
-
-		List<Long> imageIdList = new ArrayList<>(
-			clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(rgbColor[0], rgbColor[1], rgbColor[2]))
-				.stream()
-				.map(ClothAnalyzeDataEntity::getResourceLocationId)
-				.distinct()
-				.toList());
-
-		for (int[] color : similarColorList) {
-			imageIdList.addAll(clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(color[0], color[1], color[2]))
-				.stream()
-				.map(ClothAnalyzeDataEntity::getResourceLocationId)
-				.toList());
-		}
-
-		List<PostDto.PostDtoResponse> postDtoResponses = new ArrayList<>();
-		for (Long imageId : imageIdList) {
-			postRepository.findAllByImageId(imageId)
-				.forEach(postEntity -> postDtoResponses.add(
-					new PostDto.PostDtoResponse(postEntity.getUser().getNickname(), postEntity.getPostId(),
-						postEntity.getImageId(), postEntity.getHashtagContents(), postEntity.getLikeCount(),
-						postEntity.getHits(), postEntity.getCreatedAt())));
-		}
-		Sort sort = pageable.getSort();
-
-		List<PostDto.PostDtoResponse> sortedPosts = new ArrayList<>();
-		if (sort.isSorted()) {
-			sortedPosts = PostRepositoryImpl.sortPosts(sort, postDtoResponses, pageable);
-		}
-
-		return new PageImpl<>(sortedPosts, pageable, postDtoResponses.size());
+			.orElseThrow(
+				() -> ApiUserException.builder()
+					.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+					.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+					.setErrorData(() -> ("존재하는 사용자가 없습니다" + email))
+					.build()
+			);
 	}
 }

@@ -48,20 +48,20 @@ public class ImageRedisService {
 	private static final String ZSET_KEY = "ColorZSet";
 	private static final String COLOR_DIST_CAL_ZSET_KEY = "ColorDistCalZSet";
 	private static final Integer STANDARD_DIST = 10;
-	private static final Integer WEIGHT_LDT = 1;
-	private static final Integer WEIGHT_LIKE = 1;
+	private static final Integer WEIGHT_LDT = 3;
+	private static final Integer WEIGHT_LIKE = 2;
 	private static final Integer WEIGHT_VIEW = 1;
 
-	public List<String> saveNewColor(Long resourceLocationId) throws JsonProcessingException {
+	public List<String> saveNewColor(Long imageLocationId) throws JsonProcessingException {
 		List<String> colorNameList = new ArrayList<>();
 		ColorApiClient client = new ColorApiClient();
 		HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
 		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(resourceLocationId);
+		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(imageLocationId);
 
-		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {    // Clothes from an image
+		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {        // Clothes from an image
 			int[] colorRGB = {
 				clothAnalyzeData.rgbColor().getRed(),
 				clothAnalyzeData.rgbColor().getGreen(),
@@ -115,7 +115,7 @@ public class ImageRedisService {
 		// get popular color of popular ClothAnalyzeData's image analyze data to change RGB
 		HashMap<String, ColorDto.ColorSelectedDtoRequest> selectedColorHashMap = new HashMap<>();
 		for (PostEntity post : postEntities) {
-			ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(post.getImageId());
+			ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(post.getImageLocationId());
 
 			// Selection Colors for updating because we can get several requests about same color
 			for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
@@ -207,11 +207,10 @@ public class ImageRedisService {
 		return savedColorNameList;
 	}
 
-	public void updateZSetColorScore(Long resourceLocationId, UpdateScoreType updateScoreType) throws
-		JsonProcessingException {
+	public void updateZSetColorScore(Long imageLocationId, UpdateScoreType updateScoreType) throws JsonProcessingException {
 		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
 
-		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(resourceLocationId);
+		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(imageLocationId);
 		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
 			int[] rgbColor = {
 				clothAnalyzeData.rgbColor().getRed(),
@@ -221,7 +220,7 @@ public class ImageRedisService {
 			String colorName = calcCloseColorsDist(rgbColor, 1).get(0).name();
 
 			Double currentScore = zSetOps.score(ZSET_KEY, colorName);
-			if (currentScore == null) {
+			if(currentScore == null){
 				currentScore = 0.0;
 			}
 			currentScore += updateScoreType.getValue();
@@ -283,31 +282,20 @@ public class ImageRedisService {
 			.toList();
 	}
 
-	public List<int[]> getCloseColorList(int[] rgb, int num)
-		throws JsonProcessingException {
-		HashOperations<String, String, Object> hashOps = redisTemplate.opsForHash();
-		ObjectMapper objectMapper = new ObjectMapper();
+	public HashMap<int[], List<ColorDto.ColorDistanceResponse>> getCloseColorNameList(
+		ImageAnalyzeData imageAnalyzeData) throws JsonProcessingException {
+		HashMap<int[], List<ColorDto.ColorDistanceResponse>> colorInfoHashMap = new HashMap<>();
 
-		List<String> closetsColorName = calcCloseColorsDist(rgb, num)
-			.stream()
-			.map(ColorDto.ColorDistanceResponse::name)
-			.toList();
-
-		List<int[]> rgbList = new ArrayList<>();
-		for (String color : closetsColorName) {
-			// Check whether new color is enough close to originRGB
-			Object storedColor = hashOps.get(HASH_KEY, color);
-			// JSON Parsing
-			JsonNode rootNode = objectMapper.readTree(storedColor.toString());
-
-			rgbList.add(new int[] {
-				rootNode.get("r").asInt(),
-				rootNode.get("g").asInt(),
-				rootNode.get("b").asInt()
-			});
+		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
+			int[] colorRGB = {
+				clothAnalyzeData.rgbColor().getRed(),
+				clothAnalyzeData.rgbColor().getGreen(),
+				clothAnalyzeData.rgbColor().getBlue()
+			};
+			colorInfoHashMap.put(colorRGB, calcCloseColorsDist(colorRGB, 10));
 		}
 
-		return rgbList;
+		return colorInfoHashMap;
 	}
 
 	public double calcScoreOfPost(PostPopularSearchCondition condition) {
@@ -315,9 +303,7 @@ public class ImageRedisService {
 
 		Duration duration = Duration.between(condition.getCreatedAt(), LocalDateTime.now());
 		long durationDays = duration.toDays();
-
-		score += (Math.max((12.0 - (durationDays / 7.0)), 0))
-			* WEIGHT_LDT;    // 3 month over post can't get score about duration
+		score += (12.0 - (durationDays / 7.0)) * WEIGHT_LDT;    // 3 month over post can't get score about duration
 
 		int likeCount = condition.getLikeCount();
 		score += likeCount * WEIGHT_LIKE;

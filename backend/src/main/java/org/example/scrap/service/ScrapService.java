@@ -1,6 +1,5 @@
 package org.example.scrap.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.example.exception.common.ApiErrorCategory;
@@ -55,7 +54,7 @@ public class ScrapService {
 				.subCategory(ApiUserErrorSubCategory.USER_SCRAP_DUPLICATION)
 				.build();
 		}
-		imageRedisService.updateZSetColorScore(findPost(postId).getImageId(), UpdateScoreType.SCRAP);
+		imageRedisService.updateZSetColorScore(findPost(postId).getImageLocationId(), UpdateScoreType.SCRAP);
 		scrapRepository.save(
 			ScrapEntity.builder()
 				.post(this.findPost(postId))
@@ -65,7 +64,7 @@ public class ScrapService {
 	}
 
 	public void unscrapPostByPostId(Long postId, String userEmail) throws JsonProcessingException {
-		imageRedisService.updateZSetColorScore(findPost(postId).getImageId(), UpdateScoreType.SCRAP_CANCEL);
+		imageRedisService.updateZSetColorScore(findPost(postId).getImageLocationId(), UpdateScoreType.SCRAP_CANCEL);
 		scrapRepository.deleteByPostAndUser(
 			this.findPost(postId),
 			this.findUserByEmail(userEmail)

@@ -3,7 +3,7 @@ package org.example.image.imageStorageManager;
 import java.io.IOException;
 
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
-import org.example.image.imageStorageManager.type.StorageFindResult;
+import org.example.image.imageStorageManager.type.StorageLoadResult;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,16 +20,16 @@ public interface ImageStorageManager {
 	 *
 	 * @see StorageType
 	 */
-	StorageSaveResult saveResource(MultipartFile resource, StorageType storageType) throws IOException;
+	StorageSaveResult saveImage(MultipartFile resource, StorageType storageType) throws IOException;
 
 	/**
 	 * <p> 리소스 식별자를 통해서 {@link MultipartFile}을 획득 합니다.</p>
-	 * <p> {@link StorageFindResult}를 참고 해주세요.</p>
+	 * <p> {@link StorageLoadResult}를 참고 해주세요.</p>
 	 *
-	 * @param resourceId 저장된 리소스 파일에 대한 식별자 입니다.
-	 * @return {@link StorageFindResult StorageFindResult} 리소스 검색 결과를 담은 레코드 입니다.
+	 * @param imageLocationId 저장된 리소스 파일에 대한 식별자 입니다.
+	 * @return {@link StorageLoadResult StorageFindResult} 리소스 검색 결과를 담은 레코드 입니다.
 	 * @throws org.example.exception.storage.ApiStorageException 파일 탐색에 실패할 경우 런타임 예외를 발생시킵니다.
 	 */
-	StorageFindResult findResourceById(Long resourceId);
+	StorageLoadResult loadImageByLocationId(Long imageLocationId);
 
 }

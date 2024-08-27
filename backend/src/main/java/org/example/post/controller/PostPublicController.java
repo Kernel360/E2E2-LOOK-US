@@ -10,9 +10,12 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,24 +33,28 @@ import lombok.RequiredArgsConstructor;
 public class PostPublicController {
 	private final PostService postService;
 
-	// Permit All
-	@Operation(summary = "게시글 조회 API", description = "모든 게시글 조회 및 해시태그, 검색 키워드로 조회 가능하다.")
-	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "ok!!"),
-		@ApiResponse(responseCode = "404", description = "Resource not found!!")
-	})
 	@GetMapping("")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
 		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-		PostSearchCondition postSearchCondition
+		@RequestParam(required = false) String postContent,
+		@RequestParam(required = false) String hashtags,
+		@RequestParam(required = false) int[] rgbColor,
+		@RequestParam(required = false) String category
 	) throws JsonProcessingException {
-		if (postSearchCondition.getRgbColor() == null) {
-			return ResponseEntity.status(HttpStatus.OK)
-				.body(postService.findAllPosts(postSearchCondition, pageable));
-		} else {
-			return ResponseEntity.status(HttpStatus.OK)
-				.body(postService.findAllPostsByRGB(postSearchCondition.getRgbColor(), pageable));
-		}
+
+		// PostSearchCondition 객체를 생성하고 삼항 연산자를 이용해 간결하게 설정
+		PostSearchCondition postSearchCondition = new PostSearchCondition();
+		postSearchCondition.setPostContent(postContent != null ? postContent : null);
+		postSearchCondition.setHashtags(hashtags != null ? hashtags : null);
+		postSearchCondition.setRgbColor(rgbColor != null ? rgbColor : null);
+		postSearchCondition.setCategory(category != null ? category : null);
+
+		// RGB 색상에 따라 검색 로직을 분기 처리
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(postSearchCondition.getRgbColor() == null
+				? postService.findAllPosts(postSearchCondition, pageable)
+				: postService.findAllPostsByRGB(postSearchCondition.getRgbColor(), pageable)
+			);
 	}
 
 	// Permit All

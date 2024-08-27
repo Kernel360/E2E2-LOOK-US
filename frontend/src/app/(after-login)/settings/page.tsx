@@ -29,9 +29,9 @@ export default function ProfileEditPage() {
 
     useEffect(() => {
         const cookies = parseCookies()
-        const userId = cookies.userId
+        // const token = cookies.token
 
-        if (!userId) {
+        if (!cookies) {
             setShowModal(true)
             return
         }

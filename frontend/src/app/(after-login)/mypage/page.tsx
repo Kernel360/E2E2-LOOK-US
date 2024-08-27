@@ -23,9 +23,9 @@ export default function MyPage() {
 
     useEffect(() => {
         const cookies = parseCookies() // 쿠키 파싱
-        const userId = cookies.userId
+        // const token = cookies.token
 
-        if (!userId) {
+        if (!cookies) {
             setShowModal(true)
             return
         }

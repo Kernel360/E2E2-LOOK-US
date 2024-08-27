@@ -3,17 +3,18 @@
 import React, { useState, useEffect } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import { useRouter } from 'next/navigation'
+import { API_PUBLIC_URL } from '@/app/_common/constants'
 
 const sections = [
-    '아우터',
-    '상의',
-    '바지',
-    '원피스/세트',
-    '스커트',
-    '신발',
-    '가방',
-    '주얼리/잡화',
-    '모자',
+    { name: '아우터', category: 'outer' },
+    { name: '상의', category: 'top' },
+    { name: '바지', category: 'pants' },
+    { name: '원피스/세트', category: 'dress' },
+    { name: '스커트', category: 'skirt' },
+    { name: '신발', category: 'shoe' },
+    { name: '가방', category: 'bag' },
+    { name: '주얼리/잡화', category: 'accessory' },
+    { name: '모자', category: 'hat' },
 ]
 
 const ColorSelectionPage: React.FC = () => {
@@ -56,6 +57,43 @@ const ColorSelectionPage: React.FC = () => {
         router.back() // 이전 화면으로 이동해요 🎀
     }
 
+    const rgbToIntArray = (color: string) => {
+        const r = parseInt(color.slice(1, 3), 16)
+        const g = parseInt(color.slice(3, 5), 16)
+        const b = parseInt(color.slice(5, 7), 16)
+        return [r, g, b]
+    }
+
+    const onClickSearchBtn = () => {
+        // sendColorAndCategory(tempColor)
+        console.log(tempColor)
+    }
+
+    const sendColorAndCategory = async (color: string) => {
+        const rgbColor = rgbToIntArray(color)
+        const data = {
+            rgbColor,
+        }
+        try {
+            const response = await fetch(`${API_PUBLIC_URL}/posts`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+
+            if (response.ok) {
+                const result = await response.json()
+                console.log('검색 결과:', result)
+            } else {
+                console.error('검색 요청 실패:', response.statusText)
+            }
+        } catch (error) {
+            console.error('검색 중 오류 발생:', error)
+        }
+    }
+
     return (
         <div
             style={{
@@ -71,7 +109,7 @@ const ColorSelectionPage: React.FC = () => {
             }}
         >
             {sections.map((section, index) => {
-                const isHovered = hoveredSection === section
+                const isHovered = hoveredSection === section.name
 
                 const isAbove =
                     isClient &&
@@ -86,9 +124,9 @@ const ColorSelectionPage: React.FC = () => {
                             flex: '1',
                             width: '100%', // Width 고정
                             backgroundColor:
-                                selectedColors[section] || '#ffffff',
-                            color: selectedColors[section]
-                                ? getTextColor(selectedColors[section])
+                                selectedColors[section.name] || '#ffffff',
+                            color: selectedColors[section.name]
+                                ? getTextColor(selectedColors[section.name])
                                 : '#000000',
                             display: 'flex',
                             justifyContent: 'center',
@@ -100,12 +138,12 @@ const ColorSelectionPage: React.FC = () => {
                             height: isHovered ? '1.2em' : '1em', // Hover 시 height 증가
                             zIndex: isHovered ? 10 : 1, // 호버된 섹션이 다른 섹션 위에 오도록 설정
                         }}
-                        onMouseEnter={() => setHoveredSection(section)}
+                        onMouseEnter={() => setHoveredSection(section.name)}
                         onMouseLeave={() => setHoveredSection(null)}
-                        onClick={() => setCurrentSection(section)}
+                        onClick={() => setCurrentSection(section.name)}
                     >
-                        {section}
-                        {currentSection === section && (
+                        {section.name}
+                        {currentSection === section.name && (
                             <div
                                 style={{
                                     position: 'absolute',
@@ -145,7 +183,9 @@ const ColorSelectionPage: React.FC = () => {
                                         border: 'none',
                                         cursor: 'pointer',
                                     }}
-                                    onClick={applyColor}
+                                    onClick={() => {
+                                        applyColor()
+                                    }}
                                 >
                                     확인
                                 </button>
@@ -179,7 +219,7 @@ const ColorSelectionPage: React.FC = () => {
                     ⬅️
                 </button>
                 <button
-                    onClick={() => console.log('Next button clicked')}
+                    onClick={() => onClickSearchBtn()}
                     style={{
                         fontSize: '40px', // 버튼 크기를 적당히 키웠어요
                         background: 'none',

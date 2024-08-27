@@ -9,7 +9,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +39,15 @@ public class PostPublicController {
 	@GetMapping("")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
 		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-		PostSearchCondition postSearchCondition
-	) {
-		return ResponseEntity.status(HttpStatus.OK)
-			.body(postService.findAllPosts(postSearchCondition, pageable));
+		@RequestBody PostSearchCondition postSearchCondition
+	) throws JsonProcessingException {
+		if (postSearchCondition.getRgbColor() == null) {
+			return ResponseEntity.status(HttpStatus.OK)
+				.body(postService.findAllPosts(postSearchCondition, pageable));
+		} else {
+			return ResponseEntity.status(HttpStatus.OK)
+				.body(postService.findAllPostsByRGB(postSearchCondition.getRgbColor(), pageable));
+		}
 	}
 
 	// Permit All

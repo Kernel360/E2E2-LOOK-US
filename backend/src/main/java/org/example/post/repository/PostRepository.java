@@ -30,4 +30,5 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, PostRep
 		Pageable pageable
 	);
 
+	List<PostEntity> findAllByImageId(Long imageId);
 }

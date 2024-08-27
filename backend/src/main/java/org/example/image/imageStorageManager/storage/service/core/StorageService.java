@@ -1,10 +1,10 @@
 package org.example.image.imageStorageManager.storage.service.core;
 
-import org.example.image.imageStorageManager.type.StorageFindResult;
+import org.example.image.imageStorageManager.type.StorageLoadResult;
 
 public interface StorageService {
 
 	StorageSaveResultInternal save(StoragePacket packet);
 
-	StorageFindResult load(String fileUrl);
+	StorageLoadResult load(String fileUrl);
 }

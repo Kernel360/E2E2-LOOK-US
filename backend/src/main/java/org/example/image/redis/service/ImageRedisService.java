@@ -21,7 +21,6 @@ import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.PostPopularSearchCondition;
 import org.example.post.repository.custom.UpdateScoreType;
-import org.example.post.service.PostService;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -53,14 +52,14 @@ public class ImageRedisService {
 	private static final Integer WEIGHT_LIKE = 2;
 	private static final Integer WEIGHT_VIEW = 1;
 
-	public List<String> saveNewColor(Long resourceLocationId) throws JsonProcessingException {
+	public List<String> saveNewColor(Long imageLocationId) throws JsonProcessingException {
 		List<String> colorNameList = new ArrayList<>();
 		ColorApiClient client = new ColorApiClient();
 		HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
 		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(resourceLocationId);
+		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(imageLocationId);
 
 		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {        // Clothes from an image
 			int[] colorRGB = {
@@ -116,7 +115,7 @@ public class ImageRedisService {
 		// get popular color of popular ClothAnalyzeData's image analyze data to change RGB
 		HashMap<String, ColorDto.ColorSelectedDtoRequest> selectedColorHashMap = new HashMap<>();
 		for (PostEntity post : postEntities) {
-			ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(post.getImageId());
+			ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(post.getImageLocationId());
 
 			// Selection Colors for updating because we can get several requests about same color
 			for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
@@ -208,10 +207,10 @@ public class ImageRedisService {
 		return savedColorNameList;
 	}
 
-	public void updateZSetColorScore(Long resourceLocationId, UpdateScoreType updateScoreType) throws JsonProcessingException {
+	public void updateZSetColorScore(Long imageLocationId, UpdateScoreType updateScoreType) throws JsonProcessingException {
 		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
 
-		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(resourceLocationId);
+		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(imageLocationId);
 		for (ClothAnalyzeData clothAnalyzeData : imageAnalyzeData.clothAnalyzeDataList()) {
 			int[] rgbColor = {
 				clothAnalyzeData.rgbColor().getRed(),

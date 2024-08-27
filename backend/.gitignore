@@ -1,5 +1,7 @@
 build.gradle-prod
 src/main/resources/keystore.p12
+.env
+
 
 *.env
 

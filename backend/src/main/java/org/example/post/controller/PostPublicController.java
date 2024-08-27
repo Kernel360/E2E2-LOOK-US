@@ -80,4 +80,20 @@ public class PostPublicController {
 		return ResponseEntity.status(HttpStatus.OK).body(likeCount);
 	}
 
+	@Operation(summary = "카테고리별 게시글 가져오는 API", description = "카테고리 ID를 통해 해당하는 카테고리 게시글 반환")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "ok!!"),
+		@ApiResponse(responseCode = "404", description = "Resource not found!!")
+	})
+	@GetMapping("/category")
+	public ResponseEntity<Page<PostDto.PostDtoResponse>> getPostsByCategory(
+		@PathVariable Long categoryId,
+		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+	) {
+		Page<PostDto.PostDtoResponse> posts = postService.findAllPostsByCategory(categoryId, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(posts);
+
+	}
+
 }
+

@@ -25,5 +25,6 @@ public class PostStatsService {
 
 	public List<PostTotalStats> getTotalStatsByPost(PostEntity post) {
 		return postTotalStatsRepository.findByPost(post);
-	}// 날짜별로 정렬하여 가져오기
+	}
+	// 날짜별로 정렬하여 가져오기
 }

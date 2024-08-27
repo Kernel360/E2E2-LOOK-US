@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
@@ -67,11 +68,10 @@ public class PostService {
 	private final HashtagRepository hashtagRepository;
 	private final ClothAnalyzeDataRepository clothAnalyzeDataRepository;
 
-	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto,
-		String email, MultipartFile image) throws IOException {
+	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto, String email,
+		MultipartFile image) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
-		// 1. save image file
 		StorageSaveResult storageSaveResult = imageStorageManager.saveImage(
 			image, StorageType.LOCAL_FILE_SYSTEM
 		);
@@ -115,12 +115,8 @@ public class PostService {
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
 	}
 
-	public PostDto.CreatePostDtoResponse updatePost(
-		PostDto.CreatePostDtoRequest updateRequest,
-		MultipartFile image,
-		String email,
-		Long postId
-	) throws IOException {
+	public PostDto.CreatePostDtoResponse updatePost(PostDto.CreatePostDtoRequest updateRequest, MultipartFile image,
+		String email, Long postId) throws IOException {
 		UserEntity user = findUserByEmail(email);
 
 		PostEntity post = findPostById(postId);
@@ -159,10 +155,7 @@ public class PostService {
 				hashtagRepository.deleteById(he.getHashtagId());
 			}
 			List<HashtagEntity> hashtagEntities = updateRequest.convertHashtagContents(updateRequest.hashtagContents(),
-					"#")
-				.stream()
-				.map(hashtag -> new HashtagEntity(post, hashtag))
-				.toList();
+				"#").stream().map(hashtag -> new HashtagEntity(post, hashtag)).toList();
 
 			hashtagRepository.saveAll(hashtagEntities);
 			post.updateHashtags(hashtagEntities);
@@ -172,9 +165,7 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<PostDto.PostDtoResponse> findAllPosts(
-		PostSearchCondition postSearchCondition, Pageable pageable
-	) {
+	public Page<PostDto.PostDtoResponse> findAllPosts(PostSearchCondition postSearchCondition, Pageable pageable) {
 		return postRepository.search(postSearchCondition, pageable);
 	}
 

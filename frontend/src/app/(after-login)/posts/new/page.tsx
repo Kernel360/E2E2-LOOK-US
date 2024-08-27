@@ -1,7 +1,30 @@
-import * as React from 'react'
+'use client'
+
 import { PostContentForm } from '@/components/post-create'
+import { useRouter } from 'next/navigation'
+import { parseCookies } from 'nookies'
+import Modal from '@/components/modal-accesscontrol'
+import { useEffect, useState } from 'react'
 
 export default function PostCreateForm() {
+    const [showModal, setShowModal] = useState(false)
+    const router = useRouter()
+
+    useEffect(() => {
+        const cookies = parseCookies()
+        const userId = cookies.userId
+
+        if (!userId) {
+            setShowModal(true)
+            return
+        }
+    }, [router])
+
+    const handleCloseModal = () => {
+        setShowModal(false)
+        router.push('/posts')
+    }
+
     return (
         <div className='space-y-6 p-10 pb-16 md:block'>
             <div className='space-y-0.5'>
@@ -15,6 +38,8 @@ export default function PostCreateForm() {
                     <PostContentForm />
                 </div>
             </div>
+
+            <Modal show={showModal} onClose={handleCloseModal} />
         </div>
     )
 }

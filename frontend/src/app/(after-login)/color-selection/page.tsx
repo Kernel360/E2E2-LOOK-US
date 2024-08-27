@@ -23,11 +23,11 @@ const ColorSelectionPage: React.FC = () => {
     const [currentSection, setCurrentSection] = useState<string | null>(null)
     const [hoveredSection, setHoveredSection] = useState<string | null>(null)
     const [tempColor, setTempColor] = useState<string>('#ffffff')
-    const [isClient, setIsClient] = useState<boolean>(false)
-    const router = useRouter()
+    const [isClient, setIsClient] = useState<boolean>(false) // 클라이언트 여부 확인 🎀
+    const router = useRouter() // Next.js의 useRouter 훅을 사용해요 🎀
 
     useEffect(() => {
-        setIsClient(true) // 클라이언트 사이드에서만 렌더링되도록 설정
+        setIsClient(true) // 컴포넌트가 클라이언트에서 렌더링된 후 설정해요 🎀
     }, [])
 
     const handleColorChange = (color: string) => {
@@ -40,7 +40,7 @@ const ColorSelectionPage: React.FC = () => {
                 ...prevColors,
                 [currentSection]: tempColor,
             }))
-            setCurrentSection(null)
+            setCurrentSection(null) // 선택 후 창을 닫아줌
         }
     }
 
@@ -53,32 +53,30 @@ const ColorSelectionPage: React.FC = () => {
     }
 
     const handleGoBack = () => {
-        router.back()
-    }
-
-    if (!isClient) {
-        return null // 서버 사이드에서는 아무것도 렌더링하지 않음
+        router.back() // 이전 화면으로 이동해요 🎀
     }
 
     return (
         <div
             style={{
                 width: '100%',
-                height: `100vh`,
+                height: `100vh`, // 화면 전체 높이
                 margin: '0 auto',
                 textAlign: 'center',
                 backgroundColor: '#f5f5f5',
-                overflowY: 'scroll',
+                overflowY: 'scroll', // 세로 스크롤 설정
                 display: 'flex',
                 flexDirection: 'column',
-                position: 'relative',
+                position: 'relative', // 버튼 위치를 설정하기 위해 추가
             }}
         >
             {sections.map((section, index) => {
                 const isHovered = hoveredSection === section
+
                 const isAbove =
+                    isClient &&
                     window.innerHeight / 2 <
-                    (index + 1) * (window.innerHeight / sections.length)
+                        (index + 1) * (window.innerHeight / sections.length) // 클라이언트 사이드에서만 실행 🎀
 
                 return (
                     <div
@@ -86,7 +84,7 @@ const ColorSelectionPage: React.FC = () => {
                         style={{
                             position: 'relative',
                             flex: '1',
-                            width: '100%',
+                            width: '100%', // Width 고정
                             backgroundColor:
                                 selectedColors[section] || '#ffffff',
                             color: selectedColors[section]
@@ -99,8 +97,8 @@ const ColorSelectionPage: React.FC = () => {
                             transition: 'all 0.5s ease',
                             fontWeight: isHovered ? '700' : '300',
                             fontSize: isHovered ? '25px' : '16px',
-                            height: isHovered ? '1.2em' : '1em',
-                            zIndex: isHovered ? 10 : 1,
+                            height: isHovered ? '1.2em' : '1em', // Hover 시 height 증가
+                            zIndex: isHovered ? 10 : 1, // 호버된 섹션이 다른 섹션 위에 오도록 설정
                         }}
                         onMouseEnter={() => setHoveredSection(section)}
                         onMouseLeave={() => setHoveredSection(null)}
@@ -113,14 +111,14 @@ const ColorSelectionPage: React.FC = () => {
                                     position: 'absolute',
                                     left: '50%',
                                     transform: 'translateX(-50%)',
-                                    top: isAbove ? 'auto' : '100%',
-                                    bottom: isAbove ? '100%' : 'auto',
+                                    top: isAbove ? 'auto' : '100%', // 화면 위치에 따라 위/아래에 나타나도록
+                                    bottom: isAbove ? '100%' : 'auto', // 화면 위치에 따라 위/아래에 나타나도록
                                     padding: '10px',
                                     backgroundColor: '#fff',
                                     boxShadow:
                                         '0px 4px 12px rgba(0, 0, 0, 0.1)',
                                     borderRadius: '8px',
-                                    zIndex: 20,
+                                    zIndex: 20, // 컬러 피커가 항상 최상단에 나타나도록 설정
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
@@ -160,22 +158,22 @@ const ColorSelectionPage: React.FC = () => {
                 style={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    position: 'fixed',
+                    position: 'fixed', // 화면에 고정되도록 설정
                     width: '100%',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    zIndex: 100,
-                    padding: '0 20px',
+                    top: '50%', // 화면의 중간 높이에 위치하도록 설정
+                    transform: 'translateY(-50%)', // 정확히 중앙에 맞추기 위한 transform
+                    zIndex: 100, // 버튼이 다른 요소들 위에 겹쳐지도록 z-index를 높임
+                    padding: '0 20px', // 버튼과 화면 끝 사이의 여백을 설정
                 }}
             >
                 <button
                     onClick={handleGoBack}
                     style={{
-                        fontSize: '40px',
+                        fontSize: '40px', // 버튼 크기를 적당히 키웠어요
                         background: 'none',
                         border: 'none',
                         cursor: 'pointer',
-                        outline: 'none',
+                        outline: 'none', // 포커스 시 나타나는 기본 테두리 제거
                     }}
                 >
                     ⬅️
@@ -183,11 +181,11 @@ const ColorSelectionPage: React.FC = () => {
                 <button
                     onClick={() => console.log('Next button clicked')}
                     style={{
-                        fontSize: '40px',
+                        fontSize: '40px', // 버튼 크기를 적당히 키웠어요
                         background: 'none',
                         border: 'none',
                         cursor: 'pointer',
-                        outline: 'none',
+                        outline: 'none', // 포커스 시 나타나는 기본 테두리 제거
                     }}
                 >
                     ➡️

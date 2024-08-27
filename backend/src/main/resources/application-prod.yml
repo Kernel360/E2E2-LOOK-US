@@ -5,7 +5,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect # MySQL8Dialect는 deprecated되었습니다.
         format_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
 
   datasource:

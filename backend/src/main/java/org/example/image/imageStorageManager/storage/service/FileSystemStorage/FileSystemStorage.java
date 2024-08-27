@@ -27,7 +27,7 @@ import lombok.NonNull;
 @Service
 public class FileSystemStorage implements StorageService {
 
-	private final Path rootLocation = Paths.get("backend/data/images");
+	private final Path rootLocation = Paths.get("E2E2-LOOK-US/backend/data/images");
 
 	@Override
 	public StorageSaveResultInternal save(@NonNull StoragePacket packet) {
@@ -40,22 +40,20 @@ public class FileSystemStorage implements StorageService {
 				.build();
 		}
 
-		if (Files.notExists(this.rootLocation)) {
-			throw ApiStorageException
-				.builder()
-				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
-				.subCategory(ApiStorageErrorSubCategory.DIRECTORY_NOT_ACCESSIBLE)
-				.build();
-		}
-
 		try {
+			// 디렉토리가 존재하지 않으면 생성
+			if (Files.notExists(this.rootLocation)) {
+				createDirectory(this.rootLocation);
+			}
+
 			Path destination = this.rootLocation
 				.resolve(packet.getDestinationPath())
 				.normalize()
 				.toAbsolutePath();
 
+			// 상위 디렉토리가 존재하지 않으면 생성
 			if (Files.notExists(destination.getParent())) {
-				this.createDirectory(destination.getParent());
+				createDirectory(destination.getParent());
 			}
 
 			Files.copy(packet.getFileData().getInputStream(), destination);

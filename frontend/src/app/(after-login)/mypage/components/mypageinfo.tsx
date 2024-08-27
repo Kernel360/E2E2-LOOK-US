@@ -8,6 +8,7 @@ import {
 import { API_PUBLIC_URL } from '@/app/_common/constants'
 import FollowListModal from './FollowListModal' // 팔로워/팔로잉 모달 임포트
 import './mypageinfo.scss' // 스타일 파일 임포트
+import Link from 'next/link'
 
 export default function MyPageInfoComponent() {
     const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null)
@@ -56,41 +57,44 @@ export default function MyPageInfoComponent() {
     return (
         <div className='mypage-info'>
             <div className='mypage-info-header'>
-                <div className='mypage-info-content'>
-                    <img
-                        src={`${API_PUBLIC_URL}/image/${userInfo.imageId}`}
-                        alt='Avatar'
-                        className='rounded-full profile-image'
-                    />
-                    <div>
-                        <h2 className='mypage-username'>{userInfo.nickname}</h2>
-                        <a
-                            href={`https://www.instagram.com/${userInfo.instaId}/`}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='mypage-instagram'
-                        >
-                            @{userInfo.instaId}
-                        </a>
-                    </div>
+                <img
+                    src={`${API_PUBLIC_URL}/image/${userInfo.imageId}`}
+                    alt='Avatar'
+                    className='rounded-full profile-image'
+                />
+                <div className='user-details'>
+                    <h2 className='mypage-username'>{userInfo.nickname}</h2>
+                    <a
+                        href={`https://www.instagram.com/${userInfo.instaId}/`}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='mypage-instagram'
+                    >
+                        @{userInfo.instaId}
+                    </a>
+                </div>
+                <div className='mypage-actions'>
+                    <Link href='/mypage/edit' className='profile-edit-button'>
+                        <button>프로필 편집</button>
+                    </Link>
+                    <button className='profile-share-button'>
+                        프로필 공유
+                    </button>
                 </div>
             </div>
-            <div className='mypage-actions'>
-                <button className='profile-edit-button'>프로필 편집</button>
-                <button className='profile-share-button'>프로필 공유</button>
-            </div>
             <div className='mypage-stats'>
+                <span>{userInfo.postNum} 게시물</span>
                 <span
                     onClick={() => setIsFollowersModalOpen(true)}
                     className='clickable'
                 >
-                    팔로워 {followers.length}명
+                    {followers.length} 팔로워
                 </span>
                 <span
                     onClick={() => setIsFollowingsModalOpen(true)}
                     className='clickable'
                 >
-                    팔로잉 {followings.length}명
+                    {followings.length} 팔로잉
                 </span>
             </div>
 

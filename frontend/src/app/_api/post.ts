@@ -10,7 +10,6 @@ export interface GetPostResponse {
     hashtagContents: string[]
     likeCount: number
     likeStatus: boolean // likeStatus 필드 추가
-    hits: number
     createdAt: Date
     updatedAt: Date
 }

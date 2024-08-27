@@ -15,8 +15,6 @@ export interface postPreviewContent {
     nickname: string
     postId: number
     imageId: number
-    likeCount: number
-    hits: number
 }
 
 // TODO: change this to preview dto later...
@@ -31,8 +29,6 @@ export interface postPreviewsAllResponse {
             nickname: string
             postId: number
             imageId: number
-            likeCount: number
-            hits: number
             hashtags: []
         },
     ]

@@ -1,76 +1,105 @@
 .mypage-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
     padding: 1rem;
+    width: 100%;
 }
 
 .mypage-info-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
     padding: 1rem 0;
     border-bottom: 1px solid #ddd;
-}
-
-.mypage-info-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+    flex-wrap: wrap; /* 작은 화면에서 버튼이 줄바뀜 되지 않도록 설정 */
+    gap: 0.5rem;
 }
 
 .profile-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
+    width: 90px !important;
+    height: 90px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    margin-right: 1rem !important;
+}
+
+.user-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
 }
 
 .mypage-username {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: bold;
+    margin: 0;
 }
 
 .mypage-instagram {
-    color: #3b5998;
+    color: #262626;
     text-decoration: none;
+    font-size: 1rem;
 }
 
 .mypage-actions {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding-top: 1rem;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 1rem;
+    gap: 0.5rem;
+    flex-grow: 1; /* 버튼이 공간을 나누어 차지하도록 설정 */
+    justify-content: flex-end;
 }
 
 .profile-edit-button,
 .profile-share-button {
-    padding: 0.5rem 1rem;
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    flex: 1 !important;
+    padding: 0.4rem 0.5rem !important;
+    background-color: #3897f0 !important;
+    color: #fff !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 0.25rem !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    transition: background-color 0.3s !important;
+    white-space: nowrap !important;
+    font-size: 0.875rem !important;
+    max-width: 48% !important; /* 버튼이 작은 화면에서 줄바뀌지 않도록 제한 */
+    margin-top: 0 !important;
 }
 
 .profile-edit-button:hover,
 .profile-share-button:hover {
-    background-color: #e0e0e0;
+    background-color: #318ce7 !important;
 }
 
 .mypage-stats {
     display: flex;
-    gap: 2rem;
-    margin-top: 1rem;
-    font-size: 1rem;
+    justify-content: space-around;
+    padding: 1rem 0;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #ddd;
     color: #333;
+    text-align: center;
 }
 
 .clickable {
     cursor: pointer;
-    text-decoration: underline;
+    text-decoration: none;
+    color: #262626;
+}
+
+@media (max-width: 375px) {
+    .mypage-username {
+        font-size: 1.25rem; /* 작은 화면에서 폰트 크기 축소 */
+    }
+
+    .profile-edit-button,
+    .profile-share-button {
+        font-size: 0.75rem; /* 버튼 텍스트 크기 축소 */
+        padding: 0.35rem 0.4rem; /* 패딩 축소 */
+    }
+
+    .mypage-instagram {
+        font-size: 0.875rem;
+    }
 }

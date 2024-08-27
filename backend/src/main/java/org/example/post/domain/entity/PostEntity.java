@@ -52,7 +52,7 @@ public class PostEntity extends TimeTrackableEntity {
 	private UserEntity user;
 
 	@Column(nullable = false)
-	private Long imageId;
+	private Long imageLocationId;
 
 	@Column(name = "post_content", columnDefinition = "VARCHAR(255)")
 	private String postContent;
@@ -83,10 +83,10 @@ public class PostEntity extends TimeTrackableEntity {
 	private LocalDateTime removedAt;
 
 	@Builder
-	public PostEntity(UserEntity user, String postContent, Long imageId, int likeCount) {
+	public PostEntity(UserEntity user, String postContent, Long imageLocationId, int likeCount) {
 		this.user = user;
 		this.postContent = postContent;
-		this.imageId = imageId;
+		this.imageLocationId = imageLocationId;
 		this.likeCount = likeCount;
 	}
 
@@ -98,8 +98,8 @@ public class PostEntity extends TimeTrackableEntity {
 		this.postContent = postContent;
 	}
 
-	public void updateImage(Long imageId) {
-		this.imageId = imageId;
+	public void updateImage(Long imageLocationId) {
+		this.imageLocationId = imageLocationId;
 	}
 
 	public void updateHashtags(List<HashtagEntity> hashtags) {

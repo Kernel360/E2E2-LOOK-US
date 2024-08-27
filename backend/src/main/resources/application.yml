@@ -14,7 +14,7 @@ spring:
     show-sql: true
 
   datasource:
-    url: ${MY_DATA_SOURCE}
+    url: localhost
     username: ${MY_DATA_USERNAME}
     password: ${MY_DATA_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver

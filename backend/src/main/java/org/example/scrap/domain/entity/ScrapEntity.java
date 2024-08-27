@@ -2,6 +2,7 @@ package org.example.scrap.domain.entity;
 
 import org.example.post.domain.entity.PostEntity;
 import org.example.user.domain.entity.member.UserEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,11 +13,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
+@Getter
 @Table(name = "scrap_post")
 @AllArgsConstructor
 @NoArgsConstructor

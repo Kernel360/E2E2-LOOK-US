@@ -220,32 +220,32 @@ public class PostService {
 		}
 	}
 
-	@Transactional
-	public void viewCount(Long post_id, HttpServletRequest request, HttpServletResponse response) throws
-		JsonProcessingException {
-		Cookie oldCookie = null;
+	public void viewCount(Long post_id, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
+		Cookie viewCookie = null;
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if (cookie.getName().equals("postView")) {
-					oldCookie = cookie;
+					viewCookie = cookie;
+					break;
 				}
 			}
 		}
 
-		if (oldCookie != null) {
-			if (!oldCookie.getValue().contains("[" + post_id.toString() + "]")) {
+		if (viewCookie != null) {
+			if (!viewCookie.getValue().contains("[" + post_id + "]")) {
 				updateView(post_id);
-				oldCookie.setValue(oldCookie.getValue() + "_[" + post_id + "]");
-				oldCookie.setPath("/");
-				oldCookie.setMaxAge(60 * 60 * 24);                            // 쿠키 시간
-				response.addCookie(oldCookie);
+				String newValue = viewCookie.getValue() + "_[" + post_id + "]";
+				viewCookie.setValue(newValue);
+				viewCookie.setPath("/");
+				viewCookie.setMaxAge(60 * 60 * 24);  // 쿠키 유효기간 1일
+				response.addCookie(viewCookie);
 			}
 		} else {
 			updateView(post_id);
 			Cookie newCookie = new Cookie("postView", "[" + post_id + "]");
 			newCookie.setPath("/");
-			newCookie.setMaxAge(60 * 60 * 24);                                // 쿠키 시간
+			newCookie.setMaxAge(60 * 60 * 24);  // 쿠키 유효기간 1일
 			response.addCookie(newCookie);
 		}
 	}

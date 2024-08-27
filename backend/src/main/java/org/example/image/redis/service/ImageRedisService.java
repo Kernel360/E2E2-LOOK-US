@@ -207,7 +207,9 @@ public class ImageRedisService {
 		return savedColorNameList;
 	}
 
-	public void updateZSetColorScore(Long imageLocationId, UpdateScoreType updateScoreType) throws JsonProcessingException {
+	public void updateZSetColorScore(
+		Long imageLocationId, UpdateScoreType updateScoreType
+	) throws JsonProcessingException {
 		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
 
 		ImageAnalyzeData imageAnalyzeData = imageAnalyzeManager.getAnalyzedData(imageLocationId);
@@ -229,7 +231,11 @@ public class ImageRedisService {
 		}
 	}
 
-	public List<ColorDto.ColorDistanceResponse> calcCloseColorsDist(int[] rgb, int num) throws JsonProcessingException {
+	// Private Internal Method -------------------------------------------------------------------
+
+	private List<ColorDto.ColorDistanceResponse> calcCloseColorsDist(
+		int[] rgb, int num
+	) throws JsonProcessingException {
 		HashOperations<String, Object, Object> hashOps = redisTemplate.opsForHash();
 		Map<Object, Object> colorMembers = hashOps.entries(HASH_KEY);
 		ZSetOperations<String, Object> closestColorZSet = redisTemplate.opsForZSet();
@@ -309,7 +315,7 @@ public class ImageRedisService {
 		return rgbList;
 	}
 
-	public double calcScoreOfPost(PostPopularSearchCondition condition) {
+	private double calcScoreOfPost(PostPopularSearchCondition condition) {
 		double score = 0.0;
 
 		Duration duration = Duration.between(condition.getCreatedAt(), LocalDateTime.now());

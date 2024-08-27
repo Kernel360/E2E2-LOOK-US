@@ -58,6 +58,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class PostService {
+	private final ImageRedisService imageRedisService;
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
 

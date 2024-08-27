@@ -112,8 +112,14 @@ public class PostService {
 		return PostDto.CreatePostDtoResponse.toDto(savedPost);
 	}
 
-	public PostDto.CreatePostDtoResponse updatePost(PostDto.CreatePostDtoRequest updateRequest, MultipartFile image,
-		String email, Long postId) throws IOException {
+	@Transactional
+	public PostDto.CreatePostDtoResponse updatePost(
+		PostDto.CreatePostDtoRequest updateRequest,
+		MultipartFile image,
+		String email,
+		Long postId
+	) throws IOException {
+
 		UserEntity user = findUserByEmail(email);
 
 		PostEntity post = findPostById(postId);
@@ -188,6 +194,7 @@ public class PostService {
 		return PostDto.PostDetailDtoResponse.toDto(post, existLikePost);
 	}
 
+	@Transactional
 	public Boolean like(Long postId, String email) throws JsonProcessingException {
 		PostEntity post = findPostById(postId);
 		UserEntity user = findUserByEmail(email);
@@ -210,6 +217,7 @@ public class PostService {
 		}
 	}
 
+	@Transactional
 	public void viewCount(Long post_id, HttpServletRequest request, HttpServletResponse response) throws
 		JsonProcessingException {
 		Cookie oldCookie = null;
@@ -239,6 +247,7 @@ public class PostService {
 		}
 	}
 
+	@Transactional
 	public int updateView(Long postId) throws JsonProcessingException {
 		imageRedisService.updateZSetColorScore(findPostById(postId).getImageLocationId(), UpdateScoreType.VIEW);
 		return postRepository.updateView(postId);
@@ -249,12 +258,14 @@ public class PostService {
 		return likeRepository.existsByUserAndPost(user, post);
 	}
 
+	@Transactional(readOnly = true)
 	public int likeCount(Long postId) {
 		PostEntity post = findPostById(postId);
 
 		return likeRepository.likeCount(post);
 	}
 
+	@Transactional
 	public void delete(Long postId, String email) {
 		UserEntity user = findUserByEmail(email);
 
@@ -271,6 +282,7 @@ public class PostService {
 		postRepository.delete(post);
 	}
 
+	@Transactional(readOnly = true)
 	public PostEntity findPostById(Long postId) {
 
 		return postRepository.findById(postId)
@@ -282,6 +294,7 @@ public class PostService {
 
 	}
 
+	@Transactional(readOnly = true)
 	public UserEntity findUserByEmail(String email) {
 		return userRepository.findByEmail(email)
 			.orElseThrow(() -> ApiUserException.builder()

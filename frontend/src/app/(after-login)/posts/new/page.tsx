@@ -12,9 +12,10 @@ export default function PostCreateForm() {
 
     useEffect(() => {
         const cookies = parseCookies()
-        const userId = cookies.userId
+        // const token = cookies.token
+        // console.log('Parsed Cookies:', token) // 여기에서 쿠키가 올바르게 파싱되는지 확인
 
-        if (!userId) {
+        if (!cookies) {
             setShowModal(true)
             return
         }

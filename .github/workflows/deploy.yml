@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,11 +41,10 @@ jobs:
         echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
         docker build -t ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} .
         docker buildx build --push --platform linux/amd64 -t ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} .
-    
+
     - name: Clean up dangling Docker images locally
       run: |
         sudo docker image prune -f
-
     - name: Deploy
       uses: appleboy/ssh-action@master
       with:

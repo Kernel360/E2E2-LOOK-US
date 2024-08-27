@@ -67,7 +67,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 				userEntity.nickname,
 				postEntity.postId,
 				hashtagEntity.hashtagContent,
-				postEntity.imageId,
+				postEntity.imageLocationId,
 				postEntity.likeCount,
 				postEntity.hits,
 				postEntity.createdAt
@@ -84,14 +84,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		for (Tuple tuple : results) {
 			String nickname = tuple.get(userEntity.nickname);
 			Long postId = tuple.get(postEntity.postId);
-			Long imageId = tuple.get(postEntity.imageId);
+			Long imageLocationId = tuple.get(postEntity.imageLocationId);
 			String hashtagContent = tuple.get(hashtagEntity.hashtagContent);
 			LocalDateTime createdAt = tuple.get(postEntity.createdAt);
 			int likeCount = Optional.ofNullable(tuple.get(postEntity.likeCount)).orElse(0);
 			int hits = Optional.ofNullable(tuple.get(postEntity.hits)).orElse(0);
 
 			PostDto.PostDtoResponse dto = postDtoMap.computeIfAbsent(postId, id ->
-				new PostDto.PostDtoResponse(nickname, id, imageId, new ArrayList<>(), likeCount, hits, createdAt)
+				new PostDto.PostDtoResponse(nickname, id, imageLocationId, new ArrayList<>(), likeCount, hits, createdAt)
 			);
 
 			if (hashtagContent != null && !dto.hashtags().contains(hashtagContent)) {

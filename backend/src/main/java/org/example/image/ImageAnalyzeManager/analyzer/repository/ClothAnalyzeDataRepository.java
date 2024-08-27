@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ClothAnalyzeDataRepository extends JpaRepository<ClothAnalyzeDataEntity, Integer> {
 
-	List<ClothAnalyzeDataEntity> findAllByResourceLocationId(Long ResourceLocationId);
-	List<ClothAnalyzeDataEntity> findAllByRgbColor(RGBColor rgbColor);
+	List<ClothAnalyzeDataEntity> findAllByImageLocationId(Long imageLocationId);
+  List<ClothAnalyzeDataEntity> findAllByRgbColor(RGBColor rgbColor);
+
 }

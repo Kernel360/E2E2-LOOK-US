@@ -44,7 +44,7 @@ public class UserDto {
 		String birth,
 		String nickname,
 		String instaId,
-		Long imageId,
+		Long imageLocationId,
 		int postNum
 	) {
 		public static UserGetInfoResponse toDto(UserEntity userEntity, Integer postNum) {
@@ -55,7 +55,7 @@ public class UserDto {
 				userEntity.getBirth(),
 				userEntity.getNickname(),
 				userEntity.getInstaId(),
-				userEntity.getProfileImageId(),
+				userEntity.getProfileImageLocationId(),
 				postNum
 			);
 		}
@@ -63,7 +63,7 @@ public class UserDto {
 
 	// 회원이 작성한 게시글 조회 응답 DTO
 	public record UserGetPostsResponse(
-		Long imageId,
+		Long imageLocationId,
 		String postContent,
 		List<String> hashtags,
 		Integer likeCount,
@@ -71,13 +71,13 @@ public class UserDto {
 	) {
 		@QueryProjection
 		public UserGetPostsResponse(
-			Long imageId,
+			Long imageLocationId,
 			String postContent,
 			List<String> hashtags,
 			Integer likeCount,
 			Long postId
 		) {
-			this.imageId = imageId;
+			this.imageLocationId = imageLocationId;
 			this.postContent = postContent;
 			this.hashtags = hashtags;
 			this.likeCount = likeCount;

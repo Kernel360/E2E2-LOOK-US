@@ -1,0 +1,68 @@
+name: Java CI with Gradle Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v4
+
+    - name: Run chmod to make gradlew executable
+      run: chmod +x ./backend/gradlew 
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Set environment values
+      run: |
+        cd ./backend/src/main/resources
+        touch ./env.properties
+        echo "${{ secrets.ENV }}" > ./env.properties
+      shell: bash
+
+    - name: Build with Gradle
+      run: |
+        cd ./backend
+        ./gradlew clean build -x test
+        
+    - name: Docker build and push
+      run: |
+        cd ./backend
+        docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} --password-stdin
+        docker build -t ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} .
+        docker buildx build --push --platform linux/amd64 -t ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} .
+
+    - name: Clean up dangling Docker images locally
+      run: |
+        sudo docker image prune -f
+
+    - name: Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.PRIVATE_IP }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        envs: GITHUB_SHA
+        script: |
+          sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+          sudo docker pull ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
+          sudo docker tag ${{ secrets.DOCKERHUB_NAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7} look-us
+          cd ./look-us
+          sudo docker-compose down
+          sudo docker compose up -d
+          
+          # Clean up old Docker images on the server
+          sudo docker image prune -f

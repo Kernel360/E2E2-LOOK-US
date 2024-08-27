@@ -12,7 +12,7 @@ import org.example.image.ImageAnalyzeManager.analyzer.tools.ColorConverter;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 import org.example.image.imageStorageManager.ImageStorageManager;
-import org.example.image.imageStorageManager.type.StorageFindResult;
+import org.example.image.imageStorageManager.type.StorageLoadResult;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -27,8 +27,8 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 	private final ImageStorageManager imageStorageManager;
 
 	@Override
-	public void analyze(Long resourceLocationId) throws IOException {
-		StorageFindResult result = imageStorageManager.findResourceById(resourceLocationId);
+	public void analyze(Long imageLocationId) throws IOException {
+		StorageLoadResult result = imageStorageManager.loadImageByLocationId(imageLocationId);
 		byte[] imageBytes = Files.readAllBytes(result.resource().getFile().toPath());
 
 		imageAnalyzeVisionService.analyzeImage(imageBytes)
@@ -46,18 +46,18 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 								clothAnalyzeResult.rightBottomVertex()
 							)
 						)
-						.resourceLocationId(resourceLocationId)
+						.imageLocationId(imageLocationId)
 						.build()
 				);
 			});
 	}
 
 	@Override
-	public ImageAnalyzeData getAnalyzedData(Long resourceLocationId) {
+	public ImageAnalyzeData getAnalyzedData(Long imageLocationId) {
 
 		// 1. gather pre-analyzed cloth data from db
 		List<ClothAnalyzeData> clothAnalyzeDataList
-			= this.clothAnalyzeDataRepository.findAllByResourceLocationId(resourceLocationId)
+			= this.clothAnalyzeDataRepository.findAllByImageLocationId(imageLocationId)
 			.stream()
 			.map(
 				clothAnalyzeData -> ClothAnalyzeData.builder()

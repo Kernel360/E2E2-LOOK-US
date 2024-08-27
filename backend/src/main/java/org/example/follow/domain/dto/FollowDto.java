@@ -18,6 +18,6 @@ public class FollowDto {
 	public record FollowUser(
 		String nickname,
 		int followersCount,
-		Long profileImageId
+		Long profileImageLocationId
 	) {}
 }

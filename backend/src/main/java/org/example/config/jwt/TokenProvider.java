@@ -62,9 +62,10 @@ public class TokenProvider { // 계속해서 토큰을 생성하고 올바른 �
 	// 토큰 기반으로 인증 정보를 가져오는 메서드
 	public Authentication getAuthentication(String token) {
 		Claims claims = getClaims(token);
+		String roleClaim = claims.get("role", String.class);
 
 		Set<SimpleGrantedAuthority> authorities = Collections.singleton(
-			new SimpleGrantedAuthority((String)claims.get("role"))
+			new SimpleGrantedAuthority(roleClaim == null ? "ROLE_NONE" : roleClaim)
 		);
 
 		var user = new org.springframework.security.core.userdetails.User(

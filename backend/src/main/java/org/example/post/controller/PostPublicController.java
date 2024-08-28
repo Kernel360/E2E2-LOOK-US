@@ -47,10 +47,10 @@ public class PostPublicController {
 
 		// PostSearchCondition 객체를 생성하고 삼항 연산자를 이용해 간결하게 설정
 		PostSearchCondition postSearchCondition = new PostSearchCondition();
-		postSearchCondition.setPostContent(postContent != null ? postContent : null);
-		postSearchCondition.setHashtags(hashtags != null ? hashtags : null);
-		postSearchCondition.setRgbColor(rgbColor != null ? rgbColor : null);
-		postSearchCondition.setCategory(category != null ? category : null);
+		postSearchCondition.setPostContent(postContent);
+		postSearchCondition.setHashtags(hashtags);
+		postSearchCondition.setRgbColor(rgbColor);
+		postSearchCondition.setCategory(category);
 
 		// RGB 색상에 따라 검색 로직을 분기 처리
 		return ResponseEntity.status(HttpStatus.OK)
@@ -71,6 +71,7 @@ public class PostPublicController {
 	public ResponseEntity<PostDto.PostDetailDtoResponse> getPostById(
 		@PathVariable Long post_id, HttpServletRequest request, HttpServletResponse response
 	) throws JsonProcessingException {
+
 		/* 조회수 로직 */
 		postService.viewCount(post_id, request, response);
 

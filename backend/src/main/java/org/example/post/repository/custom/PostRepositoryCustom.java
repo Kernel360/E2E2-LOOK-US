@@ -16,4 +16,5 @@ public interface PostRepositoryCustom {
 
 	List<PostStatsDto> findPostStatsByType();
 
+
 }

@@ -58,7 +58,7 @@ export default function MyPageInfoComponent() {
         <div className='mypage-info'>
             <div className='mypage-info-header'>
                 <img
-                    src={`${API_PUBLIC_URL}/image/${userInfo.imageId}`}
+                    src={`${API_PUBLIC_URL}/image/${userInfo.imageLocationId}`}
                     alt='Avatar'
                     className='rounded-full profile-image'
                 />

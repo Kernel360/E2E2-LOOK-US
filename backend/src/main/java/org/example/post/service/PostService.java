@@ -95,7 +95,7 @@ public class PostService {
 		List<CategoryEntity> categoryEntities = postDto
 			.convertContents(postDto.categoryContents(), ",")
 			.stream()
-			.map(category -> new CategoryEntity(category))
+			.map(CategoryEntity::new)
 			.toList();
 
 		hashtagRepository.saveAll(hashtagEntities);

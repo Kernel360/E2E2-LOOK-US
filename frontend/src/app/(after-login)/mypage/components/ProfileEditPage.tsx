@@ -60,7 +60,7 @@ export default function ProfileEditPage() {
             <div className='profile-edit-body'>
                 <div className='profile-edit-image'>
                     <img
-                        src={`${API_PUBLIC_URL}/image/${userInfo.imageId}`}
+                        src={`${API_PUBLIC_URL}/image/${userInfo.imageLocationId}`}
                         alt='Profile'
                         className='rounded-full'
                     />

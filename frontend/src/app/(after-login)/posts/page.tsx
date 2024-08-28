@@ -1,6 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link' // next/link를 import
+import { useCallback, useEffect, useState } from 'react'
 import { getAllPostPreviews, postPreviewContent } from '../../_api/fetchStyle'
 import StylePreview from '@/components/post-preview'
 import './gallery.scss'
@@ -9,6 +8,14 @@ import { useIntersectionObserver } from './useIntersectionObserver'
 import { myInfoAllFunction, myInfoAllResponse } from '@/app/_api/myPage'
 import { useRouter } from 'next/navigation'
 
+// 프론트엔드에서 관리할 페이지네이션 상태와 데이터 타입 정의
+interface PostPreviewResponse {
+    content: postPreviewContent[]
+    totalElements: number
+    totalPages: number
+    size: number
+}
+
 export default function Gallery() {
     const [styles, setStyles] = useState<postPreviewContent[]>([])
     const [page, setPage] = useState<number>(0)
@@ -16,6 +23,8 @@ export default function Gallery() {
     const [search, setSearch] = useState<string>('')
     const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null)
     const [redirectToSignup, setRedirectToSignup] = useState<boolean>(false) // 회원가입 페이지로 리다이렉트할지 여부
+    const [totalElements, setTotalElements] = useState<number>(0) // 총 게시물 수를 관리하는 상태
+    const [size, setSize] = useState<number>(10) // 페이지 크기 상태 추가
     const router = useRouter()
     const fetchData = useCallback(async () => {
         try {
@@ -25,8 +34,14 @@ export default function Gallery() {
 
             const response = await getAllPostPreviews(request)
             setStyles(prevStyles => [...prevStyles, ...response.content])
+            setTotalElements(response.totalElements) // 총 게시물 수 업데이트
+            setSize(response.size) // 페이지 크기 업데이트
+
+            // hasMore 상태를 totalElements와 현재 페이지를 기반으로 업데이트
+            const currentPageSize = response.content.length // 현재 페이지의 데이터 수
             setHasMore(
-                response.content.length > 0 && response.totalPages > page + 1,
+                currentPageSize > 0 &&
+                    (page + 1) * response.size < response.totalElements, // 서버에서 받은 페이지 크기 사용
             )
         } catch (error) {
             console.error('Failed to fetch data:', error)
@@ -43,10 +58,12 @@ export default function Gallery() {
         setStyles([]) // 새로운 검색어로 검색할 때 기존 데이터를 초기화
     }
 
-    const lastElementRef = useIntersectionObserver(
-        () => setPage(prev => prev + 1),
-        hasMore,
-    )
+    const lastElementRef = useIntersectionObserver(() => {
+        if (hasMore) {
+            // 더 가져올 데이터가 있을 때만 페이지 증가
+            setPage(prev => prev + 1)
+        }
+    }, hasMore)
 
     useEffect(() => {
         async function fetchUserInfo() {

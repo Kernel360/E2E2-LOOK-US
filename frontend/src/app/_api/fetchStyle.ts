@@ -14,7 +14,7 @@ export interface postPreviewsAllRequest {
 export interface postPreviewContent {
     nickname: string
     postId: number
-    imageId: number
+    imageLocationId: number
 }
 
 // TODO: change this to preview dto later...
@@ -28,7 +28,7 @@ export interface postPreviewsAllResponse {
         {
             nickname: string
             postId: number
-            imageId: number
+            imageLocationId: number
             hashtags: []
         },
     ]

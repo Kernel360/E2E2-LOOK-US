@@ -1,6 +1,6 @@
 'use client'
 
-import { PostContentForm } from '@/components/post-create'
+import UploadOOTD from '@/components/post-create'
 import Modal from '@/components/modal-accesscontrol'
 import { useAuth } from '@/app/_api/useAuth'
 

@@ -15,8 +15,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
+@Slf4j
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
 
@@ -31,7 +33,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        Arrays.stream(cookies)
+/*        Arrays.stream(cookies)
               .filter(cookie -> cookie.getName().equals(OAuth2SuccessHandler.ACCESS_TOKEN_COOKIE_NAME))
               .findFirst()
               .ifPresent(cookie -> {
@@ -40,7 +42,21 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                       Authentication authentication = tokenProvider.getAuthentication(token);
                       SecurityContextHolder.getContext().setAuthentication(authentication);
                   }
-              });
+              });*/
+        Arrays.stream(cookies)
+            .filter(cookie -> cookie.getName().equals(OAuth2SuccessHandler.ACCESS_TOKEN_COOKIE_NAME))
+            .findFirst()
+            .ifPresent(cookie -> {
+                try {
+                    String token = cookie.getValue();
+                    if (tokenProvider.validToken(token)) {
+                        Authentication authentication = tokenProvider.getAuthentication(token);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                } catch (Exception e) {
+                    log.error("Error setting authentication from token", e);
+                }
+            });
 
         filterChain.doFilter(request, response);
     }

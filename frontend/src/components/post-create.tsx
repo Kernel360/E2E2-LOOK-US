@@ -1,248 +1,352 @@
-'use client'
-
-import { zodResolver } from '@hookform/resolvers/zod'
-import { CalendarIcon, CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
-import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { format } from 'date-fns'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { z } from 'zod'
-
-import { Button, buttonVariants } from './ui/button'
-import { Calendar } from './ui/calendar'
-
-import { cn } from '@/lib/utils'
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-
-import { Textarea } from './ui/textarea'
-import { useEffect, useState } from 'react'
-import { ImageEditor } from './image-editor/image-editor'
-import { Separator } from '@radix-ui/react-select'
-import { Plus, X } from 'lucide-react'
-import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
-import { createPost } from '@/app/_api/post'
+import React, { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+    Box,
+    Button,
+    Input,
+    Text,
+    VStack,
+    SimpleGrid,
+    Tag,
+    Textarea,
+    HStack,
+    IconButton,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+} from '@chakra-ui/react'
+import { AddIcon, CloseIcon } from '@chakra-ui/icons'
+import { Image as ChakraImage } from '@chakra-ui/react'
 
-// const ACCEPTED_IMAGE_MIME_TYPES = [
-//     'image/jpeg',
-//     'image/jpg',
-//     'image/png',
-//     'image/webp',
-// ]
-// const ACCEPTED_IMAGE_TYPES = ['jpeg', 'jpg', 'png', 'webp']
-// const MAX_FILE_SIZE = 1024 * 1024 * 5 // 5ML
-
-const contentFormSchema = z.object({
-    editedImageBlob: z.any(), // TODO: check input image (before editing) file format...!
-    content: z
-        .string()
-        .min(0, {
-            message: 'Content must be at least 2 characters.',
-        })
-        .max(80, {
-            message: 'Content must not be longer than 30 characters.',
-        }),
-    hashtags: z
-        .array(
-            z.object({
-                value: z.string(),
-            }),
-        )
-        .optional(),
-})
-
-export type PostFormValues = z.infer<typeof contentFormSchema>
-
-// This can come from your database or API.
-const defaultValues: Partial<PostFormValues> = {
-    editedImageBlob: undefined,
-    hashtags: [{ value: '' }],
+interface Category {
+    categoryId: number
+    categoryContent: string
 }
 
-export interface Image {
-    blob?: Blob
-}
-
-export function PostContentForm() {
+const UploadOOTD = () => {
     const router = useRouter()
+    const [step, setStep] = useState(1)
+    const [selectedImage, setSelectedImage] = useState<File | null>(null)
+    const [croppedImage, setCroppedImage] = useState<string | null>(null)
+    const [isCropperOpen, setIsCropperOpen] = useState(false)
+    const [cropArea, setCropArea] = useState({
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+    }) // 크롭 영역 설정
+    const canvasRef = useRef<HTMLCanvasElement | null>(null)
+    const [categories, setCategories] = useState<Category[]>([])
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+    const [content, setContent] = useState('')
+    const [hashtags, setHashtags] = useState<string[]>([])
+    const [newHashtag, setNewHashtag] = useState('')
 
-    const [image, setImage] = useState<Image | null>(null)
-    const [previewImageObjectUrl, setPreviewImageObjectUrl] =
-        useState<string>('')
-
-    const form = useForm<PostFormValues>({
-        resolver: zodResolver(contentFormSchema),
-        defaultValues,
-    })
-
-    const { fields, append, remove } = useFieldArray({
-        name: 'hashtags',
-        control: form.control,
-    })
-
-    function onSubmit(formData: PostFormValues) {
-        ;(async () => {
-            // 1. send createPost request to api-server
-            await createPost(formData)
-
-            // 2. move to '/posts'
-            router.push(`/posts`)
-        })(/** IIFE */)
-    }
-
-    function discardCurrentImage() {
-        // 1. discard preview image (object url)
-        URL.revokeObjectURL(previewImageObjectUrl)
-        setPreviewImageObjectUrl('')
-
-        // 2. discard image form data
-        setImage(null)
-    }
-
-    useEffect(() => {
-        // TODO: validation request - /api/v1/user/me --> redirect to /posts
+    // 카테고리 로딩
+    React.useEffect(() => {
+        const loadCategories = async () => {
+            // 여기에 카테고리 로딩 로직을 추가
+        }
+        loadCategories()
     }, [])
 
-    useEffect(() => {
-        if (image && image.blob) {
-            form.setValue('editedImageBlob', image.blob)
-            setPreviewImageObjectUrl(URL.createObjectURL(image.blob))
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (file) {
+            setSelectedImage(file)
+            setIsCropperOpen(true) // 이미지 업로드 시 크롭 모달
         }
-        // Revoke the object URL, to allow the garbage collector to destroy the uploaded before file
-        return () => {
-            URL.revokeObjectURL(previewImageObjectUrl)
+    }
+
+    const handleCrop = () => {
+        const canvas = canvasRef.current
+        if (canvas && selectedImage) {
+            const ctx = canvas.getContext('2d')
+            const img = new window.Image() // 또는 const img = new Image();
+            img.src = URL.createObjectURL(selectedImage)
+            img.onload = () => {
+                const { x, y, width, height } = cropArea
+                canvas.width = width
+                canvas.height = height
+                ctx?.drawImage(img, x, y, width, height, 0, 0, width, height)
+                setCroppedImage(canvas.toDataURL('image/jpeg'))
+                setIsCropperOpen(false) // 크롭 후 모달 닫기
+            }
         }
-    }, [image])
+    }
+
+    const handleNextStep = () => {
+        if (!croppedImage) {
+            alert('이미지를 먼저 업로드하고 자르세요.')
+            return
+        }
+        setStep(2)
+    }
+
+    const handleCategorySelect = (categoryContent: string) => {
+        setSelectedCategories(prevCategories =>
+            prevCategories.includes(categoryContent)
+                ? prevCategories.filter(c => c !== categoryContent)
+                : [...prevCategories, categoryContent],
+        )
+    }
+
+    const handleAddHashtag = () => {
+        if (newHashtag.trim()) {
+            setHashtags([...hashtags, newHashtag.trim()])
+            setNewHashtag('')
+        }
+    }
+
+    const handleRemoveHashtag = (index: number) => {
+        setHashtags(hashtags.filter((_, i) => i !== index))
+    }
+
+    const handleSubmit = async () => {
+        if (!croppedImage || !content || selectedCategories.length === 0) {
+            alert('모든 정보를 입력하세요.')
+            return
+        }
+
+        const userRequest = {
+            post_content: content,
+            hashtag_content: `#${hashtags.join('#')}`,
+            category_content: selectedCategories.join(','),
+        }
+
+        const formData = new FormData()
+
+        const response = await fetch(croppedImage!)
+        const blob = await response.blob()
+        formData.append('image', blob, 'image.jpg')
+
+        const jsonBlob = new Blob([JSON.stringify(userRequest)], {
+            type: 'application/json',
+        })
+        formData.append('userRequest', jsonBlob)
+
+        try {
+            // 여기에 서버 요청 로직 추가
+            alert('오오티디가 성공적으로 등록되었습니다!')
+            router.push('/mypage')
+        } catch (error) {
+            console.error('Error:', error)
+            alert('게시글 등록 중 오류가 발생했습니다.')
+        }
+    }
 
     return (
-        <div className=' max-w-2xl'>
-            {!image && (
-                <div className=' shadow-md shadow-gray-100'>
-                    <ImageEditor setImage={setImage} />
-                </div>
-            )}
-
-            {/* image submitted preview */}
-            {previewImageObjectUrl && (
-                <Avatar className=' flex justify-center relative shadow-sm'>
-                    <AvatarImage
-                        className=' w-full'
-                        src={previewImageObjectUrl}
-                    />
-                    {/* reset image */}
-                    <Button
-                        variant='outline'
-                        onClick={discardCurrentImage}
-                        className=' absolute right-8 top-6 p-2 '
+        <VStack spacing={4} align='stretch' p={4}>
+            {step === 1 && (
+                <VStack spacing={4} align='stretch' p={4}>
+                    <Text fontSize='lg' fontWeight='bold'>
+                        오오티디 등록하기
+                    </Text>
+                    <Box
+                        borderWidth='1px'
+                        borderRadius='lg'
+                        overflow='hidden'
+                        position='relative'
+                        width='100%'
+                        paddingBottom='80%'
+                        bg='gray.100'
+                        display='flex'
+                        justifyContent='center'
+                        alignItems='center'
                     >
-                        <X />
-                    </Button>
-                </Avatar>
-            )}
-
-            <Separator className='mt-8' />
-
-            <Form {...form}>
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className='space-y-8'
-                >
-                    <FormField
-                        control={form.control}
-                        name='content'
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Content</FormLabel>
-                                <FormControl>
-                                    <div className='grid w-full gap-2'>
-                                        <Textarea
-                                            disabled={!image || !image.blob}
-                                            placeholder='Tell us a little bit about yourself'
-                                            className='resize-none'
-                                            {...field}
-                                        />
-                                    </div>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <div>
-                        {fields.map((field, index) => (
-                            <FormField
-                                control={form.control}
-                                key={field.id}
-                                name={`hashtags.${index}.value`}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel
-                                            className={cn(
-                                                index !== 0 && 'sr-only',
-                                            )}
-                                        >
-                                            Hashtags
-                                        </FormLabel>
-                                        <FormDescription
-                                            className={cn(
-                                                index !== 0 && 'sr-only',
-                                            )}
-                                        >
-                                            Add links to your website, blog, or
-                                            social media profiles.
-                                        </FormDescription>
-
-                                        <div className='flex items-center space-x-3'>
-                                            <FormControl>
-                                                <Input
-                                                    className=' max-w-56'
-                                                    {...field}
-                                                    disabled={!image}
-                                                />
-                                            </FormControl>
-
-                                            <Button
-                                                disabled={!image}
-                                                variant='outline'
-                                                onClick={() => remove(index)}
-                                            >
-                                                <X />
-                                            </Button>
-                                        </div>
-                                    </FormItem>
-                                )}
+                        {croppedImage ? (
+                            <ChakraImage
+                                src={croppedImage}
+                                alt='Selected Book'
+                                objectFit='cover'
+                                position='absolute'
+                                top='0'
+                                left='0'
+                                width='100%'
+                                height='100%'
                             />
-                        ))}
-                        <Button
-                            type='button'
-                            variant='outline'
-                            size='sm'
-                            className='mt-2'
-                            disabled={!image || !image.blob}
-                            onClick={() => append({ value: '' })}
-                        >
-                            <Plus size={20} className=' mr-1' /> Add Hashtag
-                        </Button>
-                    </div>
-                    <Separator className='my-6' />
+                        ) : (
+                            <Text>업로드할 사진을 선택하세요!</Text>
+                        )}
+                    </Box>
+                    <Input type='file' onChange={handleImageUpload} />
                     <Button
-                        size='lg'
-                        className=' w-full py-8 text-xl'
-                        type='submit'
-                        disabled={!image || !image.blob}
+                        colorScheme='teal'
+                        onClick={handleNextStep}
+                        borderRadius='full'
+                        boxShadow='md'
+                        marginTop='20px'
                     >
-                        Create Post
+                        다음
                     </Button>
-                </form>
-            </Form>
-        </div>
+                </VStack>
+            )}
+
+            {step === 2 && (
+                <VStack spacing={4} align='stretch' p={4}>
+                    <Text fontSize='lg' fontWeight='bold'>
+                        카테고리 선택
+                    </Text>
+                    <SimpleGrid columns={3} spacing={4}>
+                        {categories.map(category => (
+                            <Button
+                                key={category.categoryId}
+                                onClick={() =>
+                                    handleCategorySelect(
+                                        category.categoryContent,
+                                    )
+                                }
+                                bg={
+                                    selectedCategories.includes(
+                                        category.categoryContent,
+                                    )
+                                        ? 'teal.500'
+                                        : 'gray.200'
+                                }
+                                color={
+                                    selectedCategories.includes(
+                                        category.categoryContent,
+                                    )
+                                        ? 'white'
+                                        : 'black'
+                                }
+                                borderRadius='full'
+                                boxShadow='md'
+                            >
+                                {category.categoryContent}
+                            </Button>
+                        ))}
+                    </SimpleGrid>
+                    <Button
+                        colorScheme='teal'
+                        onClick={() => setStep(3)}
+                        borderRadius='full'
+                        boxShadow='md'
+                        marginTop='20px'
+                    >
+                        다음
+                    </Button>
+                </VStack>
+            )}
+
+            {step === 3 && (
+                <VStack spacing={4} align='stretch' p={4}>
+                    <Text fontSize='lg' fontWeight='bold'>
+                        게시글 정보 입력
+                    </Text>
+                    <Box
+                        borderWidth='1px'
+                        borderRadius='lg'
+                        overflow='hidden'
+                        position='relative'
+                        width='100%'
+                        paddingBottom='80%'
+                        bg='gray.100'
+                        display='flex'
+                        justifyContent='center'
+                        alignItems='center'
+                    >
+                        <ChakraImage
+                            src={croppedImage!}
+                            alt='Selected Book'
+                            objectFit='cover'
+                            position='absolute'
+                            top='0'
+                            left='0'
+                            width='100%'
+                            height='100%'
+                        />
+                    </Box>
+                    <Textarea
+                        placeholder='오오티디에 대한 설명을 입력하세요!'
+                        value={content}
+                        onChange={e => setContent(e.target.value)}
+                        bg='gray.100'
+                        borderRadius='lg'
+                        marginTop='10px'
+                    />
+                    <Text fontSize='lg' fontWeight='bold'>
+                        해시태그 추가
+                    </Text>
+                    <HStack>
+                        <Input
+                            placeholder='#해시태그'
+                            value={newHashtag}
+                            onChange={e => setNewHashtag(e.target.value)}
+                            bg='gray.100'
+                            borderRadius='lg'
+                        />
+                        <IconButton
+                            icon={<AddIcon />}
+                            onClick={handleAddHashtag}
+                            colorScheme='teal'
+                            aria-label='hashtag add'
+                            borderRadius='full'
+                            boxShadow='md'
+                        />
+                    </HStack>
+                    <HStack spacing={2} wrap='wrap'>
+                        {hashtags.map((tag, index) => (
+                            <Tag
+                                key={index}
+                                size='lg'
+                                colorScheme='teal'
+                                borderRadius='full'
+                                boxShadow='md'
+                            >
+                                {tag}
+                                <IconButton
+                                    icon={<CloseIcon />}
+                                    size='xs'
+                                    ml={2}
+                                    onClick={() => handleRemoveHashtag(index)}
+                                    variant='ghost'
+                                    colorScheme='teal'
+                                    aria-label='removehashtag'
+                                    borderRadius='full'
+                                />
+                            </Tag>
+                        ))}
+                    </HStack>
+                    <Button
+                        colorScheme='teal'
+                        onClick={handleSubmit}
+                        borderRadius='full'
+                        boxShadow='md'
+                        marginTop='20px'
+                    >
+                        완료
+                    </Button>
+                </VStack>
+            )}
+
+            <Modal
+                isOpen={isCropperOpen}
+                onClose={() => setIsCropperOpen(false)}
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>이미지 자르기</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <canvas
+                            ref={canvasRef}
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button colorScheme='teal' onClick={handleCrop}>
+                            자르기
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        </VStack>
     )
 }
+
+export default UploadOOTD

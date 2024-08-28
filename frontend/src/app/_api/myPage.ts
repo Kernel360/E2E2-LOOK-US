@@ -11,12 +11,12 @@ export interface myInfoAllResponse {
     birth: string
     nickname: string
     instaId: string
-    imageId: number
+    imageLocationId: number
     postNum: number
 }
 
 export interface myPostAllResponse {
-    imageId: number
+    imageLocationId: number
     postContent: string
     hashtags: string[]
     likeCount: number
@@ -25,6 +25,7 @@ export interface myPostAllResponse {
 
 export async function myInfoAllFunction() {
     const requestUrl = `${API_PRIVATE_URL}/user/me`
+    console.log('1')
 
     const res = await fetch(requestUrl, {
         method: 'GET',

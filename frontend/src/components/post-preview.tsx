@@ -18,7 +18,7 @@ export default function StylePreview({
             <div className='overflow-hidden group'>
                 <Image
                     className='group-hover:opacity-75'
-                    src={`${API_PUBLIC_URL}/image/${content.imageId}`}
+                    src={`${API_PUBLIC_URL}/image/${content.imageLocationId}`}
                     alt='style'
                     unoptimized={true} // NOTE: used for local host... remove later
                     priority={true}

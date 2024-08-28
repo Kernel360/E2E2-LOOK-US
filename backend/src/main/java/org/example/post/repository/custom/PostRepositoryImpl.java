@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
@@ -119,6 +120,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	}
 
 	@Override
+	@Transactional
 	public int updateView(Long postId) {
 		return Math.toIntExact(queryFactory
 			.update(postEntity)

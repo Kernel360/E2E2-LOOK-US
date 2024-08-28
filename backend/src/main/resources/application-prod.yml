@@ -5,7 +5,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect # MySQL 버전에 맞게 설정하세요
         format_sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
 
   datasource:
     url: ${MY_GOOGLE_GCP_URL}
@@ -53,3 +53,7 @@ logging:
     name: logs/sbb.log
   pattern:
     dateformat: "yyyy-MM-dd HH:mm:ss.SSS,Asia/Seoul"
+    level:
+      root: debug
+      org.example: debug
+

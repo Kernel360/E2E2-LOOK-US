@@ -52,7 +52,7 @@ export default function MyPage() {
                             myPosts.map(post => (
                                 <PostCard
                                     key={post.postId}
-                                    imageLocationId={post.imageLocationId}
+                                    imageId={post.imageLocationId}
                                     postContent={post.postContent}
                                     likeCount={post.likeCount}
                                     postId={post.postId}

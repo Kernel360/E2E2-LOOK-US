@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.CategoryEntity;
+import org.example.post.repository.custom.CategoryAndColorSearchCondition;
 import org.example.post.repository.custom.PostSearchCondition;
 import org.example.post.service.PostService;
 import org.springframework.data.domain.Page;
@@ -13,7 +14,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +45,7 @@ public class PostPublicController {
 		@RequestParam(required = false) String category
 	) throws JsonProcessingException {
 
-		// PostSearchCondition 객체를 생성하고 삼항 연산자를 이용해 간결하게 설정
+		// PostSearchCondition 객체를 생성하고 간결하게 설정
 		PostSearchCondition postSearchCondition = new PostSearchCondition();
 		postSearchCondition.setPostContent(postContent);
 		postSearchCondition.setHashtags(hashtags);
@@ -60,13 +60,34 @@ public class PostPublicController {
 			);
 	}
 
-	// Permit All
+
+	@Operation(summary = "카테고리 + 색상조회 API", description = "카테고리와 색상을 기반으로 게시글을 검색하는 API입니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "ok!!"),
+		@ApiResponse(responseCode = "404", description = "Resource not found!!")
+	})
+	@PostMapping("/search_by_category")
+	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchByCategoryOrRgbPost(
+		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+		@RequestBody CategoryAndColorSearchCondition categoryAndColorSearchCondition
+	) throws JsonProcessingException {
+
+		Page<PostDto.PostDtoResponse> results;
+
+		results = postService.findAllPostsByCategoryAndRGB(
+			categoryAndColorSearchCondition.getCategory(),
+			categoryAndColorSearchCondition.getRgbColor(),
+			pageable
+		);
+
+		return ResponseEntity.status(HttpStatus.OK).body(results);
+	}
+
 	@Operation(summary = "게시글 상세 조회 API", description = "게시글 ID를 통해 게시글 조회에 필요한 데이터 반환")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-
 	@GetMapping("/{post_id}")
 	public ResponseEntity<PostDto.PostDetailDtoResponse> getPostById(
 		@PathVariable Long post_id, HttpServletRequest request, HttpServletResponse response
@@ -96,7 +117,7 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-	@GetMapping("/category")
+	@GetMapping("/category/{categoryId}")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> getPostsByCategory(
 		@PathVariable Long categoryId,
 		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable

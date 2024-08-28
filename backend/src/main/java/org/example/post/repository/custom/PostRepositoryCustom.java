@@ -16,4 +16,7 @@ public interface PostRepositoryCustom {
 
 	List<PostStatsDto> findPostStatsByType();
 
+	Page<PostDto.PostDtoResponse> searchByCategoryAndColor(CategoryAndColorSearchCondition searchCondition, Pageable pageable);
+
+
 }

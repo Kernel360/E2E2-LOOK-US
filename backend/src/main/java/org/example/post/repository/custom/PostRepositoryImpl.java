@@ -216,4 +216,33 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			.collect(Collectors.toList());
 	}
 
+	@Override
+	public Page<PostDto.PostDtoResponse> searchByCategoryAndColor(
+		CategoryAndColorSearchCondition searchCondition, Pageable pageable) {
+
+		BooleanBuilder builder = new BooleanBuilder();
+
+		// 카테고리 조건 설정
+		if (searchCondition.getCategory() != null) {
+			builder.and(postEntity.categories.any().categoryContent.eq(searchCondition.getCategory()));
+		}
+
+		// 색상 조건 설정 (실제 데이터베이스 필드가 있는 경우에만)
+		if (searchCondition.getRgbColor() != null && searchCondition.getRgbColor().length > 0) {
+			// RGB 색상을 조건으로 필터링할 경우에 사용할 로직 추가
+			// 현재는 색상 조건을 설정하는 부분을 생략하거나 다른 방식으로 구현해야 합니다.
+			// 예시: builder.and(색상 필터링 조건 추가);
+		}
+
+		// 쿼리 실행 및 결과 반환
+		List<PostDto.PostDtoResponse> results = queryFactory
+			.select(Projections.constructor(PostDto.PostDtoResponse.class,
+				postEntity.postId, postEntity.postContent, postEntity.createdAt))
+			.from(postEntity)
+			.where(builder)
+			.fetch();
+
+		// 페이지네이션 적용
+		return new PageImpl<>(results, pageable, results.size());
+	}
 }

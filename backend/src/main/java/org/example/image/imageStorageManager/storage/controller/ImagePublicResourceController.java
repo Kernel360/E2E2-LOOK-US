@@ -2,6 +2,7 @@ package org.example.image.imageStorageManager.storage.controller;
 
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.type.StorageLoadResult;
+import org.example.log.LogExecution;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author minkyeu kim
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </li>
  */
 @RestController
+@Slf4j
 @RequestMapping("/api/a1")
 public class ImagePublicResourceController {
 
@@ -40,9 +44,14 @@ public class ImagePublicResourceController {
 
 	@GetMapping("/image/{imageLocationId}")
 	@ResponseBody
+	@LogExecution
 	public ResponseEntity<Resource> serveFile(
 		@PathVariable Long imageLocationId
 	) {
+		if(imageLocationId == null || imageLocationId < 0){
+			assert imageLocationId != null;
+			log.warn("check imageLocationId:{}", imageLocationId.getClass());
+		}
 		StorageLoadResult result = this.imageStorageManager.loadImageByLocationId(imageLocationId);
 
 		return ResponseEntity.ok().header(

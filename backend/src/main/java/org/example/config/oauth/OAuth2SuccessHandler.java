@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 
 import org.example.config.jwt.TokenProvider;
+import org.example.log.LogExecution;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.entity.token.RefreshToken;
 import org.example.user.repository.token.RefreshTokenRepository;
@@ -36,6 +37,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 	private final UserService userService;
 
 	@Override
+	@LogExecution
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 		Authentication authentication
 	) throws IOException {
@@ -54,6 +56,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		getRedirectStrategy().sendRedirect(request, response, OAUTH2_SUCCESS_REDIRECT_PATH);
 	}
 
+	@LogExecution
 	private void saveRefreshToken(Long userId, String newRefreshToken) {
 		RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId)
 			.map(entity -> entity.update(newRefreshToken))
@@ -62,6 +65,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		refreshTokenRepository.save(refreshToken);
 	}
 
+	@LogExecution
 	private void addRefreshTokenToCookie(HttpServletRequest request, HttpServletResponse response,
 		String refreshToken) {
 		int cookieMaxAge = (int)REFRESH_TOKEN_DURATION.toSeconds();
@@ -70,6 +74,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		CookieUtil.addCookie(response, REFRESH_TOKEN_COOKIE_NAME, refreshToken, cookieMaxAge);
 	}
 
+	@LogExecution
 	private void addAccessTokenToCookie(HttpServletRequest request, HttpServletResponse response,
 		String accessToken) {
 		int cookieMaxAge = (int)ACCESS_TOKEN_DURATION.toSeconds();
@@ -78,6 +83,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		CookieUtil.addCookie(response, ACCESS_TOKEN_COOKIE_NAME, accessToken, cookieMaxAge);
 	}
 
+	@LogExecution
 	private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
 		super.clearAuthenticationAttributes(request);
 		authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);

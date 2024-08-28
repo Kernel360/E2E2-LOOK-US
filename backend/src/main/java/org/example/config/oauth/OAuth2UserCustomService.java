@@ -1,5 +1,6 @@
 package org.example.config.oauth;
 
+import org.example.log.LogExecution;
 import org.example.user.common.RandomName;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.enums.Role;
@@ -12,9 +13,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
@@ -31,8 +34,9 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
     }
 
     // ❷ 유저가 있으면 업데이트, 없으면 유저 생성
+    @LogExecution
     private UserEntity saveOrUpdate(OAuth2User oAuth2User) {
-        System.out.println("getAttributes:" + oAuth2User.getAttributes());
+	log.info("getAttributes:{}", oAuth2User.getAttributes());
         OAuth2UserInfo oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
 
         String provider = oAuth2UserInfo.getProvider(); //google

@@ -53,3 +53,7 @@ logging:
     name: logs/sbb.log
   pattern:
     dateformat: "yyyy-MM-dd HH:mm:ss.SSS,Asia/Seoul"
+    level:
+      root: debug
+      org.example: debug
+

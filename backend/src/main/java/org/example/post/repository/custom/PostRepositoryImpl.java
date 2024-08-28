@@ -33,7 +33,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PostRepositoryImpl implements PostRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
@@ -116,6 +118,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		if (sort.isSorted()) {
 			sortedPosts = sortPosts(sort, content, pageable);
 		}
+		log.info("page " + pageable.getPageNumber());
 		return new PageImpl<>(sortedPosts, pageable, total);
 	}
 

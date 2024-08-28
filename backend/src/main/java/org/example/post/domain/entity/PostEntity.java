@@ -75,7 +75,7 @@ public class PostEntity extends TimeTrackableEntity {
 	@Column(name = "today_hits", nullable = false)
 	private int todayHits;   // 오늘의 조회수
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<HashtagEntity> hashtags = new ArrayList<>();
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

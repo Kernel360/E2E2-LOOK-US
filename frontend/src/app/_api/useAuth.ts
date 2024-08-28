@@ -15,7 +15,7 @@ export function useAuth() {
                 setUserInfo(data)
 
                 // 유저 정보가 없거나, gender가 null이면 모달을 띄우거나 회원가입 페이지로 리다이렉트
-                if (!data || data.gender === null) {
+                if (!data) {
                     setShowModal(true)
                 }
             } catch (error) {

@@ -1,71 +1,72 @@
 'use client'
 
-import { getPost, likePost } from '@/app/_api/post';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import styles from './Post.module.scss';
-import { API_PUBLIC_URL } from '@/app/_common/constants';
-import { useRouter } from 'next/navigation';
-import { follow, FollowRequest } from '@/app/_api/follow';
-import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import { getPost, likePost } from '@/app/_api/post'
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import styles from './Post.module.scss'
+import { API_PUBLIC_URL } from '@/app/_common/constants'
+import { useRouter } from 'next/navigation'
+import { follow, FollowRequest } from '@/app/_api/follow'
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'
 
 type Props = {
-    params: { post_id: number };
-    searchParams: { [key: string]: string | string[] | undefined };
-};
+    params: { post_id: number }
+    searchParams: { [key: string]: string | string[] | undefined }
+}
 
 export default function Page({ params, searchParams }: Props) {
-    const [post, setPost] = useState<any>(null);
-    const [isFollowing, setIsFollowing] = useState<boolean>(false);
-    const [likeCount, setLikeCount] = useState<number>(0);
-    const [liked, setLiked] = useState<boolean>(false);
-    const router = useRouter();
+    const [post, setPost] = useState<any>(null)
+    const [isFollowing, setIsFollowing] = useState<boolean>(false)
+    const [likeCount, setLikeCount] = useState<number>(0)
+    const [liked, setLiked] = useState<boolean>(false)
+    const router = useRouter()
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const post = await getPost(params.post_id);
-                console.log('API Response:', post); // API 응답 확인
-                setPost(post);
-                setLikeCount(post.likeCount);
-                setLiked(post.likeStatus); // API에서 받은 likeStatus를 설정
+                const post = await getPost(params.post_id)
+                console.log('API Response:', post) // API 응답 확인
+                setPost(post)
+                setLikeCount(post.likeCount)
+                setLiked(post.likeStatus) // API에서 받은 likeStatus를 설정
             } catch (error) {
-                console.error('Failed to fetch post data:', error);
+                console.error('Failed to fetch post data:', error)
             }
-        };
-        fetchPost();
-    }, [params.post_id]);
+        }
+        fetchPost()
+    }, [params.post_id])
 
     const handleLikeClick = async () => {
         try {
-            const isLiked = await likePost(params.post_id);
-            setLiked(isLiked);
-            setLikeCount(prevCount => (isLiked ? prevCount + 1 : prevCount - 1));
+            const isLiked = await likePost(params.post_id)
+            setLiked(isLiked)
+            setLikeCount(prevCount => (isLiked ? prevCount + 1 : prevCount - 1))
         } catch (error) {
-            console.error('Failed to update like status:', error);
+            console.error('Failed to update like status:', error)
         }
-    };
+    }
 
     const handleFollowClick = async () => {
         try {
             const request: FollowRequest = {
                 nickname: post.nickname,
                 followStatus: isFollowing ? 0 : 1,
-            };
-            await follow(request);
-            setIsFollowing(prev => !prev);
+            }
+            await follow(request)
+            setIsFollowing(prev => !prev)
         } catch (error) {
-            console.error('Failed to update follow status:', error);
+            console.error('Failed to update follow status:', error)
         }
-    };
+    }
 
-    if (!post) return <div>Loading...</div>;
+    if (!post) return <div>Loading...</div>
 
+    console.log(`${post.imageLocationId}`)
     return (
         <div className={styles.postContainer}>
             <div className={styles.imageContainer}>
                 <Image
-                    src={`${API_PUBLIC_URL}/image/${post.imageId}`}
+                    src={`${API_PUBLIC_URL}/image/${post.imageLocationId}`}
                     alt='style'
                     unoptimized={true}
                     priority={true}
@@ -84,9 +85,12 @@ export default function Page({ params, searchParams }: Props) {
                     </div>
                     <span className={styles.username}>{post.nickname}</span>
                 </div>
-                
+
                 <div className={styles.actions}>
-                    <button className={styles.likeButton} onClick={handleLikeClick}>
+                    <button
+                        className={styles.likeButton}
+                        onClick={handleLikeClick}
+                    >
                         {liked ? (
                             <AiFillHeart className={styles.heartIcon} />
                         ) : (
@@ -112,12 +116,16 @@ export default function Page({ params, searchParams }: Props) {
                     <span
                         key={hashtag}
                         className={styles.hashtag}
-                        onClick={() => router.push(`/search?hashtags=${encodeURIComponent(hashtag)}`)}
+                        onClick={() =>
+                            router.push(
+                                `/search?hashtags=${encodeURIComponent(hashtag)}`,
+                            )
+                        }
                     >
                         #{hashtag}
                     </span>
                 ))}
             </div>
         </div>
-    );
+    )
 }

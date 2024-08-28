@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 import { AddIcon, CloseIcon } from '@chakra-ui/icons'
 import { API_PRIVATE_URL, API_PUBLIC_URL } from '@/app/_common/constants'
+import { createPost } from '@/app/_api/post'
 
 interface Category {
     categoryId: number
@@ -128,6 +129,7 @@ const UploadOOTD = () => {
 
         try {
             // 여기에 서버 요청 로직 추가
+            await createPost(formData)
             alert('오오티디가 성공적으로 등록되었습니다!')
             router.push('/mypage')
         } catch (error) {

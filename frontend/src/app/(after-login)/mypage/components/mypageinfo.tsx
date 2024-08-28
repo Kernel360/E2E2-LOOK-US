@@ -58,17 +58,17 @@ export default function MyPageInfoComponent() {
         <div className='mypage-info'>
             <div className='mypage-info-header'>
                 {userInfo ? (
-                        <img
-                            src={`${API_PUBLIC_URL}/image/${userInfo.imageLocationId}`}
-                            alt='Avatar'
-                            className='rounded-full profile-image'
-                        />
-                    ) : (
-                        <img
-                            src={`https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg`}
-                            alt='Avatar'
-                            className='rounded-full profile-image'
-                        />
+                    <img
+                        src={`${API_PUBLIC_URL}/image/${userInfo.imageLocationId}`}
+                        alt='Avatar'
+                        className='rounded-full profile-image'
+                    />
+                ) : (
+                    <img
+                        src={`https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg`}
+                        alt='Avatar'
+                        className='rounded-full profile-image'
+                    />
                 )}
                 <div className='user-details'>
                     <h2 className='mypage-username'>{userInfo.nickname}</h2>

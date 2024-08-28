@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.example.exception.common.ApiErrorCategory;
@@ -12,7 +11,6 @@ import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
 import org.example.image.ImageAnalyzeManager.analyzer.entity.ClothAnalyzeDataEntity;
 import org.example.image.ImageAnalyzeManager.analyzer.repository.ClothAnalyzeDataRepository;
 import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
@@ -81,7 +79,7 @@ public class PostService {
 		);
 
 		// 2. run image analyze pipeline
-		asyncImageAnalyzer.run(storageSaveResult.imageLocationId());
+		asyncImageAnalyzer.requestImageAnalyzeAsync(storageSaveResult.imageLocationId());
 
 		// 3. save post
 		PostEntity post = new PostEntity(
@@ -231,7 +229,7 @@ public class PostService {
 		if (existLikePost(user, post)) {
 			// 좋아요를 누른 상태이면, 좋아요 취소를 위해 DB 삭제
 			LikeEntity currentLikePost = likeRepository.findByUserAndPost(user, post);
-			asyncImageAnalyzer.updateScore(
+			asyncImageAnalyzer.requestScoreUpdateAsync(
 				imageLocationId,
 				UpdateScoreType.LIKE_CANCEL
 			);
@@ -240,7 +238,7 @@ public class PostService {
 			return false;
 		} else {
 			// 좋아요를 누르지 않을 경우 DB에 저장
-			asyncImageAnalyzer.updateScore(
+			asyncImageAnalyzer.requestScoreUpdateAsync(
 				imageLocationId,
 				UpdateScoreType.LIKE
 			);
@@ -284,7 +282,7 @@ public class PostService {
 	@Transactional
 	@LogExecution
 	public int updateView(Long postId) throws JsonProcessingException {
-		asyncImageAnalyzer.updateScore(
+		asyncImageAnalyzer.requestScoreUpdateAsync(
 			findPostById(postId).getImageLocationId(),
 			UpdateScoreType.VIEW
 		);

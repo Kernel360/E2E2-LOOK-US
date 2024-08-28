@@ -57,7 +57,7 @@ public class ScrapService {
 				.subCategory(ApiUserErrorSubCategory.USER_SCRAP_DUPLICATION)
 				.build();
 		}
-		asyncImageAnalyzer.updateScore(
+		asyncImageAnalyzer.requestScoreUpdateAsync(
 			findPost(postId).getImageLocationId(),
 			UpdateScoreType.SCRAP
 		);
@@ -71,7 +71,7 @@ public class ScrapService {
 
 	@LogExecution
 	public void unscrapPostByPostId(Long postId, String userEmail) throws JsonProcessingException {
-		asyncImageAnalyzer.updateScore(
+		asyncImageAnalyzer.requestScoreUpdateAsync(
 			findPost(postId).getImageLocationId(),
 			UpdateScoreType.SCRAP_CANCEL
 		);

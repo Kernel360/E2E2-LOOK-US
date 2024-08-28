@@ -2,6 +2,7 @@ package org.example.image;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -11,7 +12,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
+import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.redis.service.ImageRedisService;
+import org.example.log.LogExecution;
 import org.example.post.repository.custom.UpdateScoreType;
 import org.springframework.stereotype.Component;
 
@@ -67,11 +70,14 @@ public class AsyncImageAnalyzer {
 	 * @apiNote [이미지 분석]을 분석 쓰레드에게 비동기로 요청합니다.
 	 * @param imageLocationId 분석하길 원하는 이미지-위치 Id
 	 */
+  @LogExecution
 	public void requestImageAnalyzeAsync(Long imageLocationId) {
 		CompletableFuture.runAsync(
 			() -> onStartTask.accept(imageLocationId), singleThreadExecutor
 		).thenRunAsync(
 			() -> extractClothAndColorTask.accept(imageAnalyzeManager, imageLocationId), singleThreadExecutor
+		/*).thenRunAsync( // 미구현 기능 입니다.
+			() -> mapAnalyzedClothCategoryWithPostTask.accept(imageAnalyzeManager, imageLocationId), singleThreadExecutor*/
 		).thenRunAsync(
 			() -> colorScoringTask.accept(imageRedisService, imageLocationId), singleThreadExecutor
 		).whenCompleteAsync(
@@ -89,8 +95,9 @@ public class AsyncImageAnalyzer {
 		if ( isScoreInitialized(imageLocationId) ) {
 			try {
 				this.imageRedisService.updateZSetColorScore(imageLocationId, updateScoreType);
-				log.info("\n\n[AsyncImageAnalyzer] : Update-{} type-{}\n", imageLocationId, updateScoreType);
+				log.info("[AsyncImageAnalyzer] : update redis-score done - image {} / type-{}\n", imageLocationId, updateScoreType);
 			} catch (JsonProcessingException e) {
+				log.error("[AsyncImageAnalyzer] : update redis-score failure - image {} / type-{}\n", imageLocationId, updateScoreType);
 				throw new RuntimeException(e); // TODO: use custom exception
 			}
 			return;
@@ -107,38 +114,44 @@ public class AsyncImageAnalyzer {
 
 	// --------------------------------------------------------------------------
 	// Internal Methods
-
+  @LogExecution
 	private boolean isScoreInitialized(Long imageLocationId) {
 		return !this.onGoingTasks.contains(imageLocationId);
+
 	}
 
 	private final Consumer<Integer> pendingTask = (ms) -> {
 		try {
+			log.info("[AsyncImageAnalyzer] : pending task... - sleep {}ms", ms);
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
+			log.error("[AsyncImageAnalyzer] : pending task failure");
 			throw new RuntimeException(e);
 		}
 	};
 
 	private final Consumer<Long> onStartTask = (imageLocationId) -> {
 		this.onGoingTasks.add(imageLocationId);
-		log.info("\n\n[AsyncImageAnalyzer] : Image Analyze Task Starting... - Image {}\n", imageLocationId);
+		log.info("[AsyncImageAnalyzer] : (0) image analyze pipeline start - Image {}", imageLocationId);
 	};
 
 	private final BiConsumer<? super Throwable, Long> onCompleteTask = (exception, imageLocationId) -> {
 		this.onGoingTasks.remove(imageLocationId);
-		log.info("\n\n[AsyncImageAnalyzer] : Update Score Async Finished - Image {}\n", imageLocationId);
+
 		if (exception != null) {
+			log.info("[AsyncImageAnalyzer] : (3) image analyze pipeline done - image {}", imageLocationId);
 			throw new RuntimeException(exception); // TODO: throw custom task exception
 		}
+		log.error("[AsyncImageAnalyzer] : (3) image analyze pipeline failure - image {}", imageLocationId);
 	};
 
 	private final BiConsumer<ImageAnalyzeManager, Long> extractClothAndColorTask = (analyzeManager, imageLocationId) -> {
 		try {
 			onGoingTasks.add(imageLocationId);
 			analyzeManager.analyze(imageLocationId);
-			log.info("\n\n[AsyncImageAnalyzer] : ------- (1) analyze image done - id image {}\n", imageLocationId);
+			log.info("[AsyncImageAnalyzer] : (1) analyze done - image {}", imageLocationId);
 		} catch (IOException e) {
+			log.error("[AsyncImageAnalyzer] : (1) analyze failure - image {}", imageLocationId);
 			throw new RuntimeException(e);
 		}
 	};
@@ -146,9 +159,25 @@ public class AsyncImageAnalyzer {
 	private final BiConsumer<ImageRedisService, Long> colorScoringTask = (redisService, imageLocationId) -> {
 		try {
 			var colorList = redisService.saveNewColor(imageLocationId);
-			log.info("\n\n[AsyncImageAnalyzer] : ------- (2) save new color list done - image {}, colorList {}\n", imageLocationId, colorList);
+			log.info("[AsyncImageAnalyzer] : (2) save new color list done - image {}, colorList {}", imageLocationId, colorList);
 		} catch (JsonProcessingException e) {
+			log.error("[AsyncImageAnalyzer] : (2) save new color list failure - image {}", imageLocationId);
 			throw new RuntimeException(e);
 		}
+	};
+
+	/**
+	 * @deprecated 아직 구현되지 않은 기능입니다.
+	 * 기존엔 옷 카테고리를 사용자가 직접 입력했습니다.
+	 * 이를 사용자가 하지 않고, 이미지 분석 결과로 부터 자동으로 설정되도록 하고자 한 시도입니다.
+	 * 추후에 구현이 될지 모르지만, 일단 코드를 남깁니다.
+	 */
+	private final BiConsumer<ImageAnalyzeManager, Long> mapAnalyzedClothCategoryWithPostTask = (analyzeManager, imageLocationId) -> {
+		// 1. get cloth analyzed data
+		List<ClothAnalyzeData> clothAnalyzeDataList
+			= analyzeManager.getAnalyzedData(imageLocationId).clothAnalyzeDataList();
+
+		// 2. set cloth category
+		// TODO: 분석 결과를 가지고 Post Entity의 카테고리와 매핑합니다.
 	};
 }

@@ -4,6 +4,7 @@ import static org.example.post.domain.entity.QLikeEntity.*;
 
 import java.time.LocalDateTime;
 
+import org.example.log.LogExecution;
 import org.example.post.domain.entity.PostEntity;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
 	}
 
 	@Override
+	@LogExecution
 	public Integer likeCount(PostEntity post) {
 		long count = queryFactory
 			.selectFrom(likeEntity)
@@ -31,6 +33,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
 
 	@Transactional
 	@Override
+	@LogExecution
 	public void deleteAllByPost(PostEntity post) {
 
 

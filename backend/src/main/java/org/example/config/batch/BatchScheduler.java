@@ -2,6 +2,7 @@ package org.example.config.batch;
 
 import java.time.LocalDateTime;
 
+import org.example.log.LogExecution;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -22,7 +23,8 @@ public class BatchScheduler {
 		this.postStatsJob = postStatsJob;
 	}
 
-		@Scheduled(cron = "0 0 0 * * *") // 매일 24시에 실행
+	@Scheduled(cron = "0 0 0 * * *") // 매일 24시에 실행
+	@LogExecution
 	public void runUpdatePostStatsJob() throws Exception {
 		log.info("batch 시작");
 		jobLauncher.run(postStatsJob, new JobParametersBuilder()

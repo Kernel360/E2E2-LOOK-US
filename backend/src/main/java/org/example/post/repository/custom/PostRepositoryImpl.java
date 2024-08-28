@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.example.log.LogExecution;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.dto.PostStatsDto;
 import org.springframework.data.domain.Page;
@@ -45,6 +46,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	}
 
 	@Override
+	@LogExecution
 	public Page<PostDto.PostDtoResponse> search(PostSearchCondition searchCondition, Pageable pageable) {
 
 		BooleanBuilder builder = new BooleanBuilder();
@@ -123,6 +125,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	}
 
 	@Override
+	@LogExecution
 	@Transactional
 	public int updateView(Long postId) {
 		return Math.toIntExact(queryFactory
@@ -135,6 +138,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
 
 	@Override
+	@LogExecution
 	public List<PostStatsDto> findPostStatsByType() {
 		return queryFactory
 			.select(Projections.constructor(PostStatsDto.class,
@@ -186,7 +190,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			.collect(Collectors.toList());
 	}
 
-
+	@LogExecution
 	public static List<PostDto.PostDtoResponse> sortPosts(Sort sort, List<PostDto.PostDtoResponse> content,
 		Pageable pageable) {
 		final Map<String, Function<PostDto.PostDtoResponse, Comparable>> COMPARATORS = new HashMap<>();
@@ -215,5 +219,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			.limit(pageable.getPageSize())
 			.collect(Collectors.toList());
 	}
+
 
 }

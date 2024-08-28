@@ -5,6 +5,7 @@ import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
 import org.example.follow.domain.dto.FollowDto;
 import org.example.follow.service.FollowService;
+import org.example.log.LogExecution;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,6 +26,7 @@ public class FollowApiController {
 	 * 팔로우, 언팔로우
 	 */
 	@PutMapping("")
+	@LogExecution
 	public ResponseEntity<?> handleFollow(
 		@RequestBody FollowDto.FollowRequest requestDto
 	) {

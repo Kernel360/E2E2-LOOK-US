@@ -43,6 +43,7 @@ jwt:
   secret_key: ${MY_JWT_SECRET_KEY}
 
 logging:
+  config: classpath:log4j2.xml
   logback:
     rolling policy:
       max-history: 30

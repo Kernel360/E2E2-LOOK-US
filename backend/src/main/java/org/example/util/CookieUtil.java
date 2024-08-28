@@ -2,6 +2,7 @@ package org.example.util;
 
 import java.util.Base64;
 
+import org.example.log.LogExecution;
 import org.springframework.util.SerializationUtils;
 
 import jakarta.servlet.http.Cookie;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class CookieUtil {
 
 	//요청값(이름,값,만료기간)을 바탕으로 쿠키추가
+	@LogExecution
 	public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
 		Cookie cookie = new Cookie(name, value);
 		cookie.setPath("/");
@@ -23,6 +25,7 @@ public class CookieUtil {
 	}
 
 	//쿠키의 이름을 입력받아 쿠키 삭제
+	@LogExecution
 	public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
 		Cookie[] cookies = request.getCookies();
 

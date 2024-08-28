@@ -47,8 +47,6 @@ public class WebOAuthSecurityConfig {
 			);
 	}
 
-
-
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		return http

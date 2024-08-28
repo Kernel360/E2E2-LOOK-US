@@ -1,5 +1,6 @@
 package org.example.user.service.member;
 
+import org.example.log.LogExecution;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,6 +17,7 @@ public class UserDetailService implements UserDetailsService {
 
 	// 사용자 이름 (email)으로 사용자의 정보를 가져오는 메서드
 	@Override
+	@LogExecution
 	public UserDetails loadUserByUsername(String email) {
 		return userRepository.findByEmail(email)
 			.orElseThrow(() -> new IllegalArgumentException(email));

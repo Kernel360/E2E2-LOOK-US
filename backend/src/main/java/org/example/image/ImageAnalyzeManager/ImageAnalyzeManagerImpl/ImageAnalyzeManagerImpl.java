@@ -13,6 +13,7 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.type.StorageLoadResult;
+import org.example.log.LogExecution;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 	private final ImageStorageManager imageStorageManager;
 
 	@Override
+	@LogExecution
 	public void analyze(Long imageLocationId) throws IOException {
 		StorageLoadResult result = imageStorageManager.loadImageByLocationId(imageLocationId);
 		byte[] imageBytes = Files.readAllBytes(result.resource().getFile().toPath());
@@ -53,6 +55,7 @@ public class ImageAnalyzeManagerImpl implements ImageAnalyzeManager {
 	}
 
 	@Override
+	@LogExecution
 	public ImageAnalyzeData getAnalyzedData(Long imageLocationId) {
 
 		// 1. gather pre-analyzed cloth data from db

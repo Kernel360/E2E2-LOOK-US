@@ -12,6 +12,7 @@ import org.example.exception.user.ApiUserException;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
+import org.example.log.LogExecution;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.enums.Role;
@@ -42,6 +43,7 @@ public class UserService {
 	private final ImageStorageManager imageStorageManager;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+	@LogExecution
 	public UserDto.UserUpdateResponse updateUser(
 		UserDto.UserUpdateRequest updateRequest,
 		String email,
@@ -72,6 +74,7 @@ public class UserService {
 		return UserDto.UserUpdateResponse.toDto(user);
 	}
 
+	@LogExecution
 	public void signupUser(UserDto.UserCreateRequest addUserRequest) {
 
 		userRepository.save(UserEntity.builder()
@@ -81,6 +84,7 @@ public class UserService {
 			.build());
 	}
 
+	@LogExecution
 	public UserDto.UserResponse loginUser(UserDto.UserLoginRequest loginRequest) {
 			UserEntity user = getUserByEmail(loginRequest.email());
 
@@ -102,7 +106,7 @@ public class UserService {
 			return null; // 로그인 실패 시 null 반환
 		}
 
-
+	@LogExecution
 	@Transactional(readOnly = true)
 	public UserDto.UserGetInfoResponse getMyInfo(String email) {
 		UserEntity user = this.getUserByEmail_internal(email);
@@ -111,6 +115,7 @@ public class UserService {
 		return UserDto.UserGetInfoResponse.toDto(user,  userRepository.postCount(user));
 	}
 
+	@LogExecution
 	@Transactional(readOnly = true)
 	public List<UserDto.UserGetPostsResponse> getMyPosts(String email) {
 		UserEntity user = this.getUserByEmail_internal(email);
@@ -119,6 +124,7 @@ public class UserService {
 		return userRepository.postList(user);
 	}
 
+	@LogExecution
 	public void resignUser(String email, HttpServletRequest request, HttpServletResponse response) {
 		// 이미 탈퇴한 사용자에 대한 탈퇴 요청은 비정상 Request 입니다.
 		UserEntity user = this.getUserByEmail_internal(email);
@@ -128,6 +134,7 @@ public class UserService {
 		this.logoutUser(email, request, response);
 	}
 
+	@LogExecution
 	public void logoutUser(String email, HttpServletRequest request, HttpServletResponse response) {
 		// 이미 탈퇴한 사용자에 대한 로그아웃 요청은 비정상 Request 입니다.
 		UserEntity user = this.getUserByEmail_internal(email);
@@ -142,6 +149,7 @@ public class UserService {
 	 * NOTE: 만약 비활성화된 사용자를 검색한 경우, ApiUserException을 발생시킵니다.
 	 */
 	@Transactional(readOnly = true)
+	@LogExecution
 	public UserEntity getUserById(Long userId) throws ApiUserException {
 		UserEntity user = getUserById_internal(userId);
 		AssertThat_UserAccountIsActive(user);
@@ -153,6 +161,7 @@ public class UserService {
 	 * NOTE: 만약 비활성화된 사용자를 검색한 경우, ApiUserException을 발생시킵니다.
 	 */
 	@Transactional(readOnly = true)
+	@LogExecution
 	public UserEntity getUserByEmail(String email) throws ApiUserException {
 		UserEntity user = getUserByEmail_internal(email);
 		AssertThat_UserAccountIsActive(user);

@@ -23,6 +23,10 @@ repositories {
     mavenCentral()
 }
 
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
@@ -30,7 +34,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0' //이쁘게
     implementation 'org.springframework.boot:spring-boot-starter-batch'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -58,6 +61,17 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // aspectjweaver
+    implementation 'org.aspectj:aspectjweaver:1.9.19'
+
+    // log4j2
+    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+    // log4j2 with SLF4J bridge
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.20.0'
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+
+
     //test 롬복 사용
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
@@ -73,10 +87,12 @@ dependencies {
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
-
-tasks.named('test') {
-    useJUnitPlatform()
+configurations {
+    all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    all*.exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
+    all*.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
 }
+
 
 
 clean {

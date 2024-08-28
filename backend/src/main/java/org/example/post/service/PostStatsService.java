@@ -2,6 +2,7 @@ package org.example.post.service;
 
 import java.util.List;
 
+import org.example.log.LogExecution;
 import org.example.post.domain.entity.PostDailyStats;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.entity.PostTotalStats;
@@ -19,10 +20,12 @@ public class PostStatsService {
 	private final PostDailyStatsRepository postDailyStatsRepository;
 	private final PostTotalStatsRepository postTotalStatsRepository;
 
+	@LogExecution
 	public List<PostDailyStats> getDailyStatsByPost(PostEntity post) {
 		return postDailyStatsRepository.findByPost(post);
 	}
 
+	@LogExecution
 	public List<PostTotalStats> getTotalStatsByPost(PostEntity post) {
 		return postTotalStatsRepository.findByPost(post);
 	}

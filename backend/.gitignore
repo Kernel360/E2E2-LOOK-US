@@ -65,3 +65,4 @@ out/
 ### Image Crawling ###
 ../ImageWebCrawling.R
 ../images/
+/logs/

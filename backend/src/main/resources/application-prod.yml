@@ -6,7 +6,6 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
-    show-sql: true
 
   datasource:
     url: ${MY_GOOGLE_GCP_URL}

@@ -94,14 +94,13 @@ public class PostService {
 			.stream()
 			.map(hashtag -> new HashtagEntity(post, hashtag))
 			.toList();
-		List<CategoryEntity> categoryEntities = postDto
-			.convertContents(postDto.categoryContents(), ",")
-			.stream()
-			.map(CategoryEntity::new)
-			.toList();
+		// 카테고리 처리: 사용자 입력한 카테고리 중 DB에 존재하는 것만 처리
+		List<String> categoryNames = postDto.convertContents(postDto.categoryContents(), ",");
+		List<CategoryEntity> categoryEntities = categoryNames.stream()
+			.map(categoryRepository::findByCategoryContent)
+			.collect(Collectors.toList());
 
 		hashtagRepository.saveAll(hashtagEntities);
-		categoryRepository.saveAll(categoryEntities);
 
 		post.addHashtags(hashtagEntities);
 		post.addCategories(categoryEntities);

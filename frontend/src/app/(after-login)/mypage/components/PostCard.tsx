@@ -28,6 +28,7 @@ export default function PostCard({
                         width={500} // 예시로 width 설정
                         height={500} // 예시로 height 설정
                         className='postcard-image'
+                        unoptimized={true}
                     />
                 </Link>
                 <div className='postcard-content'>

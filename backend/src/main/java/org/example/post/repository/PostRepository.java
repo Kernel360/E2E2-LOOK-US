@@ -2,10 +2,12 @@ package org.example.post.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
+import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
+import org.example.post.repository.custom.CategoryAndColorSearchCondition;
 import org.example.post.repository.custom.PostRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,4 +37,8 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, PostRep
 	// 특정 카테고리에 속한 모든 게시글을 조회하는 메서드
 	@Query("SELECT p FROM PostEntity p JOIN p.categories c WHERE c.categoryId = :categoryId")
 	List<PostEntity> findAllByCategoryId(@Param("categoryId") Long categoryId);
+
+	//주어진 카테고리와 이미지 id에 해당하는 게시글 조회하는 메소드
+	@Query("SELECT p FROM PostEntity p JOIN p.categories c WHERE c.categoryContent = :category AND p.imageLocationId IN :imageIds")
+	List<PostEntity> findAllByCategoryAndImageIds(@Param("category") String category, @Param("imageIds") Set<Long> imageIds);
 }

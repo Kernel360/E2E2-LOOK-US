@@ -94,14 +94,13 @@ public class PostService {
 			.stream()
 			.map(hashtag -> new HashtagEntity(post, hashtag))
 			.toList();
-		List<CategoryEntity> categoryEntities = postDto
-			.convertContents(postDto.categoryContents(), ",")
-			.stream()
-			.map(CategoryEntity::new)
-			.toList();
+		// 카테고리 처리: 사용자 입력한 카테고리 중 DB에 존재하는 것만 처리
+		List<String> categoryNames = postDto.convertContents(postDto.categoryContents(), ",");
+		List<CategoryEntity> categoryEntities = categoryNames.stream()
+			.map(categoryRepository::findByCategoryContent)
+			.collect(Collectors.toList());
 
 		hashtagRepository.saveAll(hashtagEntities);
-		categoryRepository.saveAll(categoryEntities);
 
 		post.addHashtags(hashtagEntities);
 		post.addCategories(categoryEntities);
@@ -348,32 +347,15 @@ public class PostService {
 					.build());
 	}
 
-	public Page<PostDto.PostDtoResponse> findAllPostsByRGB(int[] rgbColor, Pageable pageable) throws
-		JsonProcessingException {
-		Set<Long> imageIdSet =
-			clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(rgbColor[0], rgbColor[1], rgbColor[2]))
-				.stream()
-				.map(ClothAnalyzeDataEntity::getImageLocationId)
-				.collect(Collectors.toSet());
+	public Page<PostDto.PostDtoResponse> findAllPostsByRGB(int[] rgbColor, Pageable pageable) throws JsonProcessingException {
+		// 공통 메서드를 사용해 이미지 ID를 조회
+		Set<Long> imageIdSet = findImageIdsByRGBAndSimilarColors(rgbColor);
 
-		List<int[]> similarColorList = imageRedisService.getCloseColorList(rgbColor, 2);
-		for (int[] color : similarColorList) {
-			imageIdSet.addAll(clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(color[0], color[1], color[2]))
-				.stream()
-				.map(ClothAnalyzeDataEntity::getImageLocationId)
-				.collect(Collectors.toSet()));
-		}
+		// 이미지 ID로 게시글을 조회하고 DTO로 변환
+		List<PostDto.PostDtoResponse> postDtoResponses = findPostsByImageIds(imageIdSet);
 
-		List<PostDto.PostDtoResponse> postDtoResponses = new ArrayList<>();
-		for (Long imageId : imageIdSet) {
-			postRepository.findAllByImageLocationId(imageId)
-				.forEach(postEntity -> postDtoResponses.add(
-					new PostDto.PostDtoResponse(postEntity.getUser().getNickname(), postEntity.getPostId(),
-						postEntity.getImageLocationId(), postEntity.getHashtagContents(), postEntity.getCategoryContents(), postEntity.getLikeCount(),
-						postEntity.getHits(), postEntity.getCreatedAt())));
-		}
+		// 정렬 및 페이지네이션 적용
 		Sort sort = pageable.getSort();
-
 		List<PostDto.PostDtoResponse> sortedPosts = new ArrayList<>();
 		if (sort.isSorted()) {
 			sortedPosts = PostRepositoryImpl.sortPosts(sort, postDtoResponses, pageable);
@@ -408,5 +390,80 @@ public class PostService {
 	// 카테고리 전체를 가져오는 메서드
 	public List<CategoryEntity> getAllCategory() {
 		return categoryRepository.findAll();
+	}
+
+
+	@Transactional(readOnly = true)
+	public Page<PostDto.PostDtoResponse> findAllPostsByCategoryAndRGB(String category, int[] rgbColor, Pageable pageable)
+		throws JsonProcessingException {
+
+		// 1. 주어진 색상에 해당하는 이미지 ID들을 조회
+		Set<Long> imageIdSet = findImageIdsByRGBAndSimilarColors(rgbColor);
+
+		// 2. 해당 이미지 ID를 가진 게시글들을 모두 조회
+		List<PostEntity> posts = new ArrayList<>();
+		for (Long imageId : imageIdSet) {
+			List<PostEntity> postEntities = postRepository.findAllByImageLocationId(imageId);
+			posts.addAll(postEntities);
+		}
+
+		// 3. 카테고리 필터링 적용
+		List<PostEntity> filteredPosts = posts.stream()
+			.filter(post -> post.getCategories().stream()
+				.anyMatch(cat -> cat.getCategoryContent().equals(category)))
+			.collect(Collectors.toList());
+
+		// 4. 각 게시글을 DTO로 변환하여 반환할 리스트를 생성합니다.
+		List<PostDto.PostDtoResponse> postDtoResponses = filteredPosts.stream()
+			.map(postEntity -> new PostDto.PostDtoResponse(
+				postEntity.getUser().getNickname(),
+				postEntity.getPostId(),
+				postEntity.getImageLocationId(),
+				postEntity.getHashtagContents(),
+				postEntity.getCategoryContents(),
+				postEntity.getLikeCount(),
+				postEntity.getHits(),
+				postEntity.getCreatedAt()))
+			.collect(Collectors.toList());
+
+		// 5. 정렬 및 페이지네이션 적용
+		Sort sort = pageable.getSort();
+		List<PostDto.PostDtoResponse> sortedPosts = new ArrayList<>();
+		if (sort.isSorted()) {
+			sortedPosts = PostRepositoryImpl.sortPosts(sort, postDtoResponses, pageable);
+		}
+
+		return new PageImpl<>(sortedPosts, pageable, postDtoResponses.size());
+	}
+
+	private Set<Long> findImageIdsByRGBAndSimilarColors(int[] rgbColor) throws JsonProcessingException {
+		// 주어진 RGB 색상에 해당하는 이미지 ID를 조회
+		Set<Long> imageIdSet = clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(rgbColor[0], rgbColor[1], rgbColor[2]))
+			.stream()
+			.map(ClothAnalyzeDataEntity::getImageLocationId)
+			.collect(Collectors.toSet());
+
+		// 유사한 색상 목록을 조회하여 이미지 ID 추가
+		List<int[]> similarColorList = imageRedisService.getCloseColorList(rgbColor, 2);
+		for (int[] color : similarColorList) {
+			imageIdSet.addAll(clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(color[0], color[1], color[2]))
+				.stream()
+				.map(ClothAnalyzeDataEntity::getImageLocationId)
+				.collect(Collectors.toSet()));
+		}
+
+		return imageIdSet;
+	}
+
+	private List<PostDto.PostDtoResponse> findPostsByImageIds(Set<Long> imageIdSet) {
+		List<PostDto.PostDtoResponse> postDtoResponses = new ArrayList<>();
+		for (Long imageId : imageIdSet) {
+			postRepository.findAllByImageLocationId(imageId)
+				.forEach(postEntity -> postDtoResponses.add(
+					new PostDto.PostDtoResponse(postEntity.getUser().getNickname(), postEntity.getPostId(),
+						postEntity.getImageLocationId(), postEntity.getHashtagContents(), postEntity.getCategoryContents(),
+						postEntity.getLikeCount(), postEntity.getHits(), postEntity.getCreatedAt())));
+		}
+		return postDtoResponses;
 	}
 }

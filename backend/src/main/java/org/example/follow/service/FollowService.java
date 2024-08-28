@@ -6,6 +6,7 @@ import org.example.exception.user.ApiUserException;
 import org.example.follow.domain.dto.FollowDto;
 import org.example.follow.domain.entity.Follow;
 import org.example.follow.repository.FollowRepository;
+import org.example.log.LogExecution;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class FollowService {
 	private final FollowRepository followRepository;
 
 	// follow 거는 경우
+	@LogExecution
 	public void follow(String fromUser_Email, String toUser_Nickname) {
 		UserEntity fromUser = this.getUserByEmail(fromUser_Email);
 		UserEntity toUser = this.getUserByNickname(toUser_Nickname);
@@ -47,6 +49,7 @@ public class FollowService {
 		);
 	}
 
+	@LogExecution
 	public void unFollow(String fromUser_Email, String toUser_Nickname) {
 		UserEntity fromUser = this.getUserByEmail(fromUser_Email);
 		UserEntity toUser = this.getUserByNickname(toUser_Nickname);
@@ -61,6 +64,7 @@ public class FollowService {
 		followRepository.deleteByFromUserAndToUser(fromUser, toUser);
 	}
 
+	@LogExecution
 	public FollowDto.FollowListResponse followingList(String targetUserName) {
 		return new FollowDto.FollowListResponse(
 			followRepository.findByFromUser(
@@ -75,6 +79,7 @@ public class FollowService {
 		);
 	}
 
+	@LogExecution
 	public FollowDto.FollowListResponse followerList(String targetUserName) {
 
 		return new FollowDto.FollowListResponse(
@@ -90,6 +95,7 @@ public class FollowService {
 		);
 	}
 
+	@LogExecution
 	private UserEntity getUserByEmail(String email) throws ApiUserException {
 		return userRepository.findByEmail(email)
 							 .orElseThrow(
@@ -100,6 +106,7 @@ public class FollowService {
 							 );
 	}
 
+	@LogExecution
 	private UserEntity getUserByNickname(String nickname) throws ApiUserException {
 		return userRepository.findByNickname(nickname)
 							 .orElseThrow(
@@ -110,6 +117,7 @@ public class FollowService {
 							 );
 	}
 
+	@LogExecution
 	private int getFollowerCountOfUser(UserEntity user) {
 		return this.followRepository.findByToUser(user).size();
 	}

@@ -14,6 +14,7 @@ import org.example.image.imageStorageManager.storage.service.core.strategy.UuidV
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.type.StorageLoadResult;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
+import org.example.log.LogExecution;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,7 @@ public class ImageStorageManagerImpl implements ImageStorageManager {
 	private final StorageService storageService;
 
 	@Override
+	@LogExecution
 	public StorageSaveResult saveImage(
 		@NonNull MultipartFile file,
 		StorageType storageType
@@ -64,6 +66,7 @@ public class ImageStorageManagerImpl implements ImageStorageManager {
 	}
 
 	@Override
+	@LogExecution
 	public StorageLoadResult loadImageByLocationId(Long imageLocationId) {
 		return this.imageRepository.findById(imageLocationId)
 								   .map(

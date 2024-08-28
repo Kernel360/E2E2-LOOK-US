@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.example.log.LogExecution;
 import org.example.post.domain.entity.PostDailyStats;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.entity.PostTotalStats;
@@ -29,6 +30,7 @@ public class UpdatePostStatsTasklet implements Tasklet {
 
 	@Override
 	@Transactional
+	@LogExecution
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
 		// 모든 게시글을 가져옴
 		List<PostEntity> posts = postRepository.findAll();

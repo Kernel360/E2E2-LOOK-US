@@ -1,3 +1,6 @@
+logging:
+  config: classpath:log4j2.xml
+
 spring:
   batch:
     job:
@@ -53,4 +56,3 @@ spring:
 jwt:
   issuer: ${MY_JWT_ISSUER}
   secret_key: ${MY_JWT_SECRET_KEY}
-

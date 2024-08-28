@@ -3,6 +3,7 @@ package org.example.scrap.controller;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
+import org.example.log.LogExecution;
 import org.example.scrap.domain.dto.ScrapDto;
 import org.example.scrap.service.ScrapService;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ScrapController {
 	private final ScrapService scrapService;
 
+	@LogExecution
 	@PostMapping("/posts/{post_id}")
 	public ResponseEntity<?> setPostScrapStatus(
 		@PathVariable("post_id") Long postId,
@@ -48,6 +50,7 @@ public class ScrapController {
 		return ResponseEntity.ok().build();
 	}
 
+	@LogExecution
 	@GetMapping("/posts")
 	public ResponseEntity<ScrapDto.GetAllPostScrapsResponseDto> getMyScrapedPosts() {
 		String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();

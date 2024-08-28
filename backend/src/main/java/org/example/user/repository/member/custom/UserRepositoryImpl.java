@@ -4,6 +4,7 @@ import static org.example.post.domain.entity.QPostEntity.*;
 
 import java.util.List;
 
+import org.example.log.LogExecution;
 import org.example.post.domain.entity.PostEntity;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
@@ -20,6 +21,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 	}
 
 	@Override
+	@LogExecution
 	public Integer postCount(UserEntity userEntity) {
 		long count = jpaQueryFactory
 			.selectFrom(postEntity)
@@ -29,6 +31,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 	}
 
 	@Override
+	@LogExecution
 	public List<UserDto.UserGetPostsResponse> postList(UserEntity userEntity) {
 		List<PostEntity> posts = jpaQueryFactory
 			.selectFrom(postEntity)

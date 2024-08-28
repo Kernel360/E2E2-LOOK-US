@@ -16,6 +16,7 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 import org.example.image.redis.ColorApiClient;
 import org.example.image.redis.domain.dto.ColorDto;
+import org.example.log.LogExecution;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
@@ -52,6 +53,7 @@ public class ImageRedisService {
 	private static final Integer WEIGHT_LIKE = 1;
 	private static final Integer WEIGHT_VIEW = 1;
 
+	@LogExecution
 	public List<String> saveNewColor(Long imageLocationId) throws JsonProcessingException {
 		List<String> colorNameList = new ArrayList<>();
 		ColorApiClient client = new ColorApiClient();
@@ -99,6 +101,7 @@ public class ImageRedisService {
 		return colorNameList;
 	}
 
+	@LogExecution
 	public List<String> updateExistingColor(PostPopularSearchCondition postPopularSearchCondition)
 		throws JsonProcessingException, RuntimeException {
 		List<String> savedColorNameList = new ArrayList<>();
@@ -207,6 +210,7 @@ public class ImageRedisService {
 		return savedColorNameList;
 	}
 
+	@LogExecution
 	public void updateZSetColorScore(
 		Long imageLocationId, UpdateScoreType updateScoreType
 	) throws JsonProcessingException {
@@ -232,7 +236,7 @@ public class ImageRedisService {
 	}
 
 	// Private Internal Method -------------------------------------------------------------------
-
+	@LogExecution
 	private List<ColorDto.ColorDistanceResponse> calcCloseColorsDist(
 		int[] rgb, int num
 	) throws JsonProcessingException {
@@ -288,6 +292,7 @@ public class ImageRedisService {
 			.toList();
 	}
 
+	@LogExecution
 	public List<int[]> getCloseColorList(int[] rgb, int num)
 		throws JsonProcessingException {
 		HashOperations<String, String, Object> hashOps = redisTemplate.opsForHash();
@@ -315,6 +320,7 @@ public class ImageRedisService {
 		return rgbList;
 	}
 
+	@LogExecution
 	private double calcScoreOfPost(PostPopularSearchCondition condition) {
 		double score = 0.0;
 

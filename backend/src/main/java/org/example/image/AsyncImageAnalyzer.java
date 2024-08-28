@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
 import org.example.image.redis.service.ImageRedisService;
+import org.example.log.LogExecution;
 import org.example.post.repository.custom.UpdateScoreType;
 import org.springframework.stereotype.Component;
 
@@ -55,6 +56,7 @@ public class AsyncImageAnalyzer {
 	private final Set<Long> memoForOnProcessingTasks = new HashSet<>();
 	Executor singleThreadExecutor = Executors.newSingleThreadExecutor();
 
+	@LogExecution
 	public void run(Long imageLocationId) {
 		log.info("\n\n[AsyncImageAnalyzer] : ------- (0) Running... {}\n", imageLocationId);
 		CompletableFuture
@@ -93,6 +95,7 @@ public class AsyncImageAnalyzer {
 			});
 	}
 
+	@LogExecution
 	public void updateScore(
 		Long imageLocationId,
 		UpdateScoreType updateScoreType
@@ -145,6 +148,7 @@ public class AsyncImageAnalyzer {
 		);
 	}
 
+	@LogExecution
 	private boolean isScoreNotInitialized(Long imageLocationId) {
 		return this.memoForOnProcessingTasks.contains(imageLocationId);
 	}

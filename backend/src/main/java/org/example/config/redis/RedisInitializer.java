@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.example.image.redis.domain.dto.ColorDto;
+import org.example.log.LogExecution;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,6 +34,7 @@ public class RedisInitializer implements CommandLineRunner {
 	}
 
 	@Override
+	@LogExecution
 	public void run(String... args) throws JsonProcessingException {
 		HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
 		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();

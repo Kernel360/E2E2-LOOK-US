@@ -22,6 +22,7 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothType;
 import org.example.image.ImageAnalyzeManager.analyzer.type.NormalizedVertex2D;
 import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
+import org.example.log.LogExecution;
 import org.springframework.stereotype.Service;
 
 import com.google.api.gax.core.FixedCredentialsProvider;
@@ -51,6 +52,7 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 		= GoogleApiCredentialRoller.fromEnv("GOOGLE_VISION_API_KEYS");
 
 	@Override
+	@LogExecution
 	public List<ClothAnalyzeData> analyzeImage(byte[] imgBytes) throws IOException {
 
 		// Initialize client that will be used to send requests. This client only needs to be created
@@ -130,6 +132,7 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 	 * @throws Exception   on errors while closing the client.
 	 * @throws IOException on Input/Output errors.
 	 */
+	@LogExecution
 	private List<GoogleImagenVisionDto.ClothDetection> detectClothObjects(
 		ByteString imgBytes,
 		ImageAnnotatorClient client
@@ -176,6 +179,7 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 		return new ArrayList<>(detections.values());
 	}
 
+	@LogExecution
 	private static RGBColor extractColorProperties(
 		ByteString imgBytes,
 		ImageAnnotatorClient client
@@ -265,6 +269,7 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 		return new float[] {(float)X, (float)Y, (float)Z};
 	}
 
+	@LogExecution
 	private static byte[] adjustImageBrightnessForD65(byte[] imageBytes, float[] tristimulus) throws IOException {
 		// Convert byte array to BufferedImage
 		BufferedImage image = byteArrayToBufferedImage(imageBytes);
@@ -275,6 +280,7 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 		// Convert BufferedImage back to byte array
 		return bufferedImageToByteArray(adjustedImage);
 	}
+
 	private static BufferedImage adjustImageBrightnessForD65(BufferedImage image, float[] tristimulus) {
 		int width = image.getWidth();
 		int height = image.getHeight();

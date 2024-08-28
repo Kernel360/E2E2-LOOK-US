@@ -6,6 +6,7 @@ import java.util.List;
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
 import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 import org.example.image.redis.service.ImageRedisService;
+import org.example.log.LogExecution;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.PostPopularSearchCondition;
@@ -29,6 +30,7 @@ public class ImageApiController {
 	// TODO: 추후에 ROLE 설정, POST 및 request body 등 전체적인 수정 필요
 
 	@PatchMapping("")
+	@LogExecution
 	public ResponseEntity<List<String>> updateColorToRedis(
 		@RequestBody PostPopularSearchCondition postPopularSearchCondition
 	) throws JsonProcessingException {

@@ -21,6 +21,7 @@ import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
 import org.example.image.redis.service.ImageRedisService;
+import org.example.log.LogExecution;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.CategoryEntity;
 import org.example.post.domain.entity.HashtagEntity;
@@ -70,6 +71,7 @@ public class PostService {
 	private final ClothAnalyzeDataRepository clothAnalyzeDataRepository;
 	private final CategoryRepository categoryRepository;
 
+	@LogExecution
 	public PostDto.CreatePostDtoResponse createPost(PostDto.CreatePostDtoRequest postDto, String email,
 		MultipartFile image) throws IOException {
 		UserEntity user = findUserByEmail(email);
@@ -112,6 +114,7 @@ public class PostService {
 	}
 
 	@Transactional
+	@LogExecution
 	public PostDto.CreatePostDtoResponse updatePost(
 		PostDto.CreatePostDtoRequest updateRequest,
 		MultipartFile image,
@@ -189,11 +192,13 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
+	@LogExecution
 	public Page<PostDto.PostDtoResponse> findAllPosts(PostSearchCondition postSearchCondition, Pageable pageable) {
 		return postRepository.search(postSearchCondition, pageable);
 	}
 
 	@Transactional(readOnly = true)
+	@LogExecution
 	public PostDto.PostDetailDtoResponse getPostById(Long postId) {
 		PostEntity post = findPostById(postId);
 
@@ -216,6 +221,7 @@ public class PostService {
 	}
 
 	@Transactional
+	@LogExecution
 	public Boolean like(Long postId, String email) throws JsonProcessingException {
 		PostEntity post = findPostById(postId);
 		UserEntity user = findUserByEmail(email);
@@ -244,6 +250,7 @@ public class PostService {
 		}
 	}
 
+	@LogExecution
 	public void viewCount(Long post_id, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
 		Cookie viewCookie = null;
 		Cookie[] cookies = request.getCookies();
@@ -275,6 +282,7 @@ public class PostService {
 	}
 
 	@Transactional
+	@LogExecution
 	public int updateView(Long postId) throws JsonProcessingException {
 		asyncImageAnalyzer.updateScore(
 			findPostById(postId).getImageLocationId(),
@@ -284,11 +292,13 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
+	@LogExecution
 	public boolean existLikePost(UserEntity user, PostEntity post) {
 		return likeRepository.existsByUserAndPost(user, post);
 	}
 
 	@Transactional(readOnly = true)
+	@LogExecution
 	public int likeCount(Long postId) {
 		PostEntity post = findPostById(postId);
 
@@ -296,6 +306,7 @@ public class PostService {
 	}
 
 	@Transactional
+	@LogExecution
 	public void delete(Long postId, String email) {
 		UserEntity user = findUserByEmail(email);
 
@@ -313,6 +324,7 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
+	@LogExecution
 	public PostEntity findPostById(Long postId) {
 
 		return postRepository.findById(postId)
@@ -327,6 +339,7 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
+	@LogExecution
 	public UserEntity findUserByEmail(String email) {
 		return userRepository.findByEmail(email)
 			.orElseThrow(
@@ -372,6 +385,7 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
+	@LogExecution
 	public Page<PostDto.PostDtoResponse> findAllPostsByCategory(Long categoryId, Pageable pageable) {
 		// 카테고리 ID를 통해 해당 카테고리에 속한 게시글들을 조회합니다.
 		List<PostEntity> posts = postRepository.findAllByCategoryId(categoryId);

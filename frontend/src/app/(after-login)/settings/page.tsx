@@ -139,7 +139,7 @@ export default function ProfileEditPage() {
                                         />
                                     ) : (
                                         <img
-                                            src={`${API_PUBLIC_URL}/image/${userInfo.imageId}`}
+                                            src={`${API_PUBLIC_URL}/image/${userInfo.imageLocationId}`}
                                             alt='Current Profile'
                                             className='profile-image'
                                         />

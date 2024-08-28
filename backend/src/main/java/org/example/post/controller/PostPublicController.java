@@ -1,6 +1,9 @@
 package org.example.post.controller;
 
+import java.util.List;
+
 import org.example.post.domain.dto.PostDto;
+import org.example.post.domain.entity.CategoryEntity;
 import org.example.post.repository.custom.PostSearchCondition;
 import org.example.post.service.PostService;
 import org.springframework.data.domain.Page;
@@ -100,6 +103,13 @@ public class PostPublicController {
 		Page<PostDto.PostDtoResponse> posts = postService.findAllPostsByCategory(categoryId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(posts);
 
+	}
+
+	@Operation(summary = "카테고리 전체 가져오는 API", description = "카테고리 전체 반환")
+	@GetMapping("/categoryAll")
+	public ResponseEntity<List<CategoryEntity>> getCategoryAll() {
+		List<CategoryEntity> categoryList = postService.getAllCategory();
+		return ResponseEntity.status(HttpStatus.OK).body(categoryList);
 	}
 
 }

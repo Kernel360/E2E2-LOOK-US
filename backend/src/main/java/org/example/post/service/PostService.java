@@ -392,4 +392,9 @@ public class PostService {
 		// 페이지네이션을 적용하여 결과를 반환합니다.
 		return new PageImpl<>(postDtoResponses, pageable, postDtoResponses.size());
 	}
+
+	// 카테고리 전체를 가져오는 메서드
+	public List<CategoryEntity> getAllCategory() {
+		return categoryRepository.findAll();
+	}
 }

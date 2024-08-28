@@ -1,15 +1,24 @@
+// src/app/_api/posts.ts
+
 import { ApiError } from 'next/dist/server/api-utils'
 import { API_PRIVATE_URL, API_PUBLIC_URL } from '../_common/constants'
-import { PostFormValues } from '@/components/post-create'
 
+// export interface PostFormValues {
+//     editedImageBlob: Blob // 이미지를 Blob 형태로 저장
+//     content: string // 게시글 내용
+//     hashtags: { value: string }[] // 해시태그 리스트
+//     categories: string[] // 카테고리 리스트
+// }
+
+// 게시글 정보 가져오기 🎀
 export interface GetPostResponse {
     nickname: string
     postId: number
-    imageId: number
+    imageLocationId: number
     postContent: string
     hashtagContents: string[]
     likeCount: number
-    likeStatus: boolean // likeStatus 필드 추가
+    likeStatus: boolean
     createdAt: Date
     updatedAt: Date
 }
@@ -23,63 +32,33 @@ export async function getPost(postId: number) {
 
     const body = await res.json()
 
-    if (false === res.ok) {
+    if (!res.ok) {
         throw new ApiError(res.status, body)
     }
 
     return body as GetPostResponse
 }
 
-export interface CreatePostRequest {
-    image: any
-    userRequest: {
-        post_content: string
-        hashtag_content: string
-    }
-}
-
-/**
- * - How to send image blob to server.
- * https://advanced-cropper.github.io/react-advanced-cropper/docs/guides/recipes/
- */
-export async function createPost(form: PostFormValues) {
+// 게시글 작성 요청 🎀
+export async function createPost(formData: FormData) {
     const requestUrl = `${API_PRIVATE_URL}/posts`
-    const formData = new FormData()
 
-    // 1. append image blob (file format is already set in Blob object)
-    formData.append('image', form.editedImageBlob)
-
-    // 2. append user input data (content, hashtag, etc...)
-    const data = new Blob(
-        [
-            JSON.stringify({
-                post_content: form.content,
-                hashtag_content: `#${form.hashtags?.map(tag => tag.value).join('#')}`,
-            }),
-        ],
-        {
-            type: 'application/json',
-        },
-    )
-    formData.append('userRequest', data)
-
-    // 3. send image to server
+    // 서버로 전송할 요청 생성
     const res = await fetch(requestUrl, {
         method: 'POST',
         credentials: 'include',
-        body: formData,
+        body: formData, // FormData 객체 전송
     })
-    console.log('성공')
 
     if (!res.ok) {
-        // ...
         const body = await res.json()
         throw new ApiError(res.status, body)
     }
 }
 
+// 좋아요 요청 🎀
 export async function likePost(postId: number) {
-    const requestUrl = `${API_PRIVATE_URL}/posts/likes`;
+    const requestUrl = `${API_PRIVATE_URL}/posts/likes`
 
     const res = await fetch(requestUrl, {
         method: 'PATCH',
@@ -87,13 +66,22 @@ export async function likePost(postId: number) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ postId }),  // postId를 JSON 형식으로 전달
-    });
+        body: JSON.stringify({ postId }),
+    })
 
     if (!res.ok) {
-        const body = await res.json();
-        throw new ApiError(res.status, body);
+        const body = await res.json()
+        throw new ApiError(res.status, body)
     }
 
-    return await res.json(); // Returns true if liked, false if unliked
+    return await res.json() // 좋아요 상태 반환
+}
+
+// 카테고리 목록 가져오기 🎀
+export async function fetchCategories() {
+    const response = await fetch(`${API_PUBLIC_URL}/posts/categoryAll`)
+    if (!response.ok) {
+        throw new Error('Failed to fetch categories')
+    }
+    return response.json()
 }

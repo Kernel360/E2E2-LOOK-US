@@ -1,6 +1,6 @@
 'use client'
 
-import { PostContentForm } from '@/components/post-create'
+import UploadOOTD from '@/components/post-create'
 import Modal from '@/components/modal-accesscontrol'
 import { useAuth } from '@/app/_api/useAuth'
 
@@ -17,7 +17,7 @@ export default function PostCreateForm() {
 
             <div className='flex flex-col space-y-8 lg:flex-row'>
                 <div className='flex-1'>
-                    <PostContentForm />
+                    <UploadOOTD />
                 </div>
             </div>
 

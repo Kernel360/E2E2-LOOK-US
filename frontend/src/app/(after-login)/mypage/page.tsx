@@ -20,7 +20,9 @@ export default function MyPage() {
                 const posts = await getMyPosts()
 
                 // 이미지 ID가 큰 순서로 정렬
-                const sortedPosts = posts.sort((a, b) => b.imageId - a.imageId)
+                const sortedPosts = posts.sort(
+                    (a, b) => b.imageLocationId - a.imageLocationId,
+                )
                 setMyPosts(sortedPosts)
             } catch (error) {
                 console.error('Failed to fetch posts:', error)
@@ -50,7 +52,7 @@ export default function MyPage() {
                             myPosts.map(post => (
                                 <PostCard
                                     key={post.postId}
-                                    imageId={post.imageId}
+                                    imageId={post.imageLocationId}
                                     postContent={post.postContent}
                                     likeCount={post.likeCount}
                                     postId={post.postId}

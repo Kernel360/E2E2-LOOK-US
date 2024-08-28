@@ -1,5 +1,6 @@
 package org.example.user.controller.token;
 
+import org.example.log.LogExecution;
 import org.example.user.domain.dto.request.token.CreateAccessTokenRequest;
 import org.example.user.domain.dto.response.token.CreateAccessTokenResponse;
 import org.example.user.service.token.TokenService;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class TokenApiController {
 	private final TokenService tokenService;
 
+	@LogExecution
 	@PostMapping("/api/token")
 	public ResponseEntity<CreateAccessTokenResponse> createNewAccessToken(
 		@RequestBody CreateAccessTokenRequest request) {

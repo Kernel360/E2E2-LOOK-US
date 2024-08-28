@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.example.config.jwt.TokenProvider;
+import org.example.log.LogExecution;
 import org.example.post.domain.entity.PostDailyStats;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.entity.PostTotalStats;
@@ -43,11 +44,13 @@ public class UserViewController {
 	}
 
 	// NOTE: admin login page
+	@LogExecution
 	@GetMapping("/login")
 	public String login() {
 		return "login";
 	}
 
+	@LogExecution
 	@PostMapping("/login") // NOTE: --------- ADMIN REPORT PAGE --------------
 	public String login(@ModelAttribute UserDto.UserLoginRequest loginRequest, Model model, HttpServletResponse response) {
 		UserDto.UserResponse userResponse = userService.loginUser(loginRequest);
@@ -79,7 +82,7 @@ public class UserViewController {
 		}
 	}
 
-
+	@LogExecution
 	@GetMapping("/admin/stats")
 	public String getPostStats(Model model) {
 		// 데이터 조회
@@ -128,20 +131,20 @@ public class UserViewController {
 		return "adminStats"; // Thymeleaf 템플릿 이름
 	}
 
-
+	@LogExecution
 	@GetMapping("/signup")
 	public String signup() {
 		return "signup";
 	}
 
-
+	@LogExecution
 	@PostMapping("/user")
 	public String signup(@ModelAttribute UserDto.UserCreateRequest addUserRequest) {
 		userService.signupUser(addUserRequest); // 회원가입 메서드 호출
 		return "redirect:/login"; // 회원 가입이 완료된 이후에 로그인 페이지로 이동
 	}
 
-
+	@LogExecution
 	@GetMapping("/logout")
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
 		Cookie cookie = new Cookie("token", null);

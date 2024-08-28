@@ -4,6 +4,7 @@ import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
 import org.example.follow.service.FollowService;
+import org.example.log.LogExecution;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ public class FollowPublicController {
 	 * GET
 	 */
 	@GetMapping("/relation")
+	@LogExecution
 	public ResponseEntity<?> getFollowList(
 		@RequestParam("type") String followType,
 		@RequestParam("nickname") String targetUserNickname

@@ -8,6 +8,7 @@ import org.example.exception.post.ApiPostException;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
 import org.example.image.AsyncImageAnalyzer;
+import org.example.log.LogExecution;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.UpdateScoreType;
@@ -36,6 +37,7 @@ public class ScrapService {
 	/**
 	 * 사용자가 스크랩한 모든 게시글 Id 리스트를 반환합니다.
 	 */
+	@LogExecution
 	public ScrapDto.GetAllPostScrapsResponseDto getAllScrapedPostIdByUserEmail(String email) {
 		return new ScrapDto.GetAllPostScrapsResponseDto(
 			scrapRepository.findAllByUser_Email(email).stream()
@@ -44,6 +46,7 @@ public class ScrapService {
 		);
 	}
 
+	@LogExecution
 	public void scrapPostByPostId(Long postId, String email) throws JsonProcessingException {
 		Optional<ScrapEntity> scrap = scrapRepository.findByPost_PostIdAndUser_Email(postId, email);
 
@@ -66,6 +69,7 @@ public class ScrapService {
 		);
 	}
 
+	@LogExecution
 	public void unscrapPostByPostId(Long postId, String userEmail) throws JsonProcessingException {
 		asyncImageAnalyzer.requestScoreUpdateAsync(
 			findPost(postId).getImageLocationId(),

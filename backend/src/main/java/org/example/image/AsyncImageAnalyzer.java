@@ -70,7 +70,7 @@ public class AsyncImageAnalyzer {
 	 * @apiNote [이미지 분석]을 분석 쓰레드에게 비동기로 요청합니다.
 	 * @param imageLocationId 분석하길 원하는 이미지-위치 Id
 	 */
-  @LogExecution
+	@LogExecution
 	public void requestImageAnalyzeAsync(Long imageLocationId) {
 		CompletableFuture.runAsync(
 			() -> onStartTask.accept(imageLocationId), singleThreadExecutor
@@ -90,6 +90,7 @@ public class AsyncImageAnalyzer {
 	 * @param imageLocationId 분석하길 원하는 이미지-위치 Id
 	 * @param updateScoreType 점수 업데이트의 종류 (ex. 좋아요 증가/감소)
 	 */
+	@LogExecution
 	public void requestScoreUpdateAsync(Long imageLocationId, UpdateScoreType updateScoreType)  {
 
 		if ( isScoreInitialized(imageLocationId) ) {
@@ -114,7 +115,6 @@ public class AsyncImageAnalyzer {
 
 	// --------------------------------------------------------------------------
 	// Internal Methods
-  @LogExecution
 	private boolean isScoreInitialized(Long imageLocationId) {
 		return !this.onGoingTasks.contains(imageLocationId);
 

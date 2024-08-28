@@ -1,6 +1,7 @@
 package org.example.image.redis;
 
 import org.example.image.redis.domain.dto.ColorInfoResponse;
+import org.example.log.LogExecution;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ public class ColorApiClient {
 
 	private static final String API_URL = "https://www.thecolorapi.com/id?hex={hex}";
 
+	@LogExecution
 	public String getColorInfo(String hexColor) {
 		RestTemplate restTemplate = new RestTemplate();
 		ObjectMapper objectMapper = new ObjectMapper();

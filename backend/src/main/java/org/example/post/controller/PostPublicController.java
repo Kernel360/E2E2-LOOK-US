@@ -2,6 +2,7 @@ package org.example.post.controller;
 
 import java.util.List;
 
+import org.example.log.LogExecution;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.CategoryEntity;
 import org.example.post.repository.custom.PostSearchCondition;
@@ -36,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 public class PostPublicController {
 	private final PostService postService;
 
+	@LogExecution
 	@GetMapping("")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
 		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
@@ -66,7 +68,7 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-
+	@LogExecution
 	@GetMapping("/{post_id}")
 	public ResponseEntity<PostDto.PostDetailDtoResponse> getPostById(
 		@PathVariable Long post_id, HttpServletRequest request, HttpServletResponse response
@@ -85,6 +87,7 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
+	@LogExecution
 	@GetMapping("/likes")
 	public ResponseEntity<Integer> likeCount(@RequestBody PostDto.PostIdRequest likeRequest) {
 		int likeCount = postService.likeCount(likeRequest.postId());
@@ -96,6 +99,7 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
+	@LogExecution
 	@GetMapping("/category")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> getPostsByCategory(
 		@PathVariable Long categoryId,
@@ -107,6 +111,7 @@ public class PostPublicController {
 	}
 
 	@Operation(summary = "카테고리 전체 가져오는 API", description = "카테고리 전체 반환")
+	@LogExecution
 	@GetMapping("/categoryAll")
 	public ResponseEntity<List<CategoryEntity>> getCategoryAll() {
 		List<CategoryEntity> categoryList = postService.getAllCategory();

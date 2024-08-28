@@ -1,6 +1,6 @@
 package org.example.config.oauth;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.user.common.RandomName;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.enums.Role;

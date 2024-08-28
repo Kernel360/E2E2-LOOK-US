@@ -3,7 +3,7 @@ package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisio
 import java.util.Optional;
 
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothType;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 
 public class ClothTypeMapper {
 

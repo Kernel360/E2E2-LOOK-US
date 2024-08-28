@@ -1,6 +1,6 @@
 package org.example.user.service.member;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -2,7 +2,7 @@ package org.example.config.batch;
 
 import java.time.LocalDateTime;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;

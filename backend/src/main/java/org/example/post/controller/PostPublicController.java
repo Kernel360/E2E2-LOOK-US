@@ -2,7 +2,7 @@ package org.example.post.controller;
 
 import java.util.List;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.CategoryEntity;
 import org.example.post.repository.custom.PostSearchCondition;
@@ -14,9 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

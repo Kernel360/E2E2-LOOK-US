@@ -1,18 +1,12 @@
 package org.example.image.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
-import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 import org.example.image.redis.service.ImageRedisService;
-import org.example.log.LogExecution;
-import org.example.post.domain.entity.PostEntity;
-import org.example.post.repository.PostRepository;
+import org.example.config.log.LogExecution;
 import org.example.post.repository.custom.PostPopularSearchCondition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

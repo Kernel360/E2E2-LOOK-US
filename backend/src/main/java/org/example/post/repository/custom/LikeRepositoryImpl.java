@@ -4,7 +4,7 @@ import static org.example.post.domain.entity.QLikeEntity.*;
 
 import java.time.LocalDateTime;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.post.domain.entity.PostEntity;
 import org.springframework.transaction.annotation.Transactional;
 

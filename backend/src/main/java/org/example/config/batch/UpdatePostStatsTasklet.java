@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.post.domain.entity.PostDailyStats;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.entity.PostTotalStats;

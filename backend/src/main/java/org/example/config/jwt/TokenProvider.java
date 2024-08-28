@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.user.domain.entity.member.UserEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

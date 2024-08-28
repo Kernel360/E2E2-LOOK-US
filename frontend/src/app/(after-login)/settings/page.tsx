@@ -121,6 +121,7 @@ export default function ProfileEditPage() {
                                 className='profile-edit-input'
                             />
                         </label>
+
                         <label className='profile-edit-label'>
                             프로필 이미지
                             <div className='profile-image-upload'>

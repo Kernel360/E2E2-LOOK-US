@@ -12,12 +12,12 @@ interface PostCardProps {
 }
 
 export default function PostCard({
-    imageId,
-    postContent,
-    likeCount,
-    postId,
-    hashtags, // 추가: 해시태그 배열
-}: PostCardProps) {
+                                     imageId,
+                                     postContent,
+                                     likeCount,
+                                     postId,
+                                     hashtags, // 추가: 해시태그 배열
+                                 }: PostCardProps) {
     return (
         <div className='postcard-container'>
             <div className='postcard-header'>

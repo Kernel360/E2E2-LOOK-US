@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
+import org.example.log.LogExecution;
 import org.example.user.domain.entity.member.UserEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,12 +24,14 @@ public class TokenProvider { // 계속해서 토큰을 생성하고 올바른 �
 
 	private final JwtProperties jwtProperties;
 
+	@LogExecution
 	public String generateToken(UserEntity user, Duration expiredAt) {
 		Date now = new Date();
 		return makeToken(new Date(now.getTime() + expiredAt.toMillis()), user);
 	}
 
 	// JWT 토큰 생성 메서드
+	@LogExecution
 	private String makeToken(Date expiry, UserEntity user) {
 		Date now = new Date();
 
@@ -47,6 +50,7 @@ public class TokenProvider { // 계속해서 토큰을 생성하고 올바른 �
 	}
 
 	//JWT 토큰 유효성 검증 메서드
+	@LogExecution
 	public boolean validToken(String token) {
 		try {
 			Jwts.parser()
@@ -60,6 +64,7 @@ public class TokenProvider { // 계속해서 토큰을 생성하고 올바른 �
 	}
 
 	// 토큰 기반으로 인증 정보를 가져오는 메서드
+	@LogExecution
 	public Authentication getAuthentication(String token) {
 		Claims claims = getClaims(token);
 		String roleClaim = claims.get("role", String.class);
@@ -75,11 +80,13 @@ public class TokenProvider { // 계속해서 토큰을 생성하고 올바른 �
 	}
 
 	// 토큰 기반으로 유저 ID를 가져오는 메서드
+	@LogExecution
 	public Long getUserId(String token) {
 		Claims claims = getClaims(token);
 		return claims.get("id", Long.class);
 	}
 
+	@LogExecution
 	private Claims getClaims(String token) {
 		return Jwts.parser() // 클레임 조회
 			.setSigningKey(jwtProperties.getSecretKey())

@@ -6,6 +6,7 @@ import java.util.List;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
+import org.example.log.LogExecution;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.service.member.UserService;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,7 @@ public class UserApiController {
 
 	private final UserService userService;
 
+	@LogExecution
 	@PatchMapping("/update")
 	public ResponseEntity<UserDto.UserUpdateResponse> userUpdate(
 		@RequestPart(value = "updateRequest", required = false) UserDto.UserUpdateRequest updateRequest,
@@ -50,6 +52,7 @@ public class UserApiController {
 			.body(userService.updateUser(updateRequest, email, profileImage));
 	}
 
+	@LogExecution
 	@GetMapping("/me")
 	public ResponseEntity<UserDto.UserGetInfoResponse> getMyPage(Authentication authentication) {
 
@@ -57,6 +60,7 @@ public class UserApiController {
 							 .body(userService.getMyInfo(authentication.getName()));
 	}
 
+	@LogExecution
 	@GetMapping("/me/posts")
 	public ResponseEntity<List<UserDto.UserGetPostsResponse>> getMyPosts(Authentication authentication) {
 
@@ -64,6 +68,7 @@ public class UserApiController {
 							 .body(userService.getMyPosts(authentication.getName()));
 	}
 
+	@LogExecution
 	@PostMapping("/resign")
 	public ResponseEntity<?> resignUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response){
 		userService.resignUser(authentication.getName(), request, response);
@@ -71,6 +76,7 @@ public class UserApiController {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 	}
 
+	@LogExecution
 	@PostMapping("/logout")
 	public ResponseEntity<?> logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response){
 		userService.logoutUser(authentication.getName(), request, response);

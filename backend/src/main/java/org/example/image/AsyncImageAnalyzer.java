@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.redis.service.ImageRedisService;
+import org.example.log.LogExecution;
 import org.example.post.repository.custom.UpdateScoreType;
 import org.springframework.stereotype.Component;
 
@@ -69,6 +70,7 @@ public class AsyncImageAnalyzer {
 	 * @apiNote [이미지 분석]을 분석 쓰레드에게 비동기로 요청합니다.
 	 * @param imageLocationId 분석하길 원하는 이미지-위치 Id
 	 */
+  @LogExecution
 	public void requestImageAnalyzeAsync(Long imageLocationId) {
 		CompletableFuture.runAsync(
 			() -> onStartTask.accept(imageLocationId), singleThreadExecutor
@@ -112,9 +114,10 @@ public class AsyncImageAnalyzer {
 
 	// --------------------------------------------------------------------------
 	// Internal Methods
-
+  @LogExecution
 	private boolean isScoreInitialized(Long imageLocationId) {
 		return !this.onGoingTasks.contains(imageLocationId);
+
 	}
 
 	private final Consumer<Integer> pendingTask = (ms) -> {

@@ -17,7 +17,7 @@ export default function PostCreateForm() {
 
             <div className='flex flex-col space-y-8 lg:flex-row'>
                 <div className='flex-1'>
-                    <PostContentForm />
+                    <UploadOOTD />
                 </div>
             </div>
 

@@ -94,7 +94,6 @@ public class WebOAuthSecurityConfig {
 			.logout(AbstractHttpConfigurer::disable)
 			.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // TokenAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
-			.addFilterBefore(resourceUrlEncodingFilter(), TokenAuthenticationFilter.class) // ResourceUrlEncodingFilter를 TokenAuthenticationFilter 앞에 추가
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/token").permitAll()
 				.requestMatchers("/api/a1/**").permitAll()
@@ -122,10 +121,7 @@ public class WebOAuthSecurityConfig {
 			.build();
 	}
 
-	@Bean
-	public ResourceUrlEncodingFilter resourceUrlEncodingFilter() {
-		return new ResourceUrlEncodingFilter();
-	}
+
 	@Bean
 	static RoleHierarchy roleHierarchy() {
 		return RoleHierarchyImpl.withDefaultRolePrefix() // spring security inserts ROLE_* prefix

@@ -47,42 +47,7 @@ public class WebOAuthSecurityConfig {
 			);
 	}
 
-/*	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		return http
-			.csrf(AbstractHttpConfigurer::disable)
-			.httpBasic(AbstractHttpConfigurer::disable)
-			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-			.formLogin(AbstractHttpConfigurer::disable)
-			.logout(AbstractHttpConfigurer::disable)
-			.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/api/token").permitAll()
-				.requestMatchers("/api/a1/**").permitAll()
-				.requestMatchers("/api/v1/**").hasRole("USER") // hasRole method inserts ROLE_* prefix
-				.requestMatchers("/api/i1/**").hasRole("ADMIN")
-				.requestMatchers("/admin/**").hasRole("ADMIN") // Simple admin page, just for development
-				.anyRequest().permitAll()
-			)
-			.oauth2Login(oauth2 -> oauth2
-				.loginPage("/login")
-				.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
-					.baseUri("/oauth2/authorization")
-					.authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository())
-				)
-				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
-					.userService(oAuth2UserCustomService)
-				)
-				.successHandler(oAuth2SuccessHandler())
-			)
-			.exceptionHandling(exceptionHandling -> exceptionHandling
-				.defaultAuthenticationEntryPointFor(
-					new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-					new AntPathRequestMatcher("/api/**")
-				))
-			.build();
-	}*/
+
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

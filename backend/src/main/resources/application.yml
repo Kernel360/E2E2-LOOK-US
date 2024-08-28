@@ -1,7 +1,7 @@
-logging:
-  config: classpath:log4j2.xml
-
 spring:
+  output:
+    ansi:
+      enabled: always
   batch:
     job:
       enabled: false
@@ -14,7 +14,7 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
 
   datasource:
     url: ${MY_DATA_SOURCE}

@@ -1,5 +1,6 @@
 package org.example.config;
 
+/*
 import java.sql.SQLException;
 import java.util.Locale;
 import static org.springframework.util.StringUtils.hasText;
@@ -13,10 +14,12 @@ import com.p6spy.engine.event.JdbcEventListener;
 import com.p6spy.engine.logging.Category;
 import com.p6spy.engine.spy.P6SpyOptions;
 import com.p6spy.engine.spy.appender.MessageFormattingStrategy;
+*/
 
 /**
  * Jdbc가 DB Connection을 얻은 이후에 로깅 포맷을 P6SpyOptions가 가로채도록 하는 Bean입니다.
  */
+/*
 @Profile({"default", "local", "dev"}) // WARN: Do not use in production mode.
 @Component
 public class P6SpySqlFormatter extends JdbcEventListener implements MessageFormattingStrategy {
@@ -61,3 +64,4 @@ public class P6SpySqlFormatter extends JdbcEventListener implements MessageForma
 		return Category.STATEMENT.getName().equals(category);
 	}
 }
+ */

@@ -25,11 +25,6 @@ export default function RootLayout({
                 >
                     {children}
                 </main>
-
-                {/* Adding the ColorPicker component */}
-                <div className='color-picker-container my-8'></div>
-
-                <BottomControlBar />
             </body>
         </html>
     )

@@ -3,7 +3,6 @@ import { postPreviewContent } from '@/app/_api/fetchStyle'
 import Link from 'next/link'
 import { API_PUBLIC_URL } from '@/app/_common/constants'
 import Image from 'next/image'
-import '@/app/(after-login)/posts/gallery.scss'
 import { cn } from '@/lib/utils'
 
 export default function StylePreview({
@@ -24,7 +23,7 @@ export default function StylePreview({
                     priority={true}
                     width={400}
                     height={600}
-                    sizes='250px'
+                    style={{ objectFit: 'cover', borderRadius: '8px' }} // 둥근 모서리 추가
                 />
             </div>
         </Link>

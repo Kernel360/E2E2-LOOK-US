@@ -101,7 +101,7 @@ public class FileSystemStorage implements StorageService {
 		}
 	}
 
-	private void createDirectory(@NonNull Path path) {
+	protected void createDirectory(@NonNull Path path) {
 		try {
 			Files.createDirectories(path);
 		} catch (IOException e) {

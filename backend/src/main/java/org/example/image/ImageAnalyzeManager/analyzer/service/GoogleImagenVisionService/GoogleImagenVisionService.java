@@ -179,7 +179,7 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 	}
 
 	@LogExecution
-	private static RGBColor extractColorProperties(
+	protected static RGBColor extractColorProperties(
 		ByteString imgBytes,
 		ImageAnnotatorClient client
 	) {

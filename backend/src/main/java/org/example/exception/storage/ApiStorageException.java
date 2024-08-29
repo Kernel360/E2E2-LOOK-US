@@ -17,7 +17,7 @@ import lombok.Getter;
 public class ApiStorageException extends ApiException {
 
 	@Builder
-	protected ApiStorageException(
+	public ApiStorageException(
 		ApiErrorCategory category,
 		ApiStorageErrorSubCategory subCategory,
 		@Nullable Supplier<?> setErrorData

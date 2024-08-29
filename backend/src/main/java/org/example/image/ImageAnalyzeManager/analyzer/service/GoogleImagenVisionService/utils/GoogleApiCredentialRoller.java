@@ -22,9 +22,13 @@ public class GoogleApiCredentialRoller {
 		return new GoogleApiCredentialRoller(env_name);
 	}
 
+	protected static String getEnv(String envName) {
+		return System.getenv(envName);
+	}
+
 	protected GoogleApiCredentialRoller(String env_name) {
 		// init credentials with given env files
-		JsonArray keys = JsonParser.parseString(System.getenv(env_name)).getAsJsonArray();
+		JsonArray keys = JsonParser.parseString(getEnv(env_name)).getAsJsonArray();
 		keys.forEach(key -> {
 			try {
 				this.credentialsList.add(GoogleCredentials.fromStream(

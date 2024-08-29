@@ -134,8 +134,11 @@ public class WebOAuthSecurityConfig {
 		corsConfiguration.addExposedHeader("refresh_token");
 		corsConfiguration.addExposedHeader("Set-Cookie");
 		corsConfiguration.addAllowedHeader("*"); // 모든 헤더 허용
-		corsConfiguration.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
-
+		corsConfiguration.addAllowedMethod("PATCH");
+		corsConfiguration.addAllowedMethod("GET");
+		corsConfiguration.addAllowedMethod("POST");
+		corsConfiguration.addAllowedMethod("PUT");
+		corsConfiguration.addAllowedMethod("DELETE");
 		// 쿠키 사용을 허용 (Credentials 허용)
 		corsConfiguration.setAllowCredentials(true);
 

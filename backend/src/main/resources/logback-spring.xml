@@ -79,7 +79,7 @@
     </logger>
 
     <!-- lookus 프로젝트 로그 설정  -->
-    <logger name="org.example" level="debug" additivity="false">
+    <logger name="org.example" level="trace" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE-ROLLING"/>
     </logger>
@@ -89,7 +89,7 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <root level="info">
+    <root level="trace">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE-ROLLING"/>
     </root>

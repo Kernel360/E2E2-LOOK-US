@@ -54,7 +54,7 @@ public class WebOAuthSecurityConfig {
 		return http
 			.csrf(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
-			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+			// .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.formLogin(AbstractHttpConfigurer::disable)
 			.logout(AbstractHttpConfigurer::disable)
 			.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -119,10 +119,10 @@ public class WebOAuthSecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-		corsConfiguration.addAllowedOrigin("https://www.lookus.shop");
-		corsConfiguration.addAllowedOrigin("https://api.lookus.shop");
-		corsConfiguration.addAllowedOrigin("http://localhost:8080"); // JUST FOR LOCAL DEV
-		corsConfiguration.addAllowedOrigin("http://localhost:3000"); // JUST FOR LOCAL DEV
+		corsConfiguration.addAllowedOriginPattern("https://www.lookus.shop");
+		corsConfiguration.addAllowedOriginPattern("https://api.lookus.shop");
+		corsConfiguration.addAllowedOriginPattern("http://localhost:8080"); // JUST FOR LOCAL DEV
+		corsConfiguration.addAllowedOriginPattern("http://localhost:3000"); // JUST FOR LOCAL DEV
 
 		corsConfiguration.addAllowedMethod("PATCH");
 		corsConfiguration.addAllowedMethod("GET");

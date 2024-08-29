@@ -14,7 +14,7 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
 
   datasource:
     url: ${MY_DATA_SOURCE}

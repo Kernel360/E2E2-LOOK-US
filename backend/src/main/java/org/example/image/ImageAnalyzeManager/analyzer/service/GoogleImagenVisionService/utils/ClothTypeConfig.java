@@ -15,20 +15,28 @@ public class ClothTypeConfig {
 		new ClothMappingTable(
 			ClothType.OUTER,
 			List.of(
-				"Outerwear"
+				"Outerwear",
+				"Jacket",
+				"Coat",
+				"Clothing"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
 			ClothType.TOP,
 			List.of(
-				"Top"
+				"Top",
+				"Shirt",
+				"Blouse",
+				"T-shirt"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
 			ClothType.PANTS,
 			List.of(
 				"Pants",
-				"Jeans"
+				"Jeans",
+				"Trousers",
+				"Shorts"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
@@ -36,36 +44,48 @@ public class ClothTypeConfig {
 			List.of(
 				"Shoe",
 				"Sandal",
-				"High heels"
+				"High heels",
+				"Footwear",
+				"Boot"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
 			ClothType.ACCESSORY,
 			List.of(
-				"Shoe",
-				"Sandal",
-				"Belt"
+				"Belt",
+				"Sunglasses",
+				"Glasses",
+				"Tie",
+				"Necklace"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
 			ClothType.DRESS,
 			List.of(
+				"Dress"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
 			ClothType.SKIRT,
 			List.of(
-				"Skirt"
+				"Skirt",
+				"Miniskirt"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
 			ClothType.HAT,
 			List.of(
+				"Hat",
+				"Cap",
+				"Beanie"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
 			ClothType.BAG,
 			List.of(
+				"Handbag",
+				"Bag",
+				"Luggage & bags"
 				// TODO: 추가 해주세요
 			))
 	);

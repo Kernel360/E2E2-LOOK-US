@@ -84,6 +84,24 @@ export const fetchPostsByCategory = async (
     return response.json()
 }
 
+// 색상으로 게시물 가져오기
+export const fetchPostsByColor = async (
+    rgbColor: number[],
+    page: number,
+    size: number,
+): Promise<PageResponse<PostDtoResponse>> => {
+    // RGB 값을 개별 쿼리 파라미터로 변환
+    const queryParams = `rgbColor=${rgbColor[0]}&rgbColor=${rgbColor[1]}&rgbColor=${rgbColor[2]}`
+
+    const response = await fetch(
+        `${API_PUBLIC_URL}/posts?${queryParams}&page=${page}&size=${size}`,
+    )
+    if (!response.ok) {
+        throw new Error('Failed to fetch posts by color')
+    }
+    return response.json()
+}
+
 //인기있는 컬러 가져오기
 export const fetchPopularColor = async (): Promise<PopularColor[]> => {
     const response = await fetch(`${API_PUBLIC_URL}/posts/popular_color`)

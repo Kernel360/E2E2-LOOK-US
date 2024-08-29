@@ -20,17 +20,17 @@ export default function Page({ params, searchParams }: Props) {
     const [isFollowing, setIsFollowing] = useState<boolean>(false)
     const [likeCount, setLikeCount] = useState<number>(0)
     const [liked, setLiked] = useState<boolean>(false)
-    const [scraped, setScraped] = useState<boolean>(false) // 스크랩 여부 상태 추가
+    const [scraped, setScraped] = useState<boolean>(false)
     const router = useRouter()
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
                 const post = await getPost(params.post_id)
-                console.log('API Response:', post) // API 응답 확인
+                console.log('API Response:', post)
                 setPost(post)
                 setLikeCount(post.likeCount)
-                setLiked(post.likeStatus) // API에서 받은 likeStatus를 설정
+                setLiked(post.likeStatus)
             } catch (error) {
                 console.error('Failed to fetch post data:', error)
             }
@@ -69,6 +69,16 @@ export default function Page({ params, searchParams }: Props) {
 
     return (
         <div className={styles.postContainer}>
+            <div className={styles.logoContainer}>
+                <Image
+                    src='/images/LOOKUSlogo.png'
+                    alt='LOOK:US Logo'
+                    width={171}
+                    height={36}
+                    priority={true}
+                />
+            </div>
+
             <div className={styles.imageContainer}>
                 <Image
                     src={`${API_PUBLIC_URL}/image/${post.imageLocationId}`}
@@ -139,7 +149,9 @@ export default function Page({ params, searchParams }: Props) {
                                 className={styles.hashtag}
                                 onClick={() =>
                                     router.push(
-                                        `/search?hashtags=${encodeURIComponent(hashtag)}`,
+                                        `/search?hashtags=${encodeURIComponent(
+                                            hashtag,
+                                        )}`,
                                     )
                                 }
                             >
@@ -158,14 +170,14 @@ export default function Page({ params, searchParams }: Props) {
                         <Image
                             src={`${API_PUBLIC_URL}/image/${post.profileImageLocationId}`}
                             alt='profile'
-                            width={50} // 고정된 너비
-                            height={50} // 고정된 높이
+                            width={50}
+                            height={50}
                             className={styles.profileImage}
                         />
                     </div>
                     <div className={styles.profileInfo}>
                         <span className={styles.username}>{post.nickname}</span>
-                        <div>
+                        <div className={styles.statsContainer}>
                             <span className={styles.stats}>팔로워 0명</span>
                             <span className={styles.stats}>팔로잉 0명</span>
                         </div>

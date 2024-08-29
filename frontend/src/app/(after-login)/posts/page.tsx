@@ -1,7 +1,11 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { fetchCategories, CategoryEntity } from '@/app/_api/category'
+import {
+    fetchCategories,
+    CategoryEntity,
+    fetchPostsByColor,
+} from '@/app/_api/category'
 import {
     fetchPostsByCategory,
     fetchPostsByCategoryAndColor,
@@ -48,11 +52,16 @@ export default function Gallery() {
             let response
 
             if (category && color) {
-                response = await fetchPostsByCategoryAndColor(
-                    { category, rgbColor: color },
-                    page,
-                    10,
-                )
+                // 카테고리와 색상으로 필터링
+                if (category === '전체') {
+                    response = await fetchPostsByColor(color, page, 10)
+                } else {
+                    response = await fetchPostsByCategoryAndColor(
+                        { category, rgbColor: color },
+                        page,
+                        10,
+                    )
+                }
             } else if (category) {
                 const categoryId =
                     categories.find(cat => cat.categoryContent === category)
@@ -96,8 +105,14 @@ export default function Gallery() {
         selectedCategory: string,
         selectedColor: number[],
     ) => {
-        setCategory(selectedCategory)
-        setColor(selectedColor)
+        if (selectedCategory === '전체') {
+            setCategory('전체')
+            setColor(selectedColor)
+            console.log(selectedColor)
+        } else {
+            setCategory(selectedCategory)
+            setColor(selectedColor)
+        }
         setPage(0)
         setStyles([])
     }

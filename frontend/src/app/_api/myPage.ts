@@ -53,50 +53,52 @@ export async function updateProfileInfo(
     },
     profileImage?: ProfileImage | null,
 ) {
-    const formData = new FormData()
+    const formData = new FormData();
 
+    // updateRequest를 FormData로 추가
     const updateRequestBlob = new Blob([JSON.stringify(updateRequest)], {
         type: 'application/json',
-    })
-    formData.append('updateRequest', updateRequestBlob) // JSON 데이터를 문자열로 변환하여 추가
+    });
+    formData.append('updateRequest', updateRequestBlob);
 
+    // profileImage가 있을 경우 FormData로 추가
     if (profileImage) {
-        formData.append('profileImage', profileImage.blob)
+        formData.append('profileImage', profileImage.blob);
     }
 
-    const requestUrl = `${API_PRIVATE_URL}/user/update`
+    const requestUrl = `${API_PRIVATE_URL}/user/update`;
 
     const res = await fetch(requestUrl, {
         method: 'PATCH',
         credentials: 'include',
         body: formData,
-    })
+    });
 
     if (!res.ok) {
-        const errorBody = await res.json()
-        throw new ApiError(res.status, errorBody)
+        const errorBody = await res.json();
+        throw new ApiError(res.status, errorBody);
     }
 
-    return await res.json()
+    return await res.json();
 }
 
 export async function updateProfileImg(profileImage: File) {
-    const formData = new FormData()
-    formData.append('profileImage', profileImage)
-    const requestUrl = `${API_PRIVATE_URL}/user/update`
+    const formData = new FormData();
+    formData.append('profileImage', profileImage);
+    const requestUrl = `${API_PRIVATE_URL}/user/update`;
 
     const res = await fetch(requestUrl, {
         method: 'PATCH',
         credentials: 'include',
         body: formData,
-    })
+    });
 
     if (!res.ok) {
-        const errorBody = await res.json()
-        throw new ApiError(res.status, errorBody)
+        const errorBody = await res.json();
+        throw new ApiError(res.status, errorBody);
     }
 
-    return await res.json()
+    return await res.json();
 }
 
 export async function getMyPosts(): Promise<myPostAllResponse[]> {

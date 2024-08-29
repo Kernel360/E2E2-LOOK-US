@@ -40,7 +40,8 @@ public class UserApiController {
 	) throws IOException {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		if(updateRequest == null && profileImage.isEmpty()){
+		// profileImage가 null인지도 확인
+		if (updateRequest == null && (profileImage == null || profileImage.isEmpty())) {
 			throw ApiUserException.builder()
 				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
 				.subCategory(ApiUserErrorSubCategory.USER_UPDATE_IMPOSSIBLE)

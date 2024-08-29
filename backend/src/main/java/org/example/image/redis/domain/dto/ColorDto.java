@@ -42,6 +42,7 @@ public class ColorDto {
 	) {
 
 	}
+
 	public record ColorUpdateDtoRequest(
 		String name,
 		Integer r,
@@ -53,6 +54,15 @@ public class ColorDto {
 		Integer originB
 	) {
 
+	}
+
+	public record ColorPopularResponse(
+		String name,
+		Integer r,
+		Integer g,
+		Integer b
+	){
 
 	}
+
 }

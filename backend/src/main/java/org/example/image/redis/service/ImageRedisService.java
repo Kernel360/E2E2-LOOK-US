@@ -3,20 +3,22 @@ package org.example.image.redis.service;
 import static org.example.image.ImageAnalyzeManager.analyzer.tools.ColorConverter.*;
 import static org.example.image.redis.tools.RgbColorSimilarity.*;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+import org.example.config.log.LogExecution;
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 import org.example.image.redis.ColorApiClient;
 import org.example.image.redis.domain.dto.ColorDto;
-import org.example.config.log.LogExecution;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.enums.PostStatus;
 import org.example.post.repository.PostRepository;
@@ -27,6 +29,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -226,13 +229,43 @@ public class ImageRedisService {
 			String colorName = calcCloseColorsDist(rgbColor, 1).get(0).name();
 
 			Double currentScore = zSetOps.score(ZSET_KEY, colorName);
-			if(currentScore == null){
+			if (currentScore == null) {
 				currentScore = 0.0;
 			}
 			currentScore += updateScoreType.getValue();
 
 			zSetOps.add(ZSET_KEY, colorName, currentScore);
 		}
+	}
+
+	public List<ColorDto.ColorPopularResponse> getPopularColorList() {
+		HashOperations<String, String, Object> hashOps = redisTemplate.opsForHash();
+		ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		// Return most popular 10 color as list of name and rgb
+		Set<ZSetOperations.TypedTuple<Object>> typedTuples = zSetOps.reverseRangeWithScores(ZSET_KEY, 0, 9);
+
+		assert typedTuples != null;
+
+		return typedTuples.stream()
+			.map(
+				tuple -> {
+					String colorName = (String)tuple.getValue();
+					JsonNode rootNode;
+					try {
+						rootNode = objectMapper.readTree(hashOps.get(HASH_KEY, colorName).toString());
+					} catch (JsonProcessingException e) {
+						throw new RuntimeException(e);
+					}
+
+					int[] rgb = {rootNode.get("r").asInt(), rootNode.get("g").asInt(), rootNode.get("b").asInt()};
+					return new ColorDto.ColorPopularResponse(
+						colorName,
+						rgb[0], rgb[1], rgb[2]
+					);
+				}
+			).toList();
 	}
 
 	// Private Internal Method -------------------------------------------------------------------

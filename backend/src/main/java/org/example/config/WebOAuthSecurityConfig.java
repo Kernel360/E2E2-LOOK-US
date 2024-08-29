@@ -1,5 +1,7 @@
 package org.example.config;
 
+import java.util.Arrays;
+
 import org.example.config.jwt.TokenProvider;
 import org.example.config.oauth.OAuth2AuthorizationRequestBasedOnCookieRepository;
 import org.example.config.oauth.OAuth2SuccessHandler;
@@ -116,7 +118,7 @@ public class WebOAuthSecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-
+		corsConfiguration.addAllowedOriginPattern("*");
 		// 명시적으로 도메인을 설정 (와일드카드 패턴 사용하지 않음)
 		corsConfiguration.addAllowedOrigin("https://www.lookus.shop");
 		corsConfiguration.addAllowedOrigin("https://api.lookus.shop");
@@ -135,7 +137,7 @@ public class WebOAuthSecurityConfig {
 		corsConfiguration.addExposedHeader("Set-Cookie");
 		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.addAllowedMethod("*");
-
+		corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Set-Cookie"));
 		// 쿠키 사용을 허용 (Credentials 허용)
 		corsConfiguration.setAllowCredentials(true);
 

@@ -17,7 +17,8 @@ public class ClothTypeConfig {
 			List.of(
 				"Outerwear",
 				"Jacket",
-				"Coat"
+				"Coat",
+				"Clothing"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
@@ -51,10 +52,11 @@ public class ClothTypeConfig {
 		new ClothMappingTable(
 			ClothType.ACCESSORY,
 			List.of(
-				"Shoe",
-				"Sandal",
 				"Belt",
-				"Sunglasses"
+				"Sunglasses",
+				"Glasses",
+				"Tie",
+				"Necklace"
 				// TODO: 추가 해주세요
 			)),
 		new ClothMappingTable(
@@ -81,7 +83,9 @@ public class ClothTypeConfig {
 		new ClothMappingTable(
 			ClothType.BAG,
 			List.of(
-				"Handbag"
+				"Handbag",
+				"Bag",
+				"Luggage & bags"
 				// TODO: 추가 해주세요
 			))
 	);

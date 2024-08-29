@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -18,7 +17,6 @@ import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVision
 import org.example.image.ImageAnalyzeManager.analyzer.service.ImageAnalyzeVisionService;
 import org.example.image.ImageAnalyzeManager.analyzer.tools.ImageCropper;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
-import org.example.image.ImageAnalyzeManager.analyzer.type.ClothType;
 import org.example.image.ImageAnalyzeManager.analyzer.type.NormalizedVertex2D;
 import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
 import org.example.config.log.LogExecution;
@@ -155,26 +153,34 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 		// Detects image properties such as color frequency from the specified local image.
 		Map<String, GoogleImagenVisionDto.ClothDetection> detections = new HashMap<>();
 
+		// cloth-type mapping table 수동 업데이트용 임시 리스트
+		List<String> clothTypeMappingFailures = new ArrayList<>();
+
 		for (LocalizedObjectAnnotation entity : entities) {
-
 			String rawObjectName = entity.getName();
-			Optional<ClothType> clothTypeOptional = ClothTypeMapper.toCategory(rawObjectName);
 
-			if (clothTypeOptional.isPresent()) {
-				ClothType clothType = clothTypeOptional.get();
-				detections.put(
+			ClothTypeMapper.toCategory(rawObjectName).ifPresentOrElse(
+				// if present
+				(clothType) -> detections.put(
 					rawObjectName,
 					new GoogleImagenVisionDto.ClothDetection(
 						clothType,
 						rawObjectName,
 						entity.getBoundingPoly().getNormalizedVerticesList()
 					)
-				);
-			} else if(!rawObjectName.equals("Person")){
-				log.warn("Cloth type not found for object name: {}", rawObjectName);
-			}
+				),
+				// or else
+				() -> {
+					if (!rawObjectName.equals("Person")) {
+						clothTypeMappingFailures.add(rawObjectName);
+					}
+				}
+			);
 		}
 
+		if (!clothTypeMappingFailures.isEmpty()) {
+			log.warn("Object to clothType mapping failed.\n - Object names : {}", clothTypeMappingFailures);
+		}
 		return new ArrayList<>(detections.values());
 	}
 

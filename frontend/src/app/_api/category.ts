@@ -42,6 +42,13 @@ export interface PageResponse<T> {
     empty: boolean
 }
 
+// 인기 있는 컬러 응답 형식 정의
+export interface PopularColor {
+    name: string
+    r: number
+    g: number
+    b: number
+}
 export interface CategoryEntity {
     categoryId: number
     categoryContent: string
@@ -73,6 +80,15 @@ export const fetchPostsByCategory = async (
     console.log(response)
     if (!response.ok) {
         throw new Error('Failed to fetch posts by category')
+    }
+    return response.json()
+}
+
+//인기있는 컬러 가져오기
+export const fetchPopularColor = async (): Promise<PopularColor[]> => {
+    const response = await fetch(`${API_PUBLIC_URL}/posts/popular_color`)
+    if (!response.ok) {
+        throw new Error('Failed to fetch popular colors')
     }
     return response.json()
 }

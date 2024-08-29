@@ -61,4 +61,4 @@ jobs:
           sudo docker compose up -d
           
           # Clean up old Docker images on the server
-          sudo docker image prune -f
+          sudo docker image prune -af --filter "until=24h"

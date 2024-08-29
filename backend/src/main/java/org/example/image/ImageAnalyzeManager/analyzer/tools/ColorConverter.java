@@ -9,21 +9,21 @@ public class ColorConverter {
 	// private static final float[] STANDARD_TRISTIMULUS_D50 = {96.42f, 100.000f, 82.49f};
 	private static final float[] STANDARD_TRISTIMULUS_D65 = {95.047f, 100.000f, 108.883f};	// general type
 	private static final float[] STANDARD_TRISTIMULUS_A = {109.85f, 100.000f, 35.585f};		// relatively dark type
-
-	/**
+/*
+	*//**
 	 * RGB -> CIE-LAB.
-	 * @param red Red coefficient. Values in the range [0..255].
-	 * @param green Green coefficient. Values in the range [0..255].
-	 * @param blue Blue coefficient. Values in the range [0..255].
-	 * @return CIE-LAB color space.
-	 */
+	 * @ param red Red coefficient. Values in the range [0..255].
+	 * @ param green Green coefficient. Values in the range [0..255].
+	 * @ param blue Blue coefficient. Values in the range [0..255].
+	 * @ return CIE-LAB color space.
+	 *//*
 	// float[] tristimulus param maybe need if more accurate converter for specific environment or lighting condition
 	public static float[] RGBtoLAB(int red, int green, int blue, float[] tri){
 		float[] xyz = RGBtoXYZ(red, green, blue);
 		float[] lab = XYZtoLAB(xyz[0], xyz[1], xyz[2], tri);
 
 		return lab;
-	}
+	}*/
 
 	public static LabColor RGBtoLAB(RGBColor rgbColor, float[] tri) {
 		float[] xyz = RGBtoXYZ(rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue());
@@ -31,18 +31,18 @@ public class ColorConverter {
 		return new LabColor(lab[0], lab[1], lab[2]);
 	}
 
-	/**
+/*	*//**
 	 * CIE-LAB -> RGB.
-	 * @param l L coefficient.
-	 * @param a A coefficient.
-	 * @param b B coefficient.
-	 * @return RGB color space.
-	 */
+	 * @ param l L coefficient.
+	 * @ param a A coefficient.
+	 * @ param b B coefficient.
+	 * @ return RGB color space.
+	 *//*
 	// float[] tristimulus param maybe need if more accurate converter for specific environment or lighting condition
 	public static int[] LABtoRGB(float l, float a, float b, float[] tri){
 		float[] xyz = LABtoXYZ(l, a, b, tri);
 		return XYZtoRGB(xyz[0], xyz[1], xyz[2]);
-	}
+	}*/
 
 	/**
 	 * XYZ -> CIE-LAB.

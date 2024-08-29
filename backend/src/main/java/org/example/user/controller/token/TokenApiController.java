@@ -1,6 +1,6 @@
 package org.example.user.controller.token;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.user.domain.dto.request.token.CreateAccessTokenRequest;
 import org.example.user.domain.dto.response.token.CreateAccessTokenResponse;
 import org.example.user.service.token.TokenService;

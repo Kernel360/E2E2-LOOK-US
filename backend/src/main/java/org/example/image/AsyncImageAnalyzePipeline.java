@@ -14,7 +14,6 @@ import java.util.function.Consumer;
 import org.example.image.ImageAnalyzeManager.ImageAnalyzeManager;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.redis.service.ImageRedisService;
-import org.example.log.LogExecution;
 import org.example.post.repository.custom.UpdateScoreType;
 import org.springframework.stereotype.Component;
 
@@ -24,19 +23,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *  비동기 호출에 대한 해결 방법은 총 2가지입니다.
+ *       [ 비동기 호출에 대한 해결 방법은 총 2가지입니다 ]
  *        -
  *       (1) 방법: updateZSetColorScore 함수 호출 전에 image분석 정보가 있는지 체크하고, 있을 때만 score를 update 합니다.
  *           한계: 이미지 분석이 아직 진행 중일 때 발생한 likes, scrap, view 업데이트는 score가 업데이트 되지 않습니다.
  *        -
  *       (2) 방법: job queue의 모든 작업 중에서 imageLocationId와 같은 이미지를 분석하려는 작업이 있는지 검사합니다.
  *                분석하려는 작업이 하나라도 큐에 있다면, 그것은 작업이 진행중인 상태일 것입니다.
+ *                따라서 해당 작업을 다시 큐에 집어 넣고, 분석 쓰레드는 1초간 기다린 뒤 재수행합니다.
+ *           한계: 동시에 1000개 사진이 업로드 된다면, 위 과정이 어떻게 처리될 지 고민이 필요합니다.
+ *                - 싱글 쓰레드 방식이 적절한가?
+ *                - 큐에 작업을 다시 넣고 1초간 기다리는 것이 효율적인가?
  */
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class AsyncImageAnalyzer {
+public class AsyncImageAnalyzePipeline {
 
 	/**
 	 * 이미지 분석이 끝나지 않은 상태 에서 게시물 조회 발생시, 잠시 대기 후 비동기 요청을 재시도 합니다.
@@ -54,8 +57,8 @@ public class AsyncImageAnalyzer {
 	 *               Stack-Overflow : concurrency-on-treeset
 	 *             </a>
 	 */
-	// private final Set<Long> memoForOnProcessingTasks = Collections.synchronizedSortedSet(new TreeSet<>());
-	// Executor scheduledThreadPoolExecutor = Executors.newScheduledThreadPool(10);
+	// Executor ThreadPoolExecutor = Executors.newFixedThreadPool( 8 );
+	// private final Set<Long> onGoingTasks = Collections.synchronizedSortedSet(new TreeSet<>());
 
 	/** ------------------------ (2) Single Threaded ------------------------------------------
 	 *  @implNote  No synchronization required when accessing objects that are not thread-safe.
@@ -63,21 +66,19 @@ public class AsyncImageAnalyzer {
 	 *                baeldung.com - threadpool with completablefuture
 	 *             </a>
 	 */
-	private final Executor singleThreadExecutor = Executors.newSingleThreadExecutor();
+	private final Executor singleThreadExecutor = Executors.newSingleThreadExecutor(); // 큐 + 싱글 쓰레드
 	private final Set<Long> onGoingTasks = new HashSet<>(); // 현재 처리 중인 작업을 임시 기록 합니다.
 
 	/**
 	 * @apiNote [이미지 분석]을 분석 쓰레드에게 비동기로 요청합니다.
 	 * @param imageLocationId 분석하길 원하는 이미지-위치 Id
 	 */
-	@LogExecution
-	public void requestImageAnalyzeAsync(Long imageLocationId) {
+	// @LogExecution
+	public void analyze(Long imageLocationId) {
 		CompletableFuture.runAsync(
 			() -> onStartTask.accept(imageLocationId), singleThreadExecutor
 		).thenRunAsync(
 			() -> extractClothAndColorTask.accept(imageAnalyzeManager, imageLocationId), singleThreadExecutor
-		/*).thenRunAsync( // 미구현 기능 입니다.
-			() -> mapAnalyzedClothCategoryWithPostTask.accept(imageAnalyzeManager, imageLocationId), singleThreadExecutor*/
 		).thenRunAsync(
 			() -> colorScoringTask.accept(imageRedisService, imageLocationId), singleThreadExecutor
 		).whenCompleteAsync(
@@ -90,15 +91,15 @@ public class AsyncImageAnalyzer {
 	 * @param imageLocationId 분석하길 원하는 이미지-위치 Id
 	 * @param updateScoreType 점수 업데이트의 종류 (ex. 좋아요 증가/감소)
 	 */
-	@LogExecution
-	public void requestScoreUpdateAsync(Long imageLocationId, UpdateScoreType updateScoreType)  {
+	// @LogExecution
+	public void updateScore(Long imageLocationId, UpdateScoreType updateScoreType)  {
 
 		if ( isScoreInitialized(imageLocationId) ) {
 			try {
 				this.imageRedisService.updateZSetColorScore(imageLocationId, updateScoreType);
-				log.info("[AsyncImageAnalyzer] : update redis-score done - image {} / type-{}\n", imageLocationId, updateScoreType);
+				log.debug("Update redis-score done - image {} / type-{}\n", imageLocationId, updateScoreType);
 			} catch (JsonProcessingException e) {
-				log.error("[AsyncImageAnalyzer] : update redis-score failure - image {} / type-{}\n", imageLocationId, updateScoreType);
+				log.error("Update redis-score failure - image {} / type-{}\n", imageLocationId, updateScoreType);
 				throw new RuntimeException(e); // TODO: use custom exception
 			}
 			return;
@@ -107,7 +108,7 @@ public class AsyncImageAnalyzer {
 		CompletableFuture.runAsync(
 			() -> pendingTask.accept(UPDATE_SCORE_PENDING_WAIT_MS), singleThreadExecutor
 		).thenRunAsync(
-			() -> this.requestScoreUpdateAsync(imageLocationId, updateScoreType), singleThreadExecutor
+			() -> this.updateScore(imageLocationId, updateScoreType), singleThreadExecutor
 		).orTimeout( /* for safety, throw a TimeoutException in case of a timeout */
 			UPDATE_SCORE_MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS
 		);
@@ -122,36 +123,27 @@ public class AsyncImageAnalyzer {
 
 	private final Consumer<Integer> pendingTask = (ms) -> {
 		try {
-			log.info("[AsyncImageAnalyzer] : pending task... - sleep {}ms", ms);
+			log.debug("Pending task... - sleep {}ms", ms);
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
-			log.error("[AsyncImageAnalyzer] : pending task failure");
+			log.error("Pending task failure");
 			throw new RuntimeException(e);
 		}
 	};
 
 	private final Consumer<Long> onStartTask = (imageLocationId) -> {
 		this.onGoingTasks.add(imageLocationId);
-		log.info("[AsyncImageAnalyzer] : (0) image analyze pipeline start - Image {}", imageLocationId);
-	};
-
-	private final BiConsumer<? super Throwable, Long> onCompleteTask = (exception, imageLocationId) -> {
-		this.onGoingTasks.remove(imageLocationId);
-
-		if (exception != null) {
-			log.info("[AsyncImageAnalyzer] : (3) image analyze pipeline done - image {}", imageLocationId);
-			throw new RuntimeException(exception); // TODO: throw custom task exception
-		}
-		log.error("[AsyncImageAnalyzer] : (3) image analyze pipeline failure - image {}", imageLocationId);
+		log.debug("(0) Image analyze pipeline start - Image {}", imageLocationId);
 	};
 
 	private final BiConsumer<ImageAnalyzeManager, Long> extractClothAndColorTask = (analyzeManager, imageLocationId) -> {
 		try {
+			// add to in-task record
 			onGoingTasks.add(imageLocationId);
 			analyzeManager.analyze(imageLocationId);
-			log.info("[AsyncImageAnalyzer] : (1) analyze done - image {}", imageLocationId);
+			log.debug("(1) Extract cloth info done - image {}", imageLocationId);
 		} catch (IOException e) {
-			log.error("[AsyncImageAnalyzer] : (1) analyze failure - image {}", imageLocationId);
+			log.error("(1) Extract cloth info failure - image {}", imageLocationId);
 			throw new RuntimeException(e);
 		}
 	};
@@ -159,11 +151,22 @@ public class AsyncImageAnalyzer {
 	private final BiConsumer<ImageRedisService, Long> colorScoringTask = (redisService, imageLocationId) -> {
 		try {
 			var colorList = redisService.saveNewColor(imageLocationId);
-			log.info("[AsyncImageAnalyzer] : (2) save new color list done - image {}, colorList {}", imageLocationId, colorList);
+			log.debug("(2) save new color list done - image {}, colorList {}", imageLocationId, colorList);
 		} catch (JsonProcessingException e) {
-			log.error("[AsyncImageAnalyzer] : (2) save new color list failure - image {}", imageLocationId);
+			log.error("(2) save new color list failure - image {}", imageLocationId);
 			throw new RuntimeException(e);
 		}
+	};
+
+	private final BiConsumer<? super Throwable, Long> onCompleteTask = (exception, imageLocationId) -> {
+		// remove from in-task record
+		this.onGoingTasks.remove(imageLocationId);
+
+		if (exception != null) {
+			log.error("(3) Image analyze pipeline failure - image {}", imageLocationId);
+			throw new RuntimeException(exception); // TODO: throw custom task exception
+		}
+		log.debug("(3) Image analyze pipeline done - image {}", imageLocationId);
 	};
 
 	/**
@@ -176,8 +179,7 @@ public class AsyncImageAnalyzer {
 		// 1. get cloth analyzed data
 		List<ClothAnalyzeData> clothAnalyzeDataList
 			= analyzeManager.getAnalyzedData(imageLocationId).clothAnalyzeDataList();
-
 		// 2. set cloth category
-		// TODO: 분석 결과를 가지고 Post Entity의 카테고리와 매핑합니다.
+		// 분석 결과를 가지고 Post Entity의 카테고리와 매핑합니다.
 	};
 }

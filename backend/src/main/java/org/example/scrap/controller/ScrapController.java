@@ -3,7 +3,7 @@ package org.example.scrap.controller;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.scrap.domain.dto.ScrapDto;
 import org.example.scrap.service.ScrapService;
 import org.springframework.http.HttpStatus;

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<Configuration name="LookUs-Logging">-->
+    <!-- Property 를 사용해 오늘 날짜를 저장 -->
+<!--    <Properties>-->
+<!--        <Property name="dateFolder">${date:yyyy-MM-dd}</Property>-->
+<!--    </Properties>-->
+<!---->
+<!--    <Appenders>-->
+        <!-- ConsoleAppender 설정 -->
+<!--        <Console name="CONSOLE" target="SYSTEM_OUT">-->
+<!--             로그 레벨별로 다른 색상 적용 -->
+<!--            <PatternLayout-->
+<!--                    pattern="%d{yyyy-MM-dd HH:mm:ss} %highlight{%-5level}{Faint, Green, Yellow, Red} %style{%logger{36}}{cyan} - %msg%n"/>-->
+<!--        </Console>-->
+
+        <!-- RollingFileAppender 설정 (warn 레벨 이상의 로그만 기록) -->
+<!--        <RollingFile name="FILE" fileName="${env:LOG_PATH}/${dateFolder}/application.log"-->
+<!--                     filePattern="${env:LOG_PATH}/logs/application-%d{yyyy-MM-dd}.%i.log.gz">-->
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>-->
+<!--            <Policies>-->
+<!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+<!--                <SizeBasedTriggeringPolicy size="10MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="10"/>-->
+<!--            <Filters>-->
+<!--                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>-->
+<!--            </Filters>-->
+<!--        </RollingFile>-->
+
+        <!-- LogAspect 전용 RollingFileAppender 설정 -->
+        <!-- 패키지별 로그 파일 설정 -->
+<!--        <RollingFile name="config" fileName="${env:LOG_PATH}/${dateFolder}/config.log"-->
+<!--                     filePattern="${env:LOG_PATH}/config-%d{yyyy-MM-dd}.%i.log.gz">-->
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>-->
+<!--            <Policies>-->
+<!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+<!--                <SizeBasedTriggeringPolicy size="10MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="10"/>-->
+<!--        </RollingFile>-->
+        <!--config package-->
+<!--        <RollingFile name="config" fileName="${env:LOG_PATH}/${dateFolder}/config.log"-->
+<!--                     filePattern="${env:LOG_PATH}/config-%d{yyyy-MM-dd}.%i.log.gz">-->
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>-->
+<!--            <Policies>-->
+<!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+<!--                <SizeBasedTriggeringPolicy size="10MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="10"/>-->
+<!--        </RollingFile>-->
+        <!--follow package-->
+<!--        <RollingFile name="follow" fileName="${env:LOG_PATH}/${dateFolder}/follow.log"-->
+<!--                     filePattern="${env:LOG_PATH}/follow-%d{yyyy-MM-dd}.%i.log.gz">-->
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>-->
+<!--            <Policies>-->
+<!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+<!--                <SizeBasedTriggeringPolicy size="10MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="10"/>-->
+<!--        </RollingFile>-->
+<!--        image package-->
+<!--        <RollingFile name="image" fileName="${env:LOG_PATH}/${dateFolder}/image.log"-->
+<!--                     filePattern="${env:LOG_PATH}/image-%d{yyyy-MM-dd}.%i.log.gz">-->
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>-->
+<!--            <Policies>-->
+<!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+<!--                <SizeBasedTriggeringPolicy size="10MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="10"/>-->
+<!--        </RollingFile>-->
+<!--        post package-->
+<!--        <RollingFile name="post" fileName="${env:LOG_PATH}/${dateFolder}/post.log"-->
+<!--                     filePattern="logs/post-%d{yyyy-MM-dd}.%i.log.gz">-->
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>-->
+<!--            <Policies>-->
+<!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+<!--                <SizeBasedTriggeringPolicy size="10MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="10"/>-->
+<!--        </RollingFile>-->
+        <!--scrap package-->
+<!--        <RollingFile name="scrap" fileName="${env:LOG_PATH}/${dateFolder}/scrap.log"-->
+<!--                     filePattern="${env:LOG_PATH}/scrap-%d{yyyy-MM-dd}.%i.log.gz">-->
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>-->
+<!--            <Policies>-->
+<!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+<!--                <SizeBasedTriggeringPolicy size="10MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="10"/>-->
+<!--        </RollingFile>-->
+        <!--user package-->
+<!--        <RollingFile name="user" fileName="${env:LOG_PATH}/${dateFolder}/user.log"-->
+<!--                     filePattern="${env:LOG_PATH}/user-%d{yyyy-MM-dd}.%i.log.gz">-->
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>-->
+<!--            <Policies>-->
+<!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+<!--                <SizeBasedTriggeringPolicy size="10MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="10"/>-->
+<!--        </RollingFile>-->
+        <!--util package-->
+<!--        <RollingFile name="util" fileName="${env:LOG_PATH}/${dateFolder}/util.log"-->
+<!--                     filePattern="${env:LOG_PATH}/util-%d{yyyy-MM-dd}.%i.log.gz">-->
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>-->
+<!--            <Policies>-->
+<!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+<!--                <SizeBasedTriggeringPolicy size="10MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="10"/>-->
+<!--        </RollingFile>-->
+<!---->
+<!--    </Appenders>-->
+
+    <Loggers>
+        <Root level="info" additivity="false" >
+            <AppenderRef ref="console" />
+            <AppenderRef ref="config" />
+        </Root>
+
+<!--        <logger name="org.springframework.web" additivity="false" >-->
+<!--            <AppenderRef ref="console" level="info"/>-->
+<!--            <AppenderRef ref="application" level="debug" />-->
+<!--            <AppenderRef ref="image" level="debug" />-->
+<!--        </logger>-->
+<!--        <logger name="org.springframework.beans" additivity="false" >-->
+<!--            <AppenderRef ref="console" level="debug"/>-->
+<!--            <AppenderRef ref="file1" level="debug" />-->
+<!--        </logger>-->
+
+
+        <!-- LogAspect 전용 Logger 설정 -->
+<!--        <Logger name="org.example.config.log.LogAspect" level="info" additivity="false">-->
+<!--            <AppenderRef ref="LogAspectFileAppender"/>-->
+<!--        </Logger>-->
+
+        <!-- 패키지별 Logger 설정 -->
+<!--        <Logger name="org.example.post" level="info" additivity="false">-->
+<!--            <AppenderRef ref="PostFileAppender"/>-->
+<!--        </Logger>-->
+
+<!--        <Logger name="org.example.user" level="info" additivity="false">-->
+<!--            <AppenderRef ref="UserFileAppender"/>-->
+<!--        </Logger>-->
+
+<!--        <Logger name="org.example.image" level="info" additivity="false">-->
+<!--            <AppenderRef ref="ImageFileAppender"/>-->
+<!--        </Logger>-->
+    </Loggers>
+</Configuration>

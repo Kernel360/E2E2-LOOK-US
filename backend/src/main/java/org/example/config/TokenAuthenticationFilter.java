@@ -5,7 +5,6 @@ import java.util.Arrays;
 
 import org.example.config.jwt.TokenProvider;
 import org.example.config.oauth.OAuth2SuccessHandler;
-import org.example.log.LogExecution;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;

@@ -2,7 +2,7 @@ package org.example.image.imageStorageManager.storage.controller;
 
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.type.StorageLoadResult;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;

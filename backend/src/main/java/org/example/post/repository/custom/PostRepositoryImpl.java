@@ -1,6 +1,5 @@
 package org.example.post.repository.custom;
 
-import static org.apache.logging.log4j.util.Strings.*;
 import static org.example.post.domain.entity.QCategoryEntity.*;
 import static org.example.post.domain.entity.QHashtagEntity.*;
 import static org.example.post.domain.entity.QPostEntity.*;
@@ -18,7 +17,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.dto.PostStatsDto;
 import org.springframework.data.domain.Page;
@@ -151,14 +150,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	}
 
 	private Predicate postContentContains(String postContent) {
-		if (isEmpty(postContent)) {
+		if (postContent == null || postContent.isBlank()) {
 			return null;
 		}
 		return postEntity.postContent.contains(postContent);
 	}
 
 	private Predicate hashtagContentEq(String hashtagContentList) {
-		if (isEmpty(hashtagContentList)) {
+		if (hashtagContentList == null || hashtagContentList.isBlank()) {
 			return null;
 		}
 
@@ -175,14 +174,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	}
 
 	private Predicate categoryContentEq(String categoryContent) {
-		if (isEmpty(categoryContent)) {
+		if (categoryContent == null || categoryContent.isBlank()) {
 			return null;
 		}
 		return categoryEntity.categoryContent.eq(categoryContent);
 	}
 
 	private List<String> splitString(String str, String delimiter) {
-		if (isEmpty(str)) {
+		if (str == null || str.isBlank()) {
 			return Collections.emptyList();
 		}
 		return Arrays.stream(str.split(delimiter))

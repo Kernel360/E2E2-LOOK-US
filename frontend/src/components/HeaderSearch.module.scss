@@ -1,0 +1,43 @@
+/* HeaderSearch.module.scss */
+.headerSearch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 16px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 50px;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+    position: relative;
+}
+
+.input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 10px 12px;
+    font-size: 16px;
+    border-radius: 25px;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+}
+
+.searchIcon,
+.clearIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* 너비 증가 */
+    height: 40px; /* 높이 증가 */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.searchIcon:hover,
+.clearIcon:hover {
+    background-color: #e2e6ea;
+}

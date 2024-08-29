@@ -3,6 +3,8 @@ package org.example.post.controller;
 import java.util.List;
 
 import org.example.config.log.LogExecution;
+import org.example.image.redis.domain.dto.ColorDto;
+import org.example.image.redis.service.ImageRedisService;
 import org.example.post.domain.dto.PostDto;
 import org.example.post.domain.entity.CategoryEntity;
 import org.example.post.repository.custom.CategoryAndColorSearchCondition;
@@ -36,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostPublicController {
 	private final PostService postService;
+	private final ImageRedisService imageRedisService;
 
 	@GetMapping("")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> searchPost(
@@ -133,6 +136,14 @@ public class PostPublicController {
 	public ResponseEntity<List<CategoryEntity>> getCategoryAll() {
 		List<CategoryEntity> categoryList = postService.getAllCategory();
 		return ResponseEntity.status(HttpStatus.OK).body(categoryList);
+	}
+
+	@GetMapping("/popular_color")
+	public ResponseEntity<List<ColorDto.ColorPopularResponse>> getPopularColor(){
+		List<ColorDto.ColorPopularResponse> colorPopularResponses =
+		imageRedisService.getPopularColorList();
+
+		return ResponseEntity.status(HttpStatus.OK).body(colorPopularResponses);
 	}
 
 }

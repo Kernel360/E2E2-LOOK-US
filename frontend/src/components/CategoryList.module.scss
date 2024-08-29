@@ -1,0 +1,52 @@
+.categoryList {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 10px 0;
+    margin-bottom: 20px;
+
+    // 스크롤바 숨기기 (크롬, 사파리)
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    // 스크롤바 숨기기 (파이어폭스)
+    -ms-overflow-style: none; // IE, Edge
+    scrollbar-width: none; // Firefox
+}
+
+.categoryButton {
+    flex: none;
+    padding: 10px 20px;
+    margin-right: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 50px;
+    border: 2px solid transparent;
+    background-color: #f9f9f9;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: #e0e0e0;
+    }
+
+    &.selected {
+        background-color: #000000;
+        color: #000000;
+        border-color: #000000;
+    }
+
+    &.colored {
+        color: #ffffff;
+        border-color: transparent;
+    }
+}
+
+@media (max-width: 768px) {
+    .categoryButton {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}

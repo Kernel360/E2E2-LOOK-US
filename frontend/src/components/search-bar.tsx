@@ -2,8 +2,7 @@
 
 import { BsFillEraserFill, BsSearch } from 'react-icons/bs'
 import { useCallback, useState } from 'react'
-import { FaPalette } from 'react-icons/fa'
-import Link from 'next/link' // next/link를 사용해요
+import styles from './HeaderSearch.module.scss' // SCSS 모듈을 가져와서 사용
 
 interface HeaderSearchProps {
     onSearch: (search: string) => void
@@ -28,33 +27,16 @@ const HeaderSearch = ({ onSearch }: HeaderSearchProps) => {
     }
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                width: '100%',
-                padding: '8px 16px',
-                backgroundColor: isFocused ? '#d0d0d0' : '#f0f0f0',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                transition: 'background-color 0.3s ease',
-                height: '45px',
-                marginBottom: '20px',
-                position: 'relative', // 모달 위치 조정을 위해 relative로 설정해요 🎀
-            }}
-        >
-            {!isFocused && <BsSearch size={20} onClick={triggerSearch} />}
+        <div className={styles.headerSearch}>
+            {/* {!isFocused && (
+                <BsSearch
+                    size={20}
+                    className={styles.searchIcon}
+                    onClick={triggerSearch}
+                />
+            )} */}
             <input
-                style={{
-                    flex: 1,
-                    border: 'none',
-                    outline: 'none',
-                    padding: '8px',
-                    fontSize: '16px',
-                    borderRadius: '20px',
-                    backgroundColor: 'transparent',
-                    transition: 'background-color 0.3s ease',
-                }}
+                className={styles.input}
                 type='text'
                 placeholder='검색'
                 autoComplete='off'
@@ -66,49 +48,12 @@ const HeaderSearch = ({ onSearch }: HeaderSearchProps) => {
             />
             {search && (
                 <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s ease',
-                    }}
-                    onClick={triggerSearch}
-                    onMouseEnter={e =>
-                        (e.currentTarget.style.backgroundColor = '#cccccc')
-                    }
-                    onMouseLeave={e =>
-                        (e.currentTarget.style.backgroundColor = 'transparent')
-                    }
+                    className={styles.clearIcon}
+                    onClick={() => setSearch('')} // 지우기 기능 구현
                 >
                     <BsFillEraserFill size={20} />
                 </div>
             )}
-            <Link href='/color-selection'>
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s ease',
-                    }}
-                    onMouseEnter={e =>
-                        (e.currentTarget.style.backgroundColor = '#cccccc')
-                    }
-                    onMouseLeave={e =>
-                        (e.currentTarget.style.backgroundColor = 'transparent')
-                    }
-                >
-                    <FaPalette size={20} />
-                </div>
-            </Link>
         </div>
     )
 }

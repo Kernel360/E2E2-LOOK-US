@@ -11,7 +11,7 @@ import com.google.cloud.vision.v1.NormalizedVertex;
 
 public class ImageCropper {
 
-	private final BufferedImage originalImage;
+	protected final BufferedImage originalImage;
 
 	public ImageCropper(byte[] imgBytes) {
 		this.originalImage = createBufferdImageFromBytes(imgBytes);

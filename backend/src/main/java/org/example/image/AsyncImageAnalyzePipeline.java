@@ -46,7 +46,7 @@ public class AsyncImageAnalyzePipeline {
 	 * 분석이 종료되기 까지 평균 1.5초 소요됬던 점을 바탕으로 1000ms로 설정 했습니다.
 	 */
 	private static final int UPDATE_SCORE_PENDING_WAIT_MS = 1000;
-	private static final int UPDATE_SCORE_MAX_TIMEOUT_MS = 5000;
+	protected static final int UPDATE_SCORE_MAX_TIMEOUT_MS = 5000;
 
 	private final ImageAnalyzeManager imageAnalyzeManager;
 	private final ImageRedisService imageRedisService;
@@ -116,12 +116,12 @@ public class AsyncImageAnalyzePipeline {
 
 	// --------------------------------------------------------------------------
 	// Internal Methods
-	private boolean isScoreInitialized(Long imageLocationId) {
+	protected boolean isScoreInitialized(Long imageLocationId) {
 		return !this.onGoingTasks.contains(imageLocationId);
 
 	}
 
-	private final Consumer<Integer> pendingTask = (ms) -> {
+	protected final Consumer<Integer> pendingTask = (ms) -> {
 		try {
 			log.debug("Pending task... - sleep {}ms", ms);
 			Thread.sleep(ms);
@@ -168,18 +168,18 @@ public class AsyncImageAnalyzePipeline {
 		}
 		log.debug("(3) Image analyze pipeline done - image {}", imageLocationId);
 	};
-
-	/**
-	 * @deprecated 아직 구현되지 않은 기능입니다.
+/*
+	*//**
+	 * @ deprecated 아직 구현되지 않은 기능입니다.
 	 * 기존엔 옷 카테고리를 사용자가 직접 입력했습니다.
 	 * 이를 사용자가 하지 않고, 이미지 분석 결과로 부터 자동으로 설정되도록 하고자 한 시도입니다.
 	 * 추후에 구현이 될지 모르지만, 일단 코드를 남깁니다.
-	 */
+	 *//*
 	private final BiConsumer<ImageAnalyzeManager, Long> mapAnalyzedClothCategoryWithPostTask = (analyzeManager, imageLocationId) -> {
 		// 1. get cloth analyzed data
 		List<ClothAnalyzeData> clothAnalyzeDataList
 			= analyzeManager.getAnalyzedData(imageLocationId).clothAnalyzeDataList();
 		// 2. set cloth category
 		// 분석 결과를 가지고 Post Entity의 카테고리와 매핑합니다.
-	};
+	};*/
 }

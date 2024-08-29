@@ -48,8 +48,8 @@ public class ImageRedisService {
 	private final PostRepository postRepository;
 	private final ImageAnalyzeManager imageAnalyzeManager;
 
-	private static final String HASH_KEY = "ColorHash";
-	private static final String ZSET_KEY = "ColorZSet";
+	protected static final String HASH_KEY = "ColorHash";
+	protected static final String ZSET_KEY = "ColorZSet";
 	private static final String COLOR_DIST_CAL_ZSET_KEY = "ColorDistCalZSet";
 	private static final Integer STANDARD_DIST = 10;
 	private static final Integer WEIGHT_LDT = 1;
@@ -57,7 +57,7 @@ public class ImageRedisService {
 	private static final Integer WEIGHT_VIEW = 1;
 
 	@LogExecution
-	public List<String> saveNewColor(Long imageLocationId) throws JsonProcessingException {
+	public List<String>saveNewColor(Long imageLocationId) throws JsonProcessingException {
 		List<String> colorNameList = new ArrayList<>();
 		ColorApiClient client = new ColorApiClient();
 		HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
@@ -270,7 +270,7 @@ public class ImageRedisService {
 
 	// Private Internal Method -------------------------------------------------------------------
 	@LogExecution
-	private List<ColorDto.ColorDistanceResponse> calcCloseColorsDist(
+	protected List<ColorDto.ColorDistanceResponse> calcCloseColorsDist(
 		int[] rgb, int num
 	) throws JsonProcessingException {
 		HashOperations<String, Object, Object> hashOps = redisTemplate.opsForHash();
@@ -354,7 +354,7 @@ public class ImageRedisService {
 	}
 
 	@LogExecution
-	private double calcScoreOfPost(PostPopularSearchCondition condition) {
+	protected double calcScoreOfPost(PostPopularSearchCondition condition) {
 		double score = 0.0;
 
 		Duration duration = Duration.between(condition.getCreatedAt(), LocalDateTime.now());

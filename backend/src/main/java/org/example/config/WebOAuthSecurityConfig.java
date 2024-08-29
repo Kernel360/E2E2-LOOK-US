@@ -116,17 +116,25 @@ public class WebOAuthSecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.addAllowedOriginPattern("*");
+
+		// 명시적으로 도메인을 설정 (와일드카드 패턴 사용하지 않음)
+		corsConfiguration.addAllowedOrigin("https://www.lookus.shop");
+		corsConfiguration.addAllowedOrigin("http://www.lookus.shop");
+		corsConfiguration.addAllowedOrigin("https://lookus.shop");
+		corsConfiguration.addAllowedOrigin("http://lookus.shop");
+		// corsConfiguration.addAllowedOrigin(System.getenv("API_DOMAIN"));
+		// corsConfiguration.addAllowedOrigin(System.getenv("WEBSITE_DOMAIN"));
+		corsConfiguration.addAllowedOrigin("http://localhost:8080"); // JUST FOR LOCAL DEV
+		corsConfiguration.addAllowedOrigin("http://localhost:3000"); // JUST FOR LOCAL DEV
+
+		// 필요한 헤더 및 메소드 추가
 		corsConfiguration.addExposedHeader("Authorization");
 		corsConfiguration.addExposedHeader("refresh_token");
 		corsConfiguration.addExposedHeader("Set-Cookie");
 		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.addAllowedMethod("*");
-		corsConfiguration.addAllowedOrigin(System.getenv("WEBSITE_DOMAIN"));
-		corsConfiguration.addAllowedOrigin(System.getenv("API_DOMAIN"));
-		corsConfiguration.addAllowedOrigin("http://localhost:8080"); // JUST FOR LOCAL DEV
-		corsConfiguration.addAllowedOrigin("http://localhost:8081"); // JUST FOR LOCAL DEV
-		corsConfiguration.addAllowedOrigin("http://localhost:3000"); // JUST FOR LOCAL DEV
+
+		// 쿠키 사용을 허용 (Credentials 허용)
 		corsConfiguration.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

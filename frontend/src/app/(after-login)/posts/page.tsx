@@ -1,52 +1,78 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
-import { getAllPostPreviews, postPreviewContent } from '../../_api/fetchStyle'
+
+import React, { useState, useEffect, useCallback } from 'react'
+import { fetchCategories, CategoryEntity } from '@/app/_api/category'
+import {
+    fetchPostsByCategory,
+    fetchPostsByCategoryAndColor,
+} from '@/app/_api/category'
 import StylePreview from '@/components/post-preview'
-import './gallery.scss'
 import HeaderSearch from '@/components/search-bar'
 import { useIntersectionObserver } from './useIntersectionObserver'
 import { myInfoAllFunction, myInfoAllResponse } from '@/app/_api/myPage'
 import { useRouter } from 'next/navigation'
-
-// 프론트엔드에서 관리할 페이지네이션 상태와 데이터 타입 정의
-interface PostPreviewResponse {
-    content: postPreviewContent[]
-    totalElements: number
-    totalPages: number
-    size: number
-}
+import Image from 'next/image'
+import CategoryList from '@/components/CategoryList'
+import Masonry from 'react-masonry-css'
+import galleryStyles from './gallery.module.scss'
+import { getAllPostPreviews, postPreviewContent } from '@/app/_api/fetchStyle'
 
 export default function Gallery() {
     const [styles, setStyles] = useState<postPreviewContent[]>([])
+    const [categories, setCategories] = useState<CategoryEntity[]>([])
     const [page, setPage] = useState<number>(0)
     const [hasMore, setHasMore] = useState<boolean>(true)
     const [search, setSearch] = useState<string>('')
+    const [category, setCategory] = useState<string | null>(null)
+    const [color, setColor] = useState<number[] | null>(null)
     const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null)
-    const [redirectToSignup, setRedirectToSignup] = useState<boolean>(false) // 회원가입 페이지로 리다이렉트할지 여부
-    const [totalElements, setTotalElements] = useState<number>(0) // 총 게시물 수를 관리하는 상태
-    const [size, setSize] = useState<number>(10) // 페이지 크기 상태 추가
+    const [redirectToSignup, setRedirectToSignup] = useState<boolean>(false)
     const router = useRouter()
+
+    useEffect(() => {
+        // 카테고리 데이터를 가져오는 로직 추가
+        const fetchCategoriesData = async () => {
+            try {
+                const categoriesData = await fetchCategories()
+                setCategories(categoriesData)
+            } catch (error) {
+                console.error('Failed to fetch categories', error)
+            }
+        }
+
+        fetchCategoriesData()
+    }, [])
+
     const fetchData = useCallback(async () => {
         try {
-            const request = search.startsWith('#')
-                ? { hashtags: search.slice(1), page }
-                : { postContent: search, page }
+            let response
 
-            const response = await getAllPostPreviews(request)
+            if (category && color) {
+                response = await fetchPostsByCategoryAndColor(
+                    { category, rgbColor: color },
+                    page,
+                    10,
+                )
+            } else if (category) {
+                const categoryId =
+                    categories.find(cat => cat.categoryContent === category)
+                        ?.categoryId || 0
+                response = await fetchPostsByCategory(categoryId, page, 10)
+            } else {
+                const request = search.startsWith('#')
+                    ? { hashtags: search.slice(1), page }
+                    : { postContent: search, page }
+                response = await getAllPostPreviews(request)
+            }
+
             setStyles(prevStyles => [...prevStyles, ...response.content])
-            setTotalElements(response.totalElements) // 총 게시물 수 업데이트
-            setSize(response.size) // 페이지 크기 업데이트
-
-            // hasMore 상태를 totalElements와 현재 페이지를 기반으로 업데이트
-            const currentPageSize = response.content.length // 현재 페이지의 데이터 수
             setHasMore(
-                currentPageSize > 0 &&
-                    (page + 1) * response.size < response.totalElements, // 서버에서 받은 페이지 크기 사용
+                response.content.length > 0 && page < response.totalPages,
             )
         } catch (error) {
             console.error('Failed to fetch data:', error)
         }
-    }, [search, page])
+    }, [search, page, category, color, categories])
 
     useEffect(() => {
         fetchData()
@@ -55,12 +81,29 @@ export default function Gallery() {
     const handleSearch = (search: string) => {
         setSearch(search)
         setPage(0)
-        setStyles([]) // 새로운 검색어로 검색할 때 기존 데이터를 초기화
+        setStyles([])
+        setCategory(null)
+        setColor(null)
+    }
+
+    const handleCategorySelect = (selectedCategory: string) => {
+        setCategory(selectedCategory)
+        setPage(0)
+        setStyles([])
+    }
+
+    const handleCategoryAndColorSelect = (
+        selectedCategory: string,
+        selectedColor: number[],
+    ) => {
+        setCategory(selectedCategory)
+        setColor(selectedColor)
+        setPage(0)
+        setStyles([])
     }
 
     const lastElementRef = useIntersectionObserver(() => {
         if (hasMore) {
-            // 더 가져올 데이터가 있을 때만 페이지 증가
             setPage(prev => prev + 1)
         }
     }, hasMore)
@@ -71,9 +114,8 @@ export default function Gallery() {
                 const data = await myInfoAllFunction()
                 setUserInfo(data)
 
-                // Gender가 null일 경우 회원가입 페이지로 리다이렉트
                 if (data.gender === null) {
-                    setRedirectToSignup(true) // 리다이렉트 상태 설정
+                    setRedirectToSignup(true)
                 }
             } catch (error) {
                 console.error('Failed to fetch user info:', error)
@@ -83,25 +125,47 @@ export default function Gallery() {
         fetchUserInfo()
     }, [])
 
-    // 리다이렉트 처리
     if (redirectToSignup) {
         return router.push('/signup')
     }
 
+    const breakpointColumnsObj = {
+        default: 2,
+        1100: 2,
+        700: 2,
+    }
+
     return (
-        <div className='container'>
+        <div className={galleryStyles.container}>
+            <div className={galleryStyles.logoWrapper}>
+                <Image
+                    src='/images/LOOKUSlogo.png'
+                    alt='LOOK:US Logo'
+                    width={171}
+                    height={36}
+                    priority={true}
+                />
+            </div>
             <HeaderSearch onSearch={handleSearch} />
-            <section className='gallery'>
-                {styles?.map((item, index) => (
+            <CategoryList
+                categories={categories}
+                onSelectCategory={handleCategorySelect}
+                onSelectCategoryAndColor={handleCategoryAndColorSelect}
+            />
+            <Masonry
+                breakpointCols={breakpointColumnsObj}
+                className={galleryStyles.masonryGrid}
+                columnClassName={galleryStyles.masonryGridColumn}
+            >
+                {styles.map((item, index) => (
                     <StylePreview
-                        className='gallery-item'
+                        className={galleryStyles.galleryItem}
                         content={item}
                         key={index}
                     />
                 ))}
-                <div ref={lastElementRef}></div>{' '}
-                {/* 마지막 요소에 대한 ref 추가 */}
-            </section>
+            </Masonry>
+            <div ref={lastElementRef}></div>
         </div>
     )
 }

@@ -1,0 +1,38 @@
+/* gallery.module.scss */
+
+.container {
+    max-width: 430px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    background: #ffffff;
+}
+
+.logoWrapper {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.masonryGrid {
+    display: flex;
+    margin-left: -10px; /* gutter size offset */
+    width: auto;
+}
+
+.masonryGridColumn {
+    padding-left: 10px; /* gutter size */
+    background-clip: padding-box;
+}
+
+/* 스타일 요소의 크기에 따라 높이가 달라지므로, 이미지를 전체 폭에 맞게 설정 */
+.galleryItem {
+    border-radius: 8px; /* 둥근 모서리 추가 */
+    overflow: hidden; /* 이미지가 둥근 모서리 밖으로 넘치지 않도록 설정 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 약간의 그림자 추가 (선택 사항) */
+}
+
+.galleryItem img {
+    margin-bottom: 10px !important; /* 아이템 간 간격 추가 */
+    border-radius: 8px; /* 이미지도 둥근 모서리 */
+    object-fit: cover; /* 이미지가 컨테이너에 꽉 차도록 설정 */
+}

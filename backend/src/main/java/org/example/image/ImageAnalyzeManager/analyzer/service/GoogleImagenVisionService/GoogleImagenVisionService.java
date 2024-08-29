@@ -21,7 +21,7 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothType;
 import org.example.image.ImageAnalyzeManager.analyzer.type.NormalizedVertex2D;
 import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.stereotype.Service;
 
 import com.google.api.gax.core.FixedCredentialsProvider;

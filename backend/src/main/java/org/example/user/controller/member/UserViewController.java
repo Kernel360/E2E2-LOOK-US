@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.example.config.jwt.TokenProvider;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.post.domain.entity.PostDailyStats;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.domain.entity.PostTotalStats;

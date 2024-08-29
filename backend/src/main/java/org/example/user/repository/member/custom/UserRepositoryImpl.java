@@ -4,7 +4,7 @@ import static org.example.post.domain.entity.QPostEntity.*;
 
 import java.util.List;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.post.domain.entity.PostEntity;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;

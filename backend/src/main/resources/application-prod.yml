@@ -42,18 +42,3 @@ jwt:
   issuer: ${MY_JWT_ISSUER}
   secret_key: ${MY_JWT_SECRET_KEY}
 
-logging:
-  config: classpath:log4j2.xml
-  logback:
-    rolling policy:
-      max-history: 30
-      max-file-size: 100MB
-      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}-%i.log
-  file:
-    name: logs/sbb.log
-  pattern:
-    dateformat: "yyyy-MM-dd HH:mm:ss.SSS,Asia/Seoul"
-    level:
-      root: debug
-      org.example: debug
-

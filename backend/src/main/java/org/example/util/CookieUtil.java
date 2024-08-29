@@ -2,7 +2,7 @@ package org.example.util;
 
 import java.util.Base64;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.util.SerializationUtils;
 
 import jakarta.servlet.http.Cookie;

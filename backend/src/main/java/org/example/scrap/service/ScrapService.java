@@ -7,8 +7,8 @@ import org.example.exception.post.ApiPostErrorSubCategory;
 import org.example.exception.post.ApiPostException;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.image.AsyncImageAnalyzer;
-import org.example.log.LogExecution;
+import org.example.image.AsyncImageAnalyzePipeline;
+import org.example.config.log.LogExecution;
 import org.example.post.domain.entity.PostEntity;
 import org.example.post.repository.PostRepository;
 import org.example.post.repository.custom.UpdateScoreType;
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 public class ScrapService {
-	private final AsyncImageAnalyzer asyncImageAnalyzer;
+	private final AsyncImageAnalyzePipeline asyncImageAnalyzePipeline;
 
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
@@ -57,7 +57,7 @@ public class ScrapService {
 				.subCategory(ApiUserErrorSubCategory.USER_SCRAP_DUPLICATION)
 				.build();
 		}
-		asyncImageAnalyzer.requestScoreUpdateAsync(
+		asyncImageAnalyzePipeline.updateScore(
 			findPost(postId).getImageLocationId(),
 			UpdateScoreType.SCRAP
 		);
@@ -71,7 +71,7 @@ public class ScrapService {
 
 	@LogExecution
 	public void unscrapPostByPostId(Long postId, String userEmail) throws JsonProcessingException {
-		asyncImageAnalyzer.requestScoreUpdateAsync(
+		asyncImageAnalyzePipeline.updateScore(
 			findPost(postId).getImageLocationId(),
 			UpdateScoreType.SCRAP_CANCEL
 		);

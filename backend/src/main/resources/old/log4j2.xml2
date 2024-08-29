@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration name="LookUs-Logging">
+    <!-- Property 를 사용해 오늘 날짜를 저장 -->
+    <Properties>
+        <Property name="dateFolder">${date:yyyy-MM-dd}</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- ConsoleAppender 설정 -->
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <!-- 로그 레벨별로 다른 색상 적용 -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %highlight{%-4level}{Faint, Green, Yellow, Red} %style{%logger{36}}{cyan} - %msg%n"/>
+        </Console>
+
+        <RollingFile
+                name="FILE"
+                fileName="${env:LOG_PATH}/${dateFolder}/application.log"
+                filePattern="${env:LOG_PATH}/logs/application-%d{yyyy-MM-dd}.%i.log.gz"
+        >
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <logger name="org.example" level="debug" additivity="false" >
+            <AppenderRef ref="CONSOLE" />
+            <AppenderRef ref="FILE"  />
+        </logger>
+        <Root level="info" additivity="false" >
+            <AppenderRef ref="CONSOLE" />
+            <AppenderRef ref="FILE" />
+        </Root>
+    </Loggers>
+
+</Configuration>

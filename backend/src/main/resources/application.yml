@@ -1,5 +1,3 @@
-
-
 spring:
   batch:
     job:
@@ -13,6 +11,7 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
+    show-sql: true
 
   datasource:
     url: ${MY_DATA_SOURCE}
@@ -54,10 +53,3 @@ spring:
 jwt:
   issuer: ${MY_JWT_ISSUER}
   secret_key: ${MY_JWT_SECRET_KEY}
-
-logging:
-  level:
-    root: info
-    org.example: debug
-
-  config: classpath:log4j2.xml

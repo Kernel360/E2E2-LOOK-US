@@ -6,7 +6,7 @@ import org.example.config.jwt.TokenProvider;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.service.member.UserService;
 import org.springframework.stereotype.Service;

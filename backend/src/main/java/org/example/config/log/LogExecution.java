@@ -1,4 +1,4 @@
-package org.example.log;
+package org.example.config.log;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

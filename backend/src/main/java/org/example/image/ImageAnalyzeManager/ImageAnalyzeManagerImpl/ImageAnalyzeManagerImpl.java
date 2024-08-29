@@ -13,7 +13,7 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.ImageAnalyzeManager.type.ImageAnalyzeData;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.type.StorageLoadResult;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;

@@ -3,7 +3,7 @@ package org.example.user.service.token;
 import org.example.exception.common.ApiErrorCategory;
 import org.example.exception.user.ApiUserErrorSubCategory;
 import org.example.exception.user.ApiUserException;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.user.domain.entity.token.RefreshToken;
 import org.example.user.repository.token.RefreshTokenRepository;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
-logging:
-  config: classpath:log4j2.xml
-
 spring:
+  output:
+    ansi:
+      enabled: always
   batch:
     job:
       enabled: false

@@ -1,13 +1,11 @@
 package org.example.config.redis;
 import static org.example.image.redis.tools.RgbColorSimilarity.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 import org.example.image.redis.domain.dto.ColorDto;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;

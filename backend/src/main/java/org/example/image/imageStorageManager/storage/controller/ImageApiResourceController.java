@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

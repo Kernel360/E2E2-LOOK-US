@@ -6,7 +6,7 @@ import org.example.exception.user.ApiUserException;
 import org.example.follow.domain.dto.FollowDto;
 import org.example.follow.domain.entity.Follow;
 import org.example.follow.repository.FollowRepository;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.repository.member.UserRepository;
 import org.springframework.stereotype.Service;

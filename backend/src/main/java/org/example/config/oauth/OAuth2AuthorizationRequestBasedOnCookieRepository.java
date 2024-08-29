@@ -1,6 +1,6 @@
 package org.example.config.oauth;
 
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.util.CookieUtil;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;

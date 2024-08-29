@@ -1,7 +1,7 @@
 package org.example.image.redis;
 
 import org.example.image.redis.domain.dto.ColorInfoResponse;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

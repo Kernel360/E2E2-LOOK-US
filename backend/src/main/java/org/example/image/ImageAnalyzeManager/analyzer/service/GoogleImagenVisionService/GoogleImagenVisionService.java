@@ -3,7 +3,6 @@ package org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVisio
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +21,7 @@ import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothType;
 import org.example.image.ImageAnalyzeManager.analyzer.type.NormalizedVertex2D;
 import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.stereotype.Service;
 
 import com.google.api.gax.core.FixedCredentialsProvider;

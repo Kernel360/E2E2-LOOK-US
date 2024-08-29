@@ -14,7 +14,7 @@ import org.example.image.imageStorageManager.storage.service.core.strategy.UuidV
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.type.StorageLoadResult;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

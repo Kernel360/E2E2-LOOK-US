@@ -39,12 +39,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0' //이쁘게
-    implementation("org.springframework.boot:spring-boot-starter-websocket")
+//    implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.webjars:webjars-locator-core")
-    implementation("org.webjars:sockjs-client:1.0.2")
-    implementation("org.webjars:stomp-websocket:2.3.3")
-    implementation("org.webjars:bootstrap:3.3.7")
-    implementation("org.webjars:jquery:3.1.1-1")
+//    implementation("org.webjars:sockjs-client:1.0.2")
+//    implementation("org.webjars:stomp-websocket:2.3.3")
+//    implementation("org.webjars:bootstrap:3.3.7")
+//    implementation("org.webjars:jquery:3.1.1-1")
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0' // swagger 추가
 
     //추가
@@ -65,11 +65,11 @@ dependencies {
     implementation 'org.aspectj:aspectjweaver:1.9.19'
 
     // log4j2
-    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
-    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+//    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+//    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
     // log4j2 with SLF4J bridge
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.20.0'
-    implementation 'org.slf4j:slf4j-api:2.0.9'
+//    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.20.0'
+//    implementation 'org.slf4j:slf4j-api:2.0.9'
 
 
     //test 롬복 사용
@@ -86,12 +86,17 @@ dependencies {
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+
+    // logback 사용을 위해 아래 library 추가함
+    implementation 'ch.qos.logback:logback-classic:1.4.1'
+    implementation 'org.slf4j:slf4j-api:2.0.3'
 }
-configurations {
-    all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-    all*.exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
-    all*.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
-}
+//configurations {
+//    all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+//    all*.exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
+//    all*.exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+//}
 
 
 

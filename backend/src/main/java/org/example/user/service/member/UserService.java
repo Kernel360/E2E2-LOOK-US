@@ -12,7 +12,7 @@ import org.example.exception.user.ApiUserException;
 import org.example.image.imageStorageManager.ImageStorageManager;
 import org.example.image.imageStorageManager.storage.service.core.StorageType;
 import org.example.image.imageStorageManager.type.StorageSaveResult;
-import org.example.log.LogExecution;
+import org.example.config.log.LogExecution;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.domain.enums.Role;

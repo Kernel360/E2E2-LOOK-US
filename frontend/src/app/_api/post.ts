@@ -3,22 +3,18 @@
 import { ApiError } from 'next/dist/server/api-utils'
 import { API_PRIVATE_URL, API_PUBLIC_URL } from '../_common/constants'
 
-// export interface PostFormValues {
-//     editedImageBlob: Blob // 이미지를 Blob 형태로 저장
-//     content: string // 게시글 내용
-//     hashtags: { value: string }[] // 해시태그 리스트
-//     categories: string[] // 카테고리 리스트
-// }
-
 // 게시글 정보 가져오기 🎀
 export interface GetPostResponse {
     nickname: string
+    profileImageLocationId: number
     postId: number
     imageLocationId: number
     postContent: string
     hashtagContents: string[]
+    categories: string[]
     likeCount: number
     likeStatus: boolean
+    hits: number
     createdAt: Date
     updatedAt: Date
 }

@@ -48,6 +48,7 @@ public class PostDto {
 	//       이후 프론트 개발이 진행될 때는 image_id를 사용합니다.
 	public record PostDetailDtoResponse(
 		String nickname,
+		Long profileImageLocationId,
 		Long postId,
 		Long imageLocationId,
 		String postContent,
@@ -64,6 +65,7 @@ public class PostDto {
 
 			return new PostDetailDtoResponse(
 				postEntity.getUser().getNickname(),
+				postEntity.getUser().getProfileImageLocationId(),
 				postEntity.getPostId(),
 				postEntity.getImageLocationId(),
 				postEntity.getPostContent(),

@@ -119,7 +119,9 @@ public class WebOAuthSecurityConfig {
 
 		// 명시적으로 도메인을 설정 (와일드카드 패턴 사용하지 않음)
 		corsConfiguration.addAllowedOrigin("https://www.lookus.shop");
+		corsConfiguration.addAllowedOrigin("https://api.lookus.shop");
 		corsConfiguration.addAllowedOrigin("http://www.lookus.shop");
+		corsConfiguration.addAllowedOrigin("http://api.lookus.shop");
 		corsConfiguration.addAllowedOrigin("https://lookus.shop");
 		corsConfiguration.addAllowedOrigin("http://lookus.shop");
 		// corsConfiguration.addAllowedOrigin(System.getenv("API_DOMAIN"));

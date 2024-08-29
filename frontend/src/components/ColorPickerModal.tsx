@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './ColorPickerModal.module.scss'
+import { fetchPopularColor, PopularColor } from '@/app/_api/category'
 
 interface ColorPickerModalProps {
     initialColor?: string
@@ -7,6 +8,12 @@ interface ColorPickerModalProps {
     onClose: () => void
     onCategoryOnlySelect: () => void // 카테고리만 선택할 때 호출되는 함수
     onResetCategory: () => void // 카테고리 선택 초기화 함수 추가
+}
+
+// RGB 값을 HEX 값으로 변환하는 함수
+const rgbToHex = (r: number, g: number, b: number): string => {
+    const toHex = (component: number) => component.toString(16).padStart(2, '0')
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }
 
 const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
@@ -18,19 +25,36 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
 }) => {
     const [selectedColor, setSelectedColor] = useState<string>(initialColor)
     const [sliderColor, setSliderColor] = useState<string>(initialColor)
+    const [trendColors, setTrendColors] = useState<string[]>([]) // trendColors 상태로 관리
 
-    const trendColors = [
-        '#EF4444',
-        '#F97316',
-        '#FACC15',
-        '#2DD4BF',
-        '#6366F1',
-        '#EC4899',
-        '#F43F5E',
-        '#D946EF',
-        '#0EA5E9',
-        '#84CC16',
-    ]
+    // const trendColors = [
+    //     '#EF4444',
+    //     '#F97316',
+    //     '#FACC15',
+    //     '#2DD4BF',
+    //     '#6366F1',
+    //     '#EC4899',
+    //     '#F43F5E',
+    //     '#D946EF',
+    //     '#0EA5E9',
+    //     '#84CC16',
+    // ]
+
+    useEffect(() => {
+        const loadPopularColors = async () => {
+            try {
+                const colors: PopularColor[] = await fetchPopularColor()
+                const hexColors = colors.map(color =>
+                    rgbToHex(color.r, color.g, color.b),
+                )
+                setTrendColors(hexColors)
+            } catch (error) {
+                console.error('Failed to fetch popular colors:', error)
+            }
+        }
+
+        loadPopularColors()
+    }, [])
 
     const handleColorSelect = (color: string) => {
         setSelectedColor(color)

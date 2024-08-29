@@ -8,6 +8,7 @@ import { API_PUBLIC_URL } from '@/app/_common/constants'
 import { useRouter } from 'next/navigation'
 import { follow, FollowRequest } from '@/app/_api/follow'
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'
+import { FaRegBookmark, FaBookmark } from 'react-icons/fa'
 
 type Props = {
     params: { post_id: number }
@@ -19,6 +20,7 @@ export default function Page({ params, searchParams }: Props) {
     const [isFollowing, setIsFollowing] = useState<boolean>(false)
     const [likeCount, setLikeCount] = useState<number>(0)
     const [liked, setLiked] = useState<boolean>(false)
+    const [scraped, setScraped] = useState<boolean>(false) // 스크랩 여부 상태 추가
     const router = useRouter()
 
     useEffect(() => {
@@ -59,9 +61,12 @@ export default function Page({ params, searchParams }: Props) {
         }
     }
 
+    const handleScrapClick = () => {
+        setScraped(prev => !prev)
+    }
+
     if (!post) return <div>Loading...</div>
 
-    console.log(`${post.imageLocationId}`)
     return (
         <div className={styles.postContainer}>
             <div className={styles.imageContainer}>
@@ -75,18 +80,9 @@ export default function Page({ params, searchParams }: Props) {
                     sizes='100%'
                 />
             </div>
-            <div className={styles.header}>
-                <div className={styles.profileInfo}>
-                    <div className={styles.profilePic}>
-                        <img
-                            src='https://private-user-images.githubusercontent.com/60287070/356863617-dd8f7943-e1bc-4003-bf45-78b5346b77e5.png'
-                            alt='profile'
-                        />
-                    </div>
-                    <span className={styles.username}>{post.nickname}</span>
-                </div>
 
-                <div className={styles.actions}>
+            <div className={styles.actions}>
+                <div className={styles.actionItem}>
                     <button
                         className={styles.likeButton}
                         onClick={handleLikeClick}
@@ -97,7 +93,86 @@ export default function Page({ params, searchParams }: Props) {
                             <AiOutlineHeart className={styles.heartIcon} />
                         )}
                     </button>
-                    <span className={styles.likeCount}>{likeCount}</span>
+                    <span className={styles.count}>{likeCount}</span>
+                </div>
+
+                <div className={styles.actionItem}>
+                    <button
+                        className={styles.scrapButton}
+                        onClick={handleScrapClick}
+                    >
+                        {scraped ? (
+                            <FaBookmark className={styles.scrapIcon} />
+                        ) : (
+                            <FaRegBookmark className={styles.scrapIcon} />
+                        )}
+                    </button>
+                </div>
+
+                <span className={styles.viewsCount}>{post.hits}번 조회</span>
+            </div>
+
+            <div className={styles.contentBox}>
+                <div className={styles.contentTitle}>게시글</div>
+
+                <div className={styles.content}>{post.postContent}</div>
+            </div>
+
+            <div className={styles.categoriesBox}>
+                <div className={styles.categoryTitle}>카테고리</div>
+                <div className={styles.categoryList}>
+                    {post.categories.map((category: string) => (
+                        <span key={category} className={styles.category}>
+                            {category}
+                        </span>
+                    ))}
+                </div>
+            </div>
+
+            <div className={styles.hashtagsBox}>
+                <div className={styles.hashtagTitle}>해시태그</div>
+                <div className={styles.hashtagList}>
+                    {post.hashtagContents.length > 0 ? (
+                        post.hashtagContents.map((hashtag: string) => (
+                            <span
+                                key={hashtag}
+                                className={styles.hashtag}
+                                onClick={() =>
+                                    router.push(
+                                        `/search?hashtags=${encodeURIComponent(hashtag)}`,
+                                    )
+                                }
+                            >
+                                #{hashtag}
+                            </span>
+                        ))
+                    ) : (
+                        <div className={styles.hashtagPlaceholder}>-</div>
+                    )}
+                </div>
+            </div>
+
+            <div className={styles.profileDetailsBox}>
+                <div className={styles.profileDetails}>
+                    <div className={styles.profilePic}>
+                        <Image
+                            src={`${API_PUBLIC_URL}/image/${post.profileImageLocationId}`}
+                            alt='profile'
+                            width={50} // 고정된 너비
+                            height={50} // 고정된 높이
+                            className={styles.profileImage}
+                        />
+                    </div>
+                    <div className={styles.profileInfo}>
+                        <span className={styles.username}>{post.nickname}</span>
+                        <div>
+                            <span className={styles.stats}>팔로워 0명</span>
+                            <span className={styles.stats}>팔로잉 0명</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles.followButtonContainer}>
                     <button
                         className={
                             isFollowing
@@ -109,22 +184,6 @@ export default function Page({ params, searchParams }: Props) {
                         {isFollowing ? '팔로잉' : '팔로우'}
                     </button>
                 </div>
-            </div>
-            <div className={styles.content}>{post.postContent}</div>
-            <div className={styles.hashtags}>
-                {post.hashtagContents.map((hashtag: string) => (
-                    <span
-                        key={hashtag}
-                        className={styles.hashtag}
-                        onClick={() =>
-                            router.push(
-                                `/search?hashtags=${encodeURIComponent(hashtag)}`,
-                            )
-                        }
-                    >
-                        #{hashtag}
-                    </span>
-                ))}
             </div>
         </div>
     )

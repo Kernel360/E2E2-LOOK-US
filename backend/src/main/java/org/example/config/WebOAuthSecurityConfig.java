@@ -118,16 +118,14 @@ public class WebOAuthSecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.addAllowedOriginPattern("*");
-		// 명시적으로 도메인을 설정 (와일드카드 패턴 사용하지 않음)
+
+		// 명시적으로 도메인을 설정
 		corsConfiguration.addAllowedOrigin("https://www.lookus.shop");
 		corsConfiguration.addAllowedOrigin("https://api.lookus.shop");
 		corsConfiguration.addAllowedOrigin("http://www.lookus.shop");
 		corsConfiguration.addAllowedOrigin("http://api.lookus.shop");
 		corsConfiguration.addAllowedOrigin("https://lookus.shop");
 		corsConfiguration.addAllowedOrigin("http://lookus.shop");
-		// corsConfiguration.addAllowedOrigin(System.getenv("API_DOMAIN"));
-		// corsConfiguration.addAllowedOrigin(System.getenv("WEBSITE_DOMAIN"));
 		corsConfiguration.addAllowedOrigin("http://localhost:8080"); // JUST FOR LOCAL DEV
 		corsConfiguration.addAllowedOrigin("http://localhost:3000"); // JUST FOR LOCAL DEV
 
@@ -135,14 +133,16 @@ public class WebOAuthSecurityConfig {
 		corsConfiguration.addExposedHeader("Authorization");
 		corsConfiguration.addExposedHeader("refresh_token");
 		corsConfiguration.addExposedHeader("Set-Cookie");
-		corsConfiguration.addAllowedHeader("*");
-		corsConfiguration.addAllowedMethod("*");
-		corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Set-Cookie"));
+		corsConfiguration.addAllowedHeader("*"); // 모든 헤더 허용
+		corsConfiguration.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
+
 		// 쿠키 사용을 허용 (Credentials 허용)
 		corsConfiguration.setAllowCredentials(true);
 
+		// CORS 설정을 적용할 URL 패턴 등록
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);
+
 		return source;
 	}
 }

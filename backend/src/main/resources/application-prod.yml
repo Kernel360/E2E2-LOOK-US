@@ -3,7 +3,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect # MySQL 버전에 맞게 설정하세요
-        format_sql: true
+        format_sql: false
     hibernate:
       ddl-auto: validate
 

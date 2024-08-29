@@ -13,27 +13,42 @@
 
 ### 메인 화면
 
-- 이미지, 해시태그 기반으로 업로드된 데일리룩, OOTD 확인 가능
-- 해시태그 기반 필터링, 게시물 검색 가능
+- 이미지, 해시태그, 카테고리 기반으로 업로드된 데일리룩, OOTD 확인
+- 옷 카테고리 기반 필터링, 게시물 검색
+- 게시물 내용, 해시태그를 통한 검색
+- RGB 기반 검색
+  - Color Picker 를 통해 원하는 R, G, B 값을 통한 검색
+  - 인기 있는 색을 클릭하면 RGB 값 자동 세팅되어 검색
+- 게시물 스크랩
+- 유저 팔로우
 
 ### 게시물 작성
 
 - 이미지 업로드 (필수)
 - 게시글 작성
-- 카테고리 기반 해시태그 선택 후 포스팅
+- 해시태그 작성
+- 옷 카테고리 선택
 
-### 팔로우 기능
-
+### 팔로우
 - 해당 사용자의 스타일이 맘에 드는 경우 -> 팔로우
-- 팔로워가 1000명 이상인 유저 -> 인플루언서 권한 부여 (작성한 게시글이 인플루언서 피드에도 노출됨)
 
 ### 회원가입 및 로그인
 
 - JWT 이용
+- Google 소셜 로그인
+- 추가 정보 입력
+
+### 관리자 페이지
+- 1일, 전체 통계를 그래프로 확인 가능
+- 레디스에 업데이트할 색상 조건 설정 가능
+
+### 스크랩
+- 마음에 드는 게시물 스크랩
+- 마이페이지에서 확인 가능
 
 ### 기타 기능
 
-- 댓글 및 좋아요
+- 좋아요
 - 마이페이지
 
 ## 🎨 Frontend Wireframe
@@ -47,15 +62,14 @@
   - Next.js
 - BACK
   - Spring Boot
-  - Spring Security, OAuth, JWT, Validation, Lombok,
-  - 고려해볼것: Redis, WebFlux
+  - Spring Security, OAuth, JWT
+  - R
 - DataBase
-  - MySQL / NOSQL?
+  - MySQL / Redis
 - Infra
   - AWS or Naver
 - Deploy
   - AWS EC2
-
 
 ## 📂 Directory Structure
 <details>
@@ -392,11 +406,15 @@
 
 ##### (2) Env 설정
 
-- 협의 후 추가 예정입니다.
+- Google Vision Api Key
+  - .env 의 GOOGLE_VISION_API_KEYS
 
 ##### (3) 도커 설정
 
-- 도커는 나중에 협의 후 추가 예정입니다.
+- look-us-dev
+  - look-us-mysql : MySQL Docker
+  - look-us-redis : Redis Docker
+
 
 ## 👨‍👩‍👧‍👦 Developer
 

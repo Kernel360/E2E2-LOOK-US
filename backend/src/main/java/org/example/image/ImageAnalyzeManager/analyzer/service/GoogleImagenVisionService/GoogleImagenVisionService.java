@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -18,7 +17,6 @@ import org.example.image.ImageAnalyzeManager.analyzer.service.GoogleImagenVision
 import org.example.image.ImageAnalyzeManager.analyzer.service.ImageAnalyzeVisionService;
 import org.example.image.ImageAnalyzeManager.analyzer.tools.ImageCropper;
 import org.example.image.ImageAnalyzeManager.analyzer.type.ClothAnalyzeData;
-import org.example.image.ImageAnalyzeManager.analyzer.type.ClothType;
 import org.example.image.ImageAnalyzeManager.analyzer.type.NormalizedVertex2D;
 import org.example.image.ImageAnalyzeManager.analyzer.type.RGBColor;
 import org.example.config.log.LogExecution;
@@ -180,7 +178,9 @@ public class GoogleImagenVisionService implements ImageAnalyzeVisionService {
 			);
 		}
 
-		log.warn("Object to clothType mapping failed.\n - Object names : {}", clothTypeMappingFailures);
+		if (!clothTypeMappingFailures.isEmpty()) {
+			log.warn("Object to clothType mapping failed.\n - Object names : {}", clothTypeMappingFailures);
+		}
 		return new ArrayList<>(detections.values());
 	}
 

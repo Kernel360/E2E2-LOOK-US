@@ -54,7 +54,7 @@ public class WebOAuthSecurityConfig {
 		return http
 			.csrf(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
-			// .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.formLogin(AbstractHttpConfigurer::disable)
 			.logout(AbstractHttpConfigurer::disable)
 			.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -115,31 +115,31 @@ public class WebOAuthSecurityConfig {
 		return new OAuth2AuthorizationRequestBasedOnCookieRepository();
 	}
 
-	// @Bean
-	// public CorsConfigurationSource corsConfigurationSource() {
-	// 	CorsConfiguration corsConfiguration = new CorsConfiguration();
-	//
-	// 	corsConfiguration.addAllowedOriginPattern("https://www.lookus.shop");
-	// 	corsConfiguration.addAllowedOriginPattern("https://api.lookus.shop");
-	// 	corsConfiguration.addAllowedOriginPattern("http://localhost:8080"); // JUST FOR LOCAL DEV
-	// 	corsConfiguration.addAllowedOriginPattern("http://localhost:3000"); // JUST FOR LOCAL DEV
-	//
-	// 	corsConfiguration.addAllowedMethod("PATCH");
-	// 	corsConfiguration.addAllowedMethod("GET");
-	// 	corsConfiguration.addAllowedMethod("POST");
-	// 	corsConfiguration.addAllowedMethod("PUT");
-	// 	corsConfiguration.addAllowedMethod("DELETE");
-	//
-	// 	corsConfiguration.addAllowedHeader("*");
-	// 	corsConfiguration.addExposedHeader("Authorization");
-	// 	corsConfiguration.addExposedHeader("refresh_token");
-	// 	corsConfiguration.addExposedHeader("Set-Cookie");
-	//
-	// 	corsConfiguration.setAllowCredentials(true);
-	//
-	// 	UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	// 	source.registerCorsConfiguration("/**", corsConfiguration);
-	//
-	// 	return source;
-	// }
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+
+		corsConfiguration.addAllowedOriginPattern("https://www.lookus.shop");
+		corsConfiguration.addAllowedOriginPattern("https://api.lookus.shop");
+		corsConfiguration.addAllowedOriginPattern("http://localhost:8080"); // JUST FOR LOCAL DEV
+		corsConfiguration.addAllowedOriginPattern("http://localhost:3000"); // JUST FOR LOCAL DEV
+
+		corsConfiguration.addAllowedMethod("PATCH");
+		corsConfiguration.addAllowedMethod("GET");
+		corsConfiguration.addAllowedMethod("POST");
+		corsConfiguration.addAllowedMethod("PUT");
+		corsConfiguration.addAllowedMethod("DELETE");
+
+		corsConfiguration.addAllowedHeader("*");
+		corsConfiguration.addExposedHeader("Authorization");
+		corsConfiguration.addExposedHeader("refresh_token");
+		corsConfiguration.addExposedHeader("Set-Cookie");
+
+		corsConfiguration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", corsConfiguration);
+
+		return source;
+	}
 }

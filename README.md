@@ -71,6 +71,11 @@
 - Deploy
   - AWS EC2
 
+## ERD
+![diagram](https://github.com/user-attachments/assets/c4e677c2-36b1-4692-b8b7-8569e312a0b3)
+
+
+
 ## 📂 Directory Structure
 <details>
   <summary> 📂 파일 구조 보기</summary>
@@ -376,12 +381,8 @@
 </details>
 
 ## 🔨 Server Architecture
+![image](https://github.com/user-attachments/assets/fd15c304-7cfe-449e-bfd2-f2f9b205318d)
 
-(↑서버 아키텍처에 대한 내용을 그림으로 표현함으로써 인프라를 어떻게 구축했는 지 한 눈에 보여줄 수 있다.)
-
-## ⚒ CI/CD
-
--
 
 ## 👨‍💻 Role & Contribution
 

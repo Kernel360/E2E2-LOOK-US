@@ -37,7 +37,6 @@ import lombok.RequiredArgsConstructor;
 public class PostApiController {
 
 	private final PostService postService;
-	private final UserService userService;
 
 	// Permit Only User
 	@Operation(summary = "게시글 작성 API", description = "사용자가 게시글을 작성할 수 있다.")

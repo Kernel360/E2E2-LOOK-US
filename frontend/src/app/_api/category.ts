@@ -70,13 +70,11 @@ export const fetchCategories = async (): Promise<CategoryEntity[]> => {
 
 // Fetch posts by category ID
 export const fetchPostsByCategory = async (
-    categoryId: number,
+    category: string,
     page: number,
     size: number,
 ): Promise<PageResponse<PostDtoResponse>> => {
-    const response = await fetch(
-        `${API_PUBLIC_URL}/posts/category/${categoryId}`,
-    )
+    const response = await fetch(`${API_PUBLIC_URL}/posts/category/${category}`)
     console.log(response)
     if (!response.ok) {
         throw new Error('Failed to fetch posts by category')
@@ -92,6 +90,7 @@ export const fetchPostsByColor = async (
 ): Promise<PageResponse<PostDtoResponse>> => {
     // RGB 값을 개별 쿼리 파라미터로 변환
     const queryParams = `rgbColor=${rgbColor[0]}&rgbColor=${rgbColor[1]}&rgbColor=${rgbColor[2]}`
+    console.log(queryParams)
 
     const response = await fetch(
         `${API_PUBLIC_URL}/posts?${queryParams}&page=${page}&size=${size}`,
@@ -117,6 +116,10 @@ export const fetchPostsByCategoryAndColor = async (
     page: number,
     size: number,
 ): Promise<PageResponse<PostDtoResponse>> => {
+    if (condition.category === '전체') {
+        return fetchPostsByColor(condition.rgbColor, page, size)
+    }
+
     const response = await fetch(`${API_PUBLIC_URL}/posts/search_by_category`, {
         method: 'POST',
         headers: {

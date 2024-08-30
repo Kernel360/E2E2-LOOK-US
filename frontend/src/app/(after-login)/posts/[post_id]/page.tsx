@@ -10,6 +10,7 @@ import { follow, FollowRequest } from '@/app/_api/follow'
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa'
 import Link from 'next/link' // Link 컴포넌트 import
+import { myInfoAllFunction, myInfoAllResponse } from '@/app/_api/myPage'
 
 type Props = {
     params: { post_id: number }
@@ -22,7 +23,23 @@ export default function Page({ params, searchParams }: Props) {
     const [likeCount, setLikeCount] = useState<number>(0)
     const [liked, setLiked] = useState<boolean>(false)
     const [scraped, setScraped] = useState<boolean>(false)
+    const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null) // 유저 정보
+    const [showModal, setShowModal] = useState<boolean>(false) // 모달창 상태
+
     const router = useRouter()
+    // 유저 정보 가져오기
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const data = await myInfoAllFunction()
+                setUserInfo(data)
+            } catch (error) {
+                console.error('Failed to fetch user info:', error)
+            }
+        }
+
+        fetchUserInfo()
+    }, [])
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -65,14 +82,20 @@ export default function Page({ params, searchParams }: Props) {
     const handleScrapClick = () => {
         setScraped(prev => !prev)
     }
+    const handleModalOpen = () => {
+        setShowModal(true)
+    }
 
+    const handleModalClose = () => {
+        setShowModal(false)
+    }
     if (!post) return <div>Loading...</div>
 
     return (
         <div className={styles.postContainer}>
             <div className={styles.logoContainer}>
                 <Link href='/posts'>
-                    {/* /posts로 이동하도록 Link 추가 */}
+                    {/* 메인페이지로 이동하도록 Link 추가 */}
                     <Image
                         src='/images/LOOKUSlogo.png'
                         alt='LOOK:US Logo'
@@ -188,19 +211,53 @@ export default function Page({ params, searchParams }: Props) {
                     </div>
                 </div>
 
-                <div className={styles.followButtonContainer}>
-                    <button
-                        className={
-                            isFollowing
-                                ? styles.followingButton
-                                : styles.followButton
-                        }
-                        onClick={handleFollowClick}
+                {/* 팔로우 버튼: 본인 포스트가 아니면 보여줌 */}
+                {userInfo?.nickname !== post.nickname && (
+                    <div className={styles.followButtonContainer}>
+                        <button
+                            className={
+                                isFollowing
+                                    ? styles.followingButton
+                                    : styles.followButton
+                            }
+                            onClick={handleFollowClick}
+                        >
+                            {isFollowing ? '팔로잉' : '팔로우'}
+                        </button>
+                    </div>
+                )}
+
+                {/* 내 글일 경우 동그라미 버튼 표시 */}
+                {userInfo?.nickname === post.nickname && (
+                    <div
+                        className={styles.optionsButton}
+                        onClick={handleModalOpen}
                     >
-                        {isFollowing ? '팔로잉' : '팔로우'}
-                    </button>
-                </div>
+                        &#x22EE; {/* 세 개의 점 (vertival ellipsis) */}
+                    </div>
+                )}
             </div>
+            {/* 모달창 */}
+            {showModal && (
+                <div className={styles.modalBackdrop}>
+                    <div className={styles.modalContainer}>
+                        <div className={styles.modalButtonContainer}>
+                            <button className={styles.modalButton}>
+                                내 게시글 편집하기
+                            </button>
+                            <button className={styles.modalButton}>
+                                내 게시글 삭제하기
+                            </button>
+                        </div>
+                        <button
+                            className={styles.modalCancel}
+                            onClick={handleModalClose}
+                        >
+                            취소
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

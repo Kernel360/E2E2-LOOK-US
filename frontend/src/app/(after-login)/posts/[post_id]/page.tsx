@@ -11,6 +11,7 @@ import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa'
 import Link from 'next/link' // Link 컴포넌트 import
 import { myInfoAllFunction, myInfoAllResponse } from '@/app/_api/myPage'
+import ProfileModal from '@/components/ProfileModal'
 
 type Props = {
     params: { post_id: number }
@@ -25,6 +26,7 @@ export default function Page({ params, searchParams }: Props) {
     const [scraped, setScraped] = useState<boolean>(false)
     const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null) // 유저 정보
     const [showModal, setShowModal] = useState<boolean>(false) // 모달창 상태
+    const [showProfileModal, setShowProfileModal] = useState<boolean>(false)
 
     const router = useRouter()
     // 유저 정보 가져오기
@@ -88,6 +90,14 @@ export default function Page({ params, searchParams }: Props) {
 
     const handleModalClose = () => {
         setShowModal(false)
+    }
+
+    const handleProfileClick = () => {
+        setShowProfileModal(true)
+    }
+
+    const handleProfileModalClose = () => {
+        setShowProfileModal(false)
     }
     if (!post) return <div>Loading...</div>
 
@@ -193,7 +203,10 @@ export default function Page({ params, searchParams }: Props) {
 
             <div className={styles.profileDetailsBox}>
                 <div className={styles.profileDetails}>
-                    <div className={styles.profilePic}>
+                    <div
+                        className={styles.profilePic}
+                        onClick={handleProfileClick}
+                    >
                         <Image
                             src={`${API_PUBLIC_URL}/image/${post.profileImageLocationId}`}
                             alt='profile'
@@ -237,6 +250,18 @@ export default function Page({ params, searchParams }: Props) {
                     </div>
                 )}
             </div>
+
+            {/* Profile Modal */}
+            {showProfileModal && (
+                <ProfileModal
+                    isOpen={showProfileModal}
+                    onClose={handleProfileModalClose}
+                    post={post}
+                    onFollowClick={handleFollowClick}
+                    isFollowing={isFollowing}
+                />
+            )}
+
             {/* 모달창 */}
             {showModal && (
                 <div className={styles.modalBackdrop}>

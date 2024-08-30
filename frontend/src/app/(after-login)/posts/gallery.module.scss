@@ -11,6 +11,7 @@
 .logoWrapper {
     text-align: center;
     margin-bottom: 20px;
+    position: relative;
 }
 
 .masonryGrid {
@@ -23,7 +24,16 @@
     padding-left: 10px; /* gutter size */
     background-clip: padding-box;
 }
-
+.buttonWrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 10px;
+}
+.iconButton {
+    cursor: pointer;
+}
 /* 스타일 요소의 크기에 따라 높이가 달라지므로, 이미지를 전체 폭에 맞게 설정 */
 .galleryItem {
     border-radius: 8px; /* 둥근 모서리 추가 */

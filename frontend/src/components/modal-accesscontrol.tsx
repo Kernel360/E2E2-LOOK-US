@@ -1,4 +1,6 @@
 import React from 'react'
+import Link from 'next/link'
+import styles from './modal-accesscontrol.module.scss'
 
 interface ModalProps {
     show: boolean
@@ -9,25 +11,22 @@ const Modal: React.FC<ModalProps> = ({ show, onClose }) => {
     if (!show) return null
 
     return (
-        <div className='fixed inset-0 z-50 flex items-center justify-center'>
-            <div className='fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm'></div>
-            <div className='relative bg-white p-6 rounded-lg shadow-lg max-w-sm text-center z-10'>
-                <h2 className='text-xl font-semibold mb-4'>회원가입 필요</h2>
-                <p className='mb-4'>
-                    해당 페이지에 접근하려면 회원가입이 필요합니다.
+        <div className={styles['modal-backdrop']}>
+            <div className={styles['modal-container']}>
+                <p className={styles['modal-text']}>
+                    회원가입하면 더 많은 정보를 얻을 수 있어요 :)
                 </p>
-                <button
-                    className='bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600'
-                    onClick={onClose}
-                >
-                    닫기
+                <div className={styles['modal-button-container']}>
+                    <Link href='/login' className={styles['modal-button']}>
+                        좋았어. 바로 가보자고
+                    </Link>
+                    <Link href='/posts' className={styles['modal-button']}>
+                        그냥 글이나 볼래요
+                    </Link>
+                </div>
+                <button onClick={onClose} className={styles['modal-cancel']}>
+                    취소
                 </button>
-                <a href='/login' className='block mt-4 text-blue-500 underline'>
-                    로그인/회원가입 페이지로 연결하기
-                </a>
-                <a href='/posts' className='block mt-4 text-blue-500 underline'>
-                    포스트 페이지로 연결하기
-                </a>
             </div>
         </div>
     )

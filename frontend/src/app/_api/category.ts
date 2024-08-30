@@ -122,6 +122,7 @@ export const fetchPostsByCategoryAndColor = async (
 
     if (condition.categoryId === 0) {
         // 0으로 전체 카테고리 조회하는 예시
+        console.log('wow')
         return fetchPostsByColor(condition.rgbColor, page, size)
     }
 

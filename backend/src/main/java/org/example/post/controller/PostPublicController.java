@@ -80,7 +80,7 @@ public class PostPublicController {
 		Page<PostDto.PostDtoResponse> results;
 
 		results = postService.findAllPostsByCategoryAndRGB(
-			categoryAndColorSearchCondition.getCategory(),
+			categoryAndColorSearchCondition.getCategoryId(),
 			categoryAndColorSearchCondition.getRgbColor(),
 			pageable
 		);
@@ -122,12 +122,12 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-	@GetMapping("/category/{category}")
+	@GetMapping("/category/{categoryId}")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> getPostsByCategory(
-		@PathVariable String category,
+		@PathVariable Long categoryId,
 		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
-		Page<PostDto.PostDtoResponse> posts = postService.findAllPostsByCategory(category, pageable);
+		Page<PostDto.PostDtoResponse> posts = postService.findAllPostsByCategory(categoryId, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(posts);
 
 	}

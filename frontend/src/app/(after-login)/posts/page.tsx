@@ -24,7 +24,7 @@ export default function Gallery() {
     const [page, setPage] = useState<number>(0)
     const [hasMore, setHasMore] = useState<boolean>(true)
     const [search, setSearch] = useState<string>('')
-    const [category, setCategory] = useState<string | null>(null)
+    const [categoryId, setCategoryId] = useState<number | null>(null) // string -> number로 변경
     const [color, setColor] = useState<number[] | null>(null)
     const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null)
     const [redirectToSignup, setRedirectToSignup] = useState<boolean>(false)
@@ -33,7 +33,6 @@ export default function Gallery() {
     const [totalPages, setTotalPages] = useState<number>(0)
 
     useEffect(() => {
-        // 카테고리 데이터를 가져오는 로직 추가
         const fetchCategoriesData = async () => {
             try {
                 const categoriesData = await fetchCategories()
@@ -49,14 +48,19 @@ export default function Gallery() {
     const fetchData = async (page: number) => {
         let response
 
-        if (category && color) {
+        const isColorDefault =
+            !color || (color[0] === 255 && color[1] === 255 && color[2] === 255)
+
+        if (categoryId && !isColorDefault) {
+            console.log('categoryId와 color 모두 선택됨')
             response = await fetchPostsByCategoryAndColor(
-                { category, rgbColor: color },
+                { categoryId, rgbColor: color },
                 page,
                 10,
             )
-        } else if (category) {
-            response = await fetchPostsByCategory(category, page, 10)
+        } else if (categoryId) {
+            console.log('categoryId만 선택됨')
+            response = await fetchPostsByCategory(categoryId, page, 10)
         } else {
             const request = search.startsWith('#')
                 ? { hashtags: search.slice(1), page }
@@ -69,15 +73,12 @@ export default function Gallery() {
 
     const loadAllPages = async () => {
         try {
-            // First fetch the first page to get the total number of pages
             const firstPageResponse = await fetchData(0)
             const totalPages = firstPageResponse.totalPages
             setTotalPages(totalPages)
 
-            // Fetch all pages data
             let allPosts: postPreviewContent[] = []
             for (let page = 0; page < totalPages; page++) {
-                // 페이지 0번부터 시작해서 totalPages까지
                 const pageResponse = await fetchData(page)
                 allPosts = [...allPosts, ...pageResponse.content]
             }
@@ -90,33 +91,35 @@ export default function Gallery() {
 
     useEffect(() => {
         loadAllPages()
-    }, [search, category, color])
+    }, [search, categoryId, color])
 
     const handleSearch = (search: string) => {
         setSearch(search)
         setStyles([])
-        setCategory(null)
+        setCategoryId(null)
         setColor(null)
     }
 
-    const handleCategorySelect = (selectedCategory: string) => {
-        setCategory(selectedCategory)
+    const handleCategorySelect = (selectedCategoryId: number) => {
+        // string -> number로 변경
+        setCategoryId(selectedCategoryId)
         setStyles([])
     }
 
     const handleCategoryAndColorSelect = (
-        selectedCategory: string,
+        selectedCategoryId: number, // string -> number로 변경
         selectedColor: number[],
     ) => {
-        setCategory(selectedCategory)
+        setCategoryId(selectedCategoryId)
         setColor(selectedColor)
         setStyles([])
     }
 
     const handleColorChange = (rgbColor: number[]) => {
-        setColor(rgbColor) // 색상 변경 시 상태 업데이트
-        setStyles([]) // 기존 스타일을 초기화하여 새로운 데이터 로딩
+        setColor(rgbColor)
+        setStyles([])
     }
+
     useEffect(() => {
         async function fetchUserInfo() {
             try {
@@ -180,7 +183,7 @@ export default function Gallery() {
                 categories={categories}
                 onSelectCategory={handleCategorySelect}
                 onSelectCategoryAndColor={handleCategoryAndColorSelect}
-                onColorChange={handleColorChange} // 실시간 색상 변경 핸들러 추가
+                onColorChange={handleColorChange}
             />
             <Masonry
                 breakpointCols={breakpointColumnsObj}

@@ -55,7 +55,7 @@ export interface CategoryEntity {
 }
 
 export interface CategoryAndColorSearchCondition {
-    category: string
+    categoryId: number // 변경된 부분
     rgbColor: number[]
 }
 
@@ -70,11 +70,13 @@ export const fetchCategories = async (): Promise<CategoryEntity[]> => {
 
 // Fetch posts by category ID
 export const fetchPostsByCategory = async (
-    category: string,
+    categoryId: number, // 변경된 부분
     page: number,
     size: number,
 ): Promise<PageResponse<PostDtoResponse>> => {
-    const response = await fetch(`${API_PUBLIC_URL}/posts/category/${category}`)
+    const response = await fetch(
+        `${API_PUBLIC_URL}/posts/category/${categoryId}`,
+    )
     console.log(response)
     if (!response.ok) {
         throw new Error('Failed to fetch posts by category')
@@ -116,7 +118,10 @@ export const fetchPostsByCategoryAndColor = async (
     page: number,
     size: number,
 ): Promise<PageResponse<PostDtoResponse>> => {
-    if (condition.category === '전체') {
+    console.log('Condition before API call:', condition) // 디버깅 로그 추가
+
+    if (condition.categoryId === 0) {
+        // 0으로 전체 카테고리 조회하는 예시
         return fetchPostsByColor(condition.rgbColor, page, size)
     }
 

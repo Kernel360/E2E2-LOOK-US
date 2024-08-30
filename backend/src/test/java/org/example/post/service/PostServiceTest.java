@@ -1,5 +1,6 @@
 package org.example.post.service;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -8,7 +9,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.example.exception.common.ApiErrorCategory;
+import org.example.exception.post.ApiPostErrorSubCategory;
+import org.example.exception.post.ApiPostException;
+import org.example.exception.user.ApiUserErrorSubCategory;
+import org.example.exception.user.ApiUserException;
 import org.example.image.AsyncImageAnalyzePipeline;
 import org.example.image.ImageAnalyzeManager.analyzer.repository.ClothAnalyzeDataRepository;
 import org.example.image.imageStorageManager.ImageStorageManager;
@@ -33,6 +40,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -58,17 +67,29 @@ class PostServiceTest {
 	private MockMvc mockMvc;
 	private ObjectMapper objectMapper;
 
+	@Mock
 	private PostService postService;
+
+	@InjectMocks
+	private PostService postServiceMock;
+
+	@Mock
 	private UserService userService;
 
+	@Mock
 	private ImageRedisService imageRedisService;
+
+	@InjectMocks
+	private ImageRedisService imageRedisServiceMock;
+	@Mock
+	private ClothAnalyzeDataRepository clothAnalyzeDataRepository;
+
 	private PostRepository postRepository;
 	private UserRepository userRepository;
 	private ImageStorageManager imageStorageManager;
 	private AsyncImageAnalyzePipeline asyncImageAnalyzePipeline;
 	private LikeRepository likeRepository;
 	private HashtagRepository hashtagRepository;
-	private ClothAnalyzeDataRepository clothAnalyzeDataRepository;
 	private CategoryRepository categoryRepository;
 
 	private UserEntity user;
@@ -276,7 +297,6 @@ class PostServiceTest {
 		verify(likeRepository).delete(like);
 	}
 
-
 	@Test
 	public void increments_view_count_first_time() throws JsonProcessingException {
 		// Arrange
@@ -300,7 +320,6 @@ class PostServiceTest {
 			categoryRepository
 		));
 
-
 		// Act
 		postService.viewCount(1L, request, response);
 
@@ -315,6 +334,7 @@ class PostServiceTest {
 		assertEquals("postView", addedCookie.getName());
 		assertEquals("[1]", addedCookie.getValue());
 	}
+
 	@Test
 	public void updates_view_count_and_cookie_when_cookie_contains_post_id() throws Exception {
 		// Arrange
@@ -347,7 +367,6 @@ class PostServiceTest {
 		// Verify that no cookie was added or changed
 		verify(response, never()).addCookie(any(Cookie.class));
 	}
-
 
 	@Test
 	public void updates_view_count_and_cookie_when_cookie_does_not_contain_post_id() throws Exception {
@@ -388,5 +407,264 @@ class PostServiceTest {
 		assertEquals("[0]_[1]", addedCookie.getValue()); // Cookie value should be "[0]_[1]"
 	}
 
+	@Test
+	public void test_delete_post_successfully() {
+		// Arrange
+		Long postId = 1L;
+		String email = "user@example.com";
 
+		when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(post.getUser()).thenReturn(user);
+
+		// Act
+		postService.delete(postId, email);
+
+		// Assert
+		verify(postRepository, times(1)).delete(post); // delete 메소드가 호출되었는지 확인
+	}
+
+	@Test
+	public void test_delete_post_fails_for_unauthorized_user() {
+		// Arrange
+		Long postId = 1L;
+		String email = "user@example.com";
+		UserEntity anotherUser = mock(UserEntity.class); // 다른 사용자
+
+		when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(user.getUserId()).thenReturn(1L);
+		when(anotherUser.getUserId()).thenReturn(2L);
+		when(post.getUser()).thenReturn(anotherUser); // 다른 사용자가 포스트의 소유자임
+
+		// Act & Assert
+		ApiPostException exception = assertThrows(ApiPostException.class, () -> {
+			postService.delete(postId, email);
+		});
+
+		// 예외의 카테고리와 서브카테고리가 올바른지 확인
+		assertEquals(ApiErrorCategory.RESOURCE_BAD_REQUEST, exception.getErrorCategory());
+		assertEquals(ApiPostErrorSubCategory.POST_INVALID_AUTHOR, exception.getErrorSubCategory());
+
+		// postRepository.delete 메서드가 호출되지 않았는지 확인
+		verify(postRepository, never()).delete(any(PostEntity.class));
+
+	}
+
+	@Test
+	public void test_like_count_success() {
+		// Arrange
+		Long postId = 1L;
+		int expectedLikeCount = 5; // 예상되는 좋아요 수
+		PostEntity post = mock(PostEntity.class); // 포스트 엔티티를 모킹
+
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post)); // 포스트가 존재한다고 설정
+		when(likeRepository.likeCount(post)).thenReturn(expectedLikeCount); // likeRepository에서 좋아요 수 반환
+
+		// Act
+		int actualLikeCount = postService.likeCount(postId);
+
+		// Assert
+		assertEquals(expectedLikeCount, actualLikeCount); // 예상되는 좋아요 수와 실제 결과를 비교
+	}
+
+	@Test
+	public void test_like_count_post_not_found() {
+		// Arrange
+		Long postId = 1L;
+
+		when(postRepository.findById(postId)).thenReturn(Optional.empty()); // 포스트가 존재하지 않는다고 설정
+
+		// Act & Assert
+
+		assertThrows(ApiPostException.class, () -> postService.likeCount(postId)); // EntityNotFoundException이 발생하는지 확인
+	}
+
+	@Test
+	public void test_find_post_by_id_not_found() {
+		// Arrange
+		Long postId = 1L;
+
+		when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+		// Act & Assert
+		ApiPostException exception = assertThrows(ApiPostException.class, () -> {
+			postService.findPostById(postId);
+		});
+
+		// 예외의 카테고리와 서브카테고리가 올바른지 확인
+		assertEquals(ApiErrorCategory.RESOURCE_INACCESSIBLE, exception.getErrorCategory());
+		assertEquals(ApiPostErrorSubCategory.POST_NOT_FOUND, exception.getErrorSubCategory());
+
+		// postRepository.delete 메서드가 호출되지 않았는지 확인
+		assertFalse(exception.getErrorData().equals("잘못된 게시글 조회 요청입니다."));
+
+	}
+
+	@Test
+	public void test_find_user_by_email_not_found() {
+		// Arrange
+		String email = "test@email.com";
+
+		when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+		// Act & Assert
+		ApiUserException exception = assertThrows(ApiUserException.class, () -> {
+			postService.findUserByEmail(email);
+		});
+
+		// 예외의 카테고리와 서브카테고리가 올바른지 확인
+		assertEquals(ApiErrorCategory.RESOURCE_INACCESSIBLE, exception.getErrorCategory());
+		assertEquals(ApiUserErrorSubCategory.USER_NOT_FOUND, exception.getErrorSubCategory());
+
+		// postRepository.delete 메서드가 호출되지 않았는지 확인
+		assertFalse(exception.getErrorData().equals("존재하는 사용자가 없습니다" + email));
+
+	}
+
+	/*
+
+		@Test
+		public void test_findAllPostsByRGB_success() throws JsonProcessingException {
+			// Arrange
+			int[] rgbColor = {255, 0, 0}; // RGB 색상 (예: 빨간색)
+			Pageable pageable = PageRequest.of(0, 10, Sort.by("postContent")); // 페이지네이션과 정렬 설정
+
+			Set<Long> imageIdSet = Set.of(2L, 1L); // RGB와 유사한 이미지 ID 목록
+			List<PostDto.PostDtoResponse> postDtoResponses = List.of(
+				new PostDto.PostDtoResponse("user1", 1L, 1L, List.of("tag1"), List.of("cat1"), 10, 100, LocalDateTime.now()),
+				new PostDto.PostDtoResponse("user2", 2L, 2L, List.of("tag2"), List.of("cat2"), 20, 200, LocalDateTime.now())
+			);
+
+			List<int[]> similarColorList = List.of(new int[] {250, 0, 0}, new int[] {255, 10, 0}); // 유사 색상 리스트
+
+			// Mocking 설정
+			when(postServiceMock.findImageIdsByRGBAndSimilarColors(rgbColor)).thenReturn(imageIdSet);
+			when(postServiceMock.findPostsByImageIds(imageIdSet)).thenReturn(postDtoResponses);
+			when(imageRedisServiceMock.getCloseColorList(eq(rgbColor), anyInt())).thenReturn(similarColorList);
+
+			// Act
+			Page<PostDto.PostDtoResponse> result = postService.findAllPostsByRGB(rgbColor, pageable);
+
+			// Assert
+			assertNotNull(result);
+			assertEquals(postDtoResponses.size(), result.getTotalElements());
+			assertEquals(postDtoResponses.get(0).postId(), result.getContent().get(0).postId());
+		}
+	*/
+	@Test
+	public void test_get_all_category() {
+		// Arrange
+		List<CategoryEntity> expectedCategories = new ArrayList<>(); // Populate with test data if necessary
+
+		// Mocking
+		when(categoryRepository.findAll()).thenReturn(expectedCategories);
+		when(postService.getAllCategory()).thenReturn(expectedCategories);
+
+		// Act
+		List<CategoryEntity> actualCategories = postService.getAllCategory();
+
+		// Assert
+		assertNotNull(actualCategories);
+		assertEquals(expectedCategories.size(), actualCategories.size()); // Adjust assertions as needed
+	}
+
+	@Test
+	public void test_findAllPostsByCategory_success() {
+		// Arrange
+		Long categoryId = 1L;
+		Pageable pageable = PageRequest.of(0, 10);
+
+		List<PostEntity> posts = List.of(
+			mock(PostEntity.class),
+			mock(PostEntity.class)
+		);
+		when(posts.get(0).getPostId()).thenReturn(1L);
+		when(posts.get(0).getUser()).thenReturn(mock(UserEntity.class));
+		when(posts.get(0).getUser().getNickname()).thenReturn("nick1");
+
+		when(posts.get(1).getPostId()).thenReturn(2L);
+		when(posts.get(1).getUser()).thenReturn(mock(UserEntity.class));
+		when(posts.get(1).getUser().getNickname()).thenReturn("nick2");
+
+		List<PostDto.PostDtoResponse> postDtoResponses = posts.stream()
+			.map(postEntity -> new PostDto.PostDtoResponse(
+				postEntity.getUser().getNickname(),
+				postEntity.getPostId(),
+				postEntity.getImageLocationId(),
+				postEntity.getHashtagContents(),
+				postEntity.getCategoryContents(),
+				postEntity.getLikeCount(),
+				postEntity.getHits(),
+				postEntity.getCreatedAt()))
+			.toList();
+
+		Page<PostDto.PostDtoResponse> expectedPage = new PageImpl<>(postDtoResponses, pageable,
+			postDtoResponses.size());
+
+		when(postRepository.findAllByCategoryId(categoryId)).thenReturn(posts);
+
+		// Act
+		Page<PostDto.PostDtoResponse> result = postService.findAllPostsByCategory(categoryId, pageable);
+
+		// Assert
+		assertNotNull(result);
+		assertEquals(expectedPage.getTotalElements(), result.getTotalElements());
+		assertEquals(expectedPage.getContent(), result.getContent());
+		verify(postRepository).findAllByCategoryId(categoryId);
+	}
+	@Test
+	public void test_findPostsByImageIds_success() {
+		// Arrange
+		Set<Long> imageIdSet = Set.of(1L, 2L);
+
+		// Mock UserEntity
+		UserEntity userEntity1 = mock(UserEntity.class);
+		when(userEntity1.getNickname()).thenReturn("user1");
+
+		UserEntity userEntity2 = mock(UserEntity.class);
+		when(userEntity2.getNickname()).thenReturn("user2");
+
+		// Mock PostEntity
+		PostEntity postEntity1 = mock(PostEntity.class);
+		when(postEntity1.getUser()).thenReturn(userEntity1);
+		when(postEntity1.getPostId()).thenReturn(1L);
+		when(postEntity1.getImageLocationId()).thenReturn(1L);
+		when(postEntity1.getHashtagContents()).thenReturn(List.of("tag1"));
+		when(postEntity1.getCategoryContents()).thenReturn(List.of("cat1"));
+		when(postEntity1.getLikeCount()).thenReturn(10);
+		when(postEntity1.getHits()).thenReturn(100);
+		when(postEntity1.getCreatedAt()).thenReturn(LocalDateTime.of(2024, 1, 1, 0, 0, 0));
+
+		PostEntity postEntity2 = mock(PostEntity.class);
+		when(postEntity2.getUser()).thenReturn(userEntity2);
+		when(postEntity2.getPostId()).thenReturn(2L);
+		when(postEntity2.getImageLocationId()).thenReturn(2L);
+		when(postEntity2.getHashtagContents()).thenReturn(List.of("tag2"));
+		when(postEntity2.getCategoryContents()).thenReturn(List.of("cat2"));
+		when(postEntity2.getLikeCount()).thenReturn(20);
+		when(postEntity2.getHits()).thenReturn(200);
+		when(postEntity2.getCreatedAt()).thenReturn(LocalDateTime.of(2024, 1, 1, 0, 0, 0));
+
+		// Set up repository mocks
+		when(postRepository.findAllByImageLocationId(1L)).thenReturn(List.of(postEntity1));
+		when(postRepository.findAllByImageLocationId(2L)).thenReturn(List.of(postEntity2));
+
+		// Expected result setup
+		List<PostDto.PostDtoResponse> expectedPostDtoResponses = new ArrayList<>();
+		expectedPostDtoResponses.add(new PostDto.PostDtoResponse("user1", 1L, 1L, List.of("tag1"), List.of("cat1"),
+			10, 100, LocalDateTime.of(2024, 1, 1, 0, 0, 0)));
+		expectedPostDtoResponses.add(new PostDto.PostDtoResponse("user2", 2L, 2L, List.of("tag2"), List.of("cat2"),
+			20, 200, LocalDateTime.of(2024, 1, 1, 0, 0, 0)));
+
+		// Act
+		List<PostDto.PostDtoResponse> result = postService.findPostsByImageIds(imageIdSet);
+
+		// Assert
+		assertNotNull(result);
+		assertThat(result).containsExactlyInAnyOrderElementsOf(expectedPostDtoResponses);
+
+		verify(postRepository).findAllByImageLocationId(2L);
+		verify(postRepository).findAllByImageLocationId(1L);
+	}
 }

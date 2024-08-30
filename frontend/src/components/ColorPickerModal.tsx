@@ -4,7 +4,7 @@ import { fetchPopularColor, PopularColor } from '@/app/_api/category'
 
 interface ColorPickerModalProps {
     initialColor?: string
-    onComplete: (color: string) => void
+    onComplete: (color: number[]) => void
     onClose: () => void
     onCategoryOnlySelect: () => void // 카테고리만 선택할 때 호출되는 함수
     onResetCategory: () => void // 카테고리 선택 초기화 함수 추가
@@ -15,7 +15,49 @@ const rgbToHex = (r: number, g: number, b: number): string => {
     const toHex = (component: number) => component.toString(16).padStart(2, '0')
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }
+// 문자열 색상을 RGB 배열로 변환하는 함수
+const parseColorToRgb = (color: string): number[] => {
+    let r = 0,
+        g = 0,
+        b = 0
 
+    if (color.startsWith('rgb')) {
+        const match = color.match(/\d+/g)
+        if (match) {
+            r = parseInt(match[0])
+            g = parseInt(match[1])
+            b = parseInt(match[2])
+        }
+    } else if (color.startsWith('hsl')) {
+        const match = color.match(/\d+/g)
+        if (match) {
+            const h = parseInt(match[0])
+            const s = parseInt(match[1])
+            const l = parseInt(match[2])
+            ;[r, g, b] = hslToRgb(h, s, l)
+        }
+    } else if (color.startsWith('#')) {
+        r = parseInt(color.substring(1, 3), 16)
+        g = parseInt(color.substring(3, 5), 16)
+        b = parseInt(color.substring(5, 7), 16)
+    }
+
+    return [r, g, b]
+}
+// HSL을 RGB로 변환하는 함수
+function hslToRgb(h: number, s: number, l: number): [number, number, number] {
+    s /= 100
+    l /= 100
+    const k = (n: number) => (n + h / 30) % 12
+    const a = s * Math.min(l, 1 - l)
+    const f = (n: number) =>
+        l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))
+    return [
+        Math.round(f(0) * 255),
+        Math.round(f(8) * 255),
+        Math.round(f(4) * 255),
+    ]
+}
 const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
     initialColor = '',
     onComplete,
@@ -26,19 +68,6 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
     const [selectedColor, setSelectedColor] = useState<string>(initialColor)
     const [sliderColor, setSliderColor] = useState<string>(initialColor)
     const [trendColors, setTrendColors] = useState<string[]>([]) // trendColors 상태로 관리
-
-    // const trendColors = [
-    //     '#EF4444',
-    //     '#F97316',
-    //     '#FACC15',
-    //     '#2DD4BF',
-    //     '#6366F1',
-    //     '#EC4899',
-    //     '#F43F5E',
-    //     '#D946EF',
-    //     '#0EA5E9',
-    //     '#84CC16',
-    // ]
 
     useEffect(() => {
         const loadPopularColors = async () => {
@@ -70,7 +99,8 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
     }
 
     const handleComplete = () => {
-        onComplete(selectedColor)
+        const rgbColor = parseColorToRgb(selectedColor)
+        onComplete(rgbColor)
     }
 
     const handleClose = () => {

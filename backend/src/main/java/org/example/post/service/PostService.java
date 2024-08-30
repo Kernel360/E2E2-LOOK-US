@@ -436,7 +436,7 @@ public class PostService {
 		return new PageImpl<>(sortedPosts, pageable, postDtoResponses.size());
 	}
 
-	private Set<Long> findImageIdsByRGBAndSimilarColors(int[] rgbColor) throws JsonProcessingException {
+	protected Set<Long> findImageIdsByRGBAndSimilarColors(int[] rgbColor) throws JsonProcessingException {
 		// 주어진 RGB 색상에 해당하는 이미지 ID를 조회
 		Set<Long> imageIdSet = clothAnalyzeDataRepository.findAllByRgbColor(new RGBColor(rgbColor[0], rgbColor[1], rgbColor[2]))
 			.stream()
@@ -455,7 +455,7 @@ public class PostService {
 		return imageIdSet;
 	}
 
-	private List<PostDto.PostDtoResponse> findPostsByImageIds(Set<Long> imageIdSet) {
+	protected List<PostDto.PostDtoResponse> findPostsByImageIds(Set<Long> imageIdSet) {
 		List<PostDto.PostDtoResponse> postDtoResponses = new ArrayList<>();
 		for (Long imageId : imageIdSet) {
 			postRepository.findAllByImageLocationId(imageId)

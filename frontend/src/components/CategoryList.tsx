@@ -21,6 +21,7 @@ export default function CategoryList({
     const [selectedCategoryColor, setSelectedCategoryColor] = useState<{
         [key: string]: string
     }>({})
+
     const handleCategoryClick = (category: string) => {
         if (selectedCategory === category) {
             // 선택된 카테고리를 다시 클릭하면 선택 해제
@@ -37,12 +38,14 @@ export default function CategoryList({
             setModalVisible(true)
         }
     }
-    const handleColorComplete = (color: string) => {
+
+    const handleColorComplete = (rgbColor: number[]) => {
+        // 이제 color는 RGB 배열로 처리
         if (selectedCategory) {
-            const rgbColor = color.match(/\d+/g)?.map(Number) || []
+            const colorString = `rgb(${rgbColor.join(', ')})`
             setSelectedCategoryColor(prev => ({
                 ...prev,
-                [selectedCategory]: color,
+                [selectedCategory]: colorString,
             }))
             onSelectCategoryAndColor(selectedCategory, rgbColor)
         }
@@ -63,6 +66,35 @@ export default function CategoryList({
 
     return (
         <div className={styles.categoryList}>
+            {/* 전체 카테고리 버튼 추가 */}
+            <button
+                className={`${styles.categoryButton} ${
+                    selectedCategory === '전체'
+                        ? selectedCategoryColor['전체']
+                            ? styles.colored
+                            : styles.selected
+                        : ''
+                }`}
+                style={{
+                    backgroundColor:
+                        selectedCategoryColor['전체'] || 'transparent',
+                    borderColor: selectedCategoryColor['전체']
+                        ? 'transparent'
+                        : selectedCategory === '전체'
+                          ? '#000'
+                          : '#D3D3D3',
+                    color: selectedCategoryColor['전체']
+                        ? isBrightColor(selectedCategoryColor['전체'])
+                            ? '#000000'
+                            : '#FFFFFF'
+                        : selectedCategory === '전체'
+                          ? '#333'
+                          : '#898989',
+                }}
+                onClick={() => handleCategoryClick('전체')}
+            >
+                전체
+            </button>
             {categories.map(category => (
                 <button
                     key={category.categoryId}
@@ -82,8 +114,8 @@ export default function CategoryList({
                         ]
                             ? 'transparent'
                             : selectedCategory === category.categoryContent
-                              ? '#000' // 선택된 카테고리일 때 검정 모서리
-                              : '#D3D3D3', // 기본 상태에서 아주 연한 회색 모서리
+                              ? '#000'
+                              : '#D3D3D3',
                         color: selectedCategoryColor[category.categoryContent]
                             ? isBrightColor(
                                   selectedCategoryColor[
@@ -93,8 +125,8 @@ export default function CategoryList({
                                 ? '#000000'
                                 : '#FFFFFF'
                             : selectedCategory === category.categoryContent
-                              ? '#333' // 카테고리만 선택된 경우 기본 텍스트 색상 유지
-                              : '#898989', // 기본 텍스트 색상
+                              ? '#333'
+                              : '#898989',
                     }}
                     onClick={() =>
                         handleCategoryClick(category.categoryContent)
@@ -114,6 +146,7 @@ export default function CategoryList({
         </div>
     )
 }
+
 function isBrightColor(color: string): boolean {
     let r: number, g: number, b: number
     if (color.startsWith('rgb')) {

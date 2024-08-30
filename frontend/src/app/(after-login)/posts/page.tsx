@@ -46,21 +46,28 @@ export default function Gallery() {
 
     const fetchData = async (page: number) => {
         let response
+        console.log(
+            'fetchData called with categoryId:',
+            categoryId,
+            'and color:',
+            color,
+        )
 
         const isColorDefault =
             !color || (color[0] === 255 && color[1] === 255 && color[2] === 255)
 
-        if (categoryId && !isColorDefault) {
+        if (categoryId !== null && !isColorDefault) {
             console.log('categoryId와 color 모두 선택됨')
             response = await fetchPostsByCategoryAndColor(
                 { categoryId, rgbColor: color },
                 page,
                 10,
             )
-        } else if (categoryId) {
+        } else if (categoryId !== null) {
             console.log('categoryId만 선택됨')
             response = await fetchPostsByCategory(categoryId, page, 10)
         } else {
+            console.log('여기였네')
             const request = search.startsWith('#')
                 ? { hashtags: search.slice(1), page }
                 : { postContent: search, page }

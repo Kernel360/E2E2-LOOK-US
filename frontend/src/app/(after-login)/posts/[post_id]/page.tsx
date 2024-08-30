@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { follow, FollowRequest } from '@/app/_api/follow'
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa'
+import Link from 'next/link' // Link 컴포넌트 import
 
 type Props = {
     params: { post_id: number }
@@ -70,13 +71,16 @@ export default function Page({ params, searchParams }: Props) {
     return (
         <div className={styles.postContainer}>
             <div className={styles.logoContainer}>
-                <Image
-                    src='/images/LOOKUSlogo.png'
-                    alt='LOOK:US Logo'
-                    width={171}
-                    height={36}
-                    priority={true}
-                />
+                <Link href='/posts'>
+                    {/* /posts로 이동하도록 Link 추가 */}
+                    <Image
+                        src='/images/LOOKUSlogo.png'
+                        alt='LOOK:US Logo'
+                        width={171}
+                        height={36}
+                        priority={true}
+                    />
+                </Link>
             </div>
 
             <div className={styles.imageContainer}>

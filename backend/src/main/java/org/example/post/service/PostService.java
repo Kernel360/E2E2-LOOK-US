@@ -366,9 +366,9 @@ public class PostService {
 
 	@Transactional(readOnly = true)
 	@LogExecution
-	public Page<PostDto.PostDtoResponse> findAllPostsByCategory(Long categoryId, Pageable pageable) {
-		// 카테고리 ID를 통해 해당 카테고리에 속한 게시글들을 조회합니다.
-		List<PostEntity> posts = postRepository.findAllByCategoryId(categoryId);
+	public Page<PostDto.PostDtoResponse> findAllPostsByCategory(String categoryContent, Pageable pageable) {
+		// 카테고리 이름을 통해 해당 카테고리에 속한 게시글들을 조회합니다.
+		List<PostEntity> posts = postRepository.findAllByCategoryContent(categoryContent);
 
 		// 각 게시글을 DTO로 변환하여 반환할 리스트를 생성합니다.
 		List<PostDto.PostDtoResponse> postDtoResponses = posts.stream()

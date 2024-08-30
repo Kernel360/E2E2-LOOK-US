@@ -1,11 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
-import {
-    fetchCategories,
-    CategoryEntity,
-    fetchPostsByColor,
-} from '@/app/_api/category'
+import { fetchCategories, CategoryEntity } from '@/app/_api/category'
 import {
     fetchPostsByCategory,
     fetchPostsByCategoryAndColor,
@@ -32,6 +28,8 @@ export default function Gallery() {
     const [userInfo, setUserInfo] = useState<myInfoAllResponse | null>(null)
     const [redirectToSignup, setRedirectToSignup] = useState<boolean>(false)
     const router = useRouter()
+    const [isFetching, setIsFetching] = useState<boolean>(false)
+    const [totalPages, setTotalPages] = useState<number>(0)
 
     useEffect(() => {
         // 카테고리 데이터를 가져오는 로직 추가
@@ -47,49 +45,54 @@ export default function Gallery() {
         fetchCategoriesData()
     }, [])
 
-    const fetchData = useCallback(async () => {
-        try {
-            let response
+    const fetchData = async (page: number) => {
+        let response
 
-            if (category && color) {
-                // 카테고리와 색상으로 필터링
-                if (category === '전체') {
-                    response = await fetchPostsByColor(color, page, 10)
-                } else {
-                    response = await fetchPostsByCategoryAndColor(
-                        { category, rgbColor: color },
-                        page,
-                        10,
-                    )
-                }
-            } else if (category) {
-                const categoryId =
-                    categories.find(cat => cat.categoryContent === category)
-                        ?.categoryId || 0
-                response = await fetchPostsByCategory(categoryId, page, 10)
-            } else {
-                const request = search.startsWith('#')
-                    ? { hashtags: search.slice(1), page }
-                    : { postContent: search, page }
-                response = await getAllPostPreviews(request)
+        if (category && color) {
+            response = await fetchPostsByCategoryAndColor(
+                { category, rgbColor: color },
+                page,
+                10,
+            )
+        } else if (category) {
+            response = await fetchPostsByCategory(category, page, 10)
+        } else {
+            const request = search.startsWith('#')
+                ? { hashtags: search.slice(1), page }
+                : { postContent: search, page }
+            response = await getAllPostPreviews(request)
+        }
+
+        return response
+    }
+
+    const loadAllPages = async () => {
+        try {
+            // First fetch the first page to get the total number of pages
+            const firstPageResponse = await fetchData(0)
+            const totalPages = firstPageResponse.totalPages
+            setTotalPages(totalPages)
+
+            // Fetch all pages data
+            let allPosts: postPreviewContent[] = []
+            for (let page = 0; page < totalPages; page++) {
+                // 페이지 0번부터 시작해서 totalPages까지
+                const pageResponse = await fetchData(page)
+                allPosts = [...allPosts, ...pageResponse.content]
             }
 
-            setStyles(prevStyles => [...prevStyles, ...response.content])
-            setHasMore(
-                response.content.length > 0 && page < response.totalPages,
-            )
+            setStyles(allPosts)
         } catch (error) {
             console.error('Failed to fetch data:', error)
         }
-    }, [search, page, category, color, categories])
+    }
 
     useEffect(() => {
-        fetchData()
-    }, [fetchData])
+        loadAllPages()
+    }, [search, category, color])
 
     const handleSearch = (search: string) => {
         setSearch(search)
-        setPage(0)
         setStyles([])
         setCategory(null)
         setColor(null)
@@ -97,7 +100,6 @@ export default function Gallery() {
 
     const handleCategorySelect = (selectedCategory: string) => {
         setCategory(selectedCategory)
-        setPage(0)
         setStyles([])
     }
 
@@ -105,24 +107,15 @@ export default function Gallery() {
         selectedCategory: string,
         selectedColor: number[],
     ) => {
-        if (selectedCategory === '전체') {
-            setCategory('전체')
-            setColor(selectedColor)
-            console.log(selectedColor)
-        } else {
-            setCategory(selectedCategory)
-            setColor(selectedColor)
-        }
-        setPage(0)
+        setCategory(selectedCategory)
+        setColor(selectedColor)
         setStyles([])
     }
 
-    const lastElementRef = useIntersectionObserver(() => {
-        if (hasMore) {
-            setPage(prev => prev + 1)
-        }
-    }, hasMore)
-
+    const handleColorChange = (rgbColor: number[]) => {
+        setColor(rgbColor) // 색상 변경 시 상태 업데이트
+        setStyles([]) // 기존 스타일을 초기화하여 새로운 데이터 로딩
+    }
     useEffect(() => {
         async function fetchUserInfo() {
             try {
@@ -166,6 +159,7 @@ export default function Gallery() {
                 categories={categories}
                 onSelectCategory={handleCategorySelect}
                 onSelectCategoryAndColor={handleCategoryAndColorSelect}
+                onColorChange={handleColorChange} // 실시간 색상 변경 핸들러 추가
             />
             <Masonry
                 breakpointCols={breakpointColumnsObj}
@@ -180,7 +174,6 @@ export default function Gallery() {
                     />
                 ))}
             </Masonry>
-            <div ref={lastElementRef}></div>
         </div>
     )
 }

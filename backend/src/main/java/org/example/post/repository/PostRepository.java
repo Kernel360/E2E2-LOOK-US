@@ -34,11 +34,13 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, PostRep
 
 	List<PostEntity> findAllByImageLocationId(Long imageId);
 
-	// 특정 카테고리에 속한 모든 게시글을 조회하는 메서드
-	@Query("SELECT p FROM PostEntity p JOIN p.categories c WHERE c.categoryId = :categoryId")
-	List<PostEntity> findAllByCategoryId(@Param("categoryId") Long categoryId);
 
 	//주어진 카테고리와 이미지 id에 해당하는 게시글 조회하는 메소드
 	@Query("SELECT p FROM PostEntity p JOIN p.categories c WHERE c.categoryContent = :category AND p.imageLocationId IN :imageIds")
 	List<PostEntity> findAllByCategoryAndImageIds(@Param("category") String category, @Param("imageIds") Set<Long> imageIds);
+
+
+	// 새로운 메서드 추가
+	@Query("SELECT p FROM PostEntity p JOIN p.categories c WHERE c.categoryContent = :categoryContent")
+	List<PostEntity> findAllByCategoryContent(@Param("categoryContent") String categoryContent);
 }

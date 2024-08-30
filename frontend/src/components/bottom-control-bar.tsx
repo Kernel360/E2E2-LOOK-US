@@ -25,7 +25,7 @@ export default function BottomControlBar() {
 
                     {/* ---------------------------------------------------------------- */}
                     <Link href={'/posts/new'}>
-                        <Button className='bg-primary p-2 text-primary-foreground shadow-md'>
+                        <Button className='bg-black p-2 text-primary-foreground shadow-md'>
                             <PlusIcon className='h-8 w-8' />
                             <span className='sr-only'>Add</span>
                         </Button>

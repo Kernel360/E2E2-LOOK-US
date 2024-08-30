@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import './LoginPage.scss'
 import { API_OAUTH2_URL } from '@/app/_common/constants'
+import Image from 'next/image'
 
 export default function LoginPage() {
     const router = useRouter()
@@ -23,12 +24,15 @@ export default function LoginPage() {
 
     return (
         <div className='login-container'>
-            <header className='login-header'>
-                <h1 className='login-logo'>LOOK:US</h1>
-                <p className='login-description'>
-                    당신만의 퍼스널 패션 커뮤니티 서비스
-                </p>
-            </header>
+            <div className='login-background'>
+                <Image
+                    src='/images/loginsplashbg.png'
+                    alt='Login Background'
+                    layout='fill' // 배경 이미지를 화면에 꽉 채우기 위해 사용
+                    objectFit='cover'
+                    priority={true}
+                />
+            </div>
 
             <div className='login-content'>
                 <button
@@ -36,35 +40,13 @@ export default function LoginPage() {
                     disabled={isLoading}
                     className='login-button'
                 >
-                    {isLoading ? (
-                        <svg
-                            className='spinner'
-                            xmlns='http://www.w3.org/2000/svg'
-                            viewBox='0 0 24 24'
-                            fill='none'
-                            stroke='currentColor'
-                            strokeWidth='2'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                        >
-                            <circle cx='12' cy='12' r='10' />
-                            <path d='M14 2a10 10 0 0 1 0 20' />
-                        </svg>
-                    ) : (
-                        <svg
-                            className='google-icon'
-                            xmlns='http://www.w3.org/2000/svg'
-                            viewBox='0 0 24 24'
-                            fill='none'
-                            stroke='currentColor'
-                            strokeWidth='2'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                        >
-                            <path d='M21.35 11.1h-9.86v2.8h5.97c-.54 1.94-2.04 3.2-4.17 3.2-2.56 0-4.66-2.1-4.66-4.67s2.1-4.67 4.66-4.67c1.17 0 2.23.43 3.05 1.14l2.26-2.26c-1.4-1.3-3.26-2.1-5.3-2.1-4.06 0-7.37 3.3-7.37 7.36s3.3 7.36 7.37 7.36c3.97 0 6.85-2.83 6.85-6.81 0-.46-.05-.9-.13-1.33z' />
-                        </svg>
-                    )}
-                    {isLoading ? '로그인 중...' : 'Google로 시작하기'}
+                    <Image
+                        src='/images/googleloginbtn.png'
+                        alt='Google Login Button'
+                        width={300} // 버튼 이미지의 너비 설정
+                        height={50} // 버튼 이미지의 높이 설정
+                        priority={true}
+                    />
                 </button>
             </div>
         </div>

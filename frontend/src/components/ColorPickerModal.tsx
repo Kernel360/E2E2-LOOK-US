@@ -118,9 +118,11 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
         onClose() // 모달 닫기
     }
     const handleCategoryOnlySelect = () => {
-        onCategoryOnlySelect()
-        setSelectedColor('') // 카테고리만 선택 시 색상 초기화
+        // 카테고리만 선택 시 색상 초기화
+        onColorChange([255, 255, 255]) // 완전히 흰색으로 설정 (혹은 초기화 값 설정)
+        setSelectedColor('') // 선택된 색상 초기화
         setSliderColor('') // 슬라이더 색상도 초기화
+        onCategoryOnlySelect() // 카테고리만 선택
     }
     const sliderHue = sliderColor
         ? parseInt(sliderColor.match(/\d+/)?.[0] || '180')

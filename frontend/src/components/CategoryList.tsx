@@ -5,18 +5,18 @@ import { CategoryEntity } from '@/app/_api/category'
 
 interface CategoryListProps {
     categories: CategoryEntity[]
-    onSelectCategory: (category: string) => void
-    onSelectCategoryAndColor: (category: string, color: number[]) => void
-    onColorChange: (color: number[]) => void // New prop to handle color change
+    onSelectCategory: (categoryId: number) => void // string -> number로 변경
+    onSelectCategoryAndColor: (categoryId: number, color: number[]) => void // string -> number로 변경
+    onColorChange: (color: number[]) => void
 }
 
 export default function CategoryList({
     categories,
     onSelectCategory,
     onSelectCategoryAndColor,
-    onColorChange, // Accept the new prop
+    onColorChange,
 }: CategoryListProps) {
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
         null,
     )
     const [modalVisible, setModalVisible] = useState<boolean>(false)
@@ -24,81 +24,83 @@ export default function CategoryList({
         [key: string]: string
     }>({})
 
-    const handleCategoryClick = (category: string) => {
-        if (selectedCategory === category) {
-            // 선택된 카테고리를 다시 클릭하면 선택 해제
-            setSelectedCategory(null)
+    const handleCategoryClick = (categoryId: number) => {
+        // string -> number로 변경
+        if (selectedCategoryId === categoryId) {
+            setSelectedCategoryId(null)
             setSelectedCategoryColor(prev => {
                 const newColors = { ...prev }
-                delete newColors[category]
+                delete newColors[categoryId]
                 return newColors
             })
-            onSelectCategory('') // 선택 해제 시 빈 문자열로 선택 해제 알림
+            onSelectCategory(0) // 선택 해제 시 기본값으로 (0)을 넘겨줌
         } else {
-            // 새로운 카테고리 선택
-            setSelectedCategory(category)
+            setSelectedCategoryId(categoryId)
             setModalVisible(true)
         }
     }
 
     const handleColorComplete = (rgbColor: number[]) => {
-        // 이제 color는 RGB 배열로 처리
-        if (selectedCategory) {
+        if (selectedCategoryId) {
             const colorString = `rgb(${rgbColor.join(', ')})`
             setSelectedCategoryColor(prev => ({
                 ...prev,
-                [selectedCategory]: colorString,
+                [selectedCategoryId]: colorString,
             }))
-            onSelectCategoryAndColor(selectedCategory, rgbColor)
+            onSelectCategoryAndColor(selectedCategoryId, rgbColor)
         }
         setModalVisible(false)
     }
+
     const handleCategoryOnlySelect = () => {
-        if (selectedCategory) {
-            onSelectCategory(selectedCategory) // 카테고리만 선택
-            setSelectedCategoryColor({}) // 색상 초기화
+        if (selectedCategoryId) {
+            setSelectedCategoryColor(prev => ({
+                ...prev,
+                [selectedCategoryId]: '',
+            }))
+            onSelectCategory(selectedCategoryId)
+            onColorChange([255, 255, 255])
         }
         setModalVisible(false)
     }
 
     const handleCloseModal = () => {
-        setSelectedCategory(null) // 카테고리 선택 해제
-        setModalVisible(false) // 모달 닫기
+        setSelectedCategoryId(null)
+        setModalVisible(false)
     }
+
     const handleColorChange = (rgbColor: number[]) => {
-        // 색상 변경 시 실시간으로 업데이트
-        if (selectedCategory) {
+        if (selectedCategoryId) {
             onColorChange(rgbColor)
         }
     }
+
     return (
         <div className={styles.categoryList}>
-            {/* 전체 카테고리 버튼 추가 */}
             <button
                 className={`${styles.categoryButton} ${
-                    selectedCategory === '전체'
-                        ? selectedCategoryColor['전체']
+                    selectedCategoryId === 0
+                        ? selectedCategoryColor[0]
                             ? styles.colored
                             : styles.selected
                         : ''
                 }`}
                 style={{
-                    backgroundColor:
-                        selectedCategoryColor['전체'] || 'transparent',
-                    borderColor: selectedCategoryColor['전체']
+                    backgroundColor: selectedCategoryColor[0] || 'transparent',
+                    borderColor: selectedCategoryColor[0]
                         ? 'transparent'
-                        : selectedCategory === '전체'
+                        : selectedCategoryId === 0
                           ? '#000'
                           : '#D3D3D3',
-                    color: selectedCategoryColor['전체']
-                        ? isBrightColor(selectedCategoryColor['전체'])
+                    color: selectedCategoryColor[0]
+                        ? isBrightColor(selectedCategoryColor[0])
                             ? '#000000'
                             : '#FFFFFF'
-                        : selectedCategory === '전체'
+                        : selectedCategoryId === 0
                           ? '#333'
                           : '#898989',
                 }}
-                onClick={() => handleCategoryClick('전체')}
+                onClick={() => handleCategoryClick(0)}
             >
                 전체
             </button>
@@ -106,38 +108,32 @@ export default function CategoryList({
                 <button
                     key={category.categoryId}
                     className={`${styles.categoryButton} ${
-                        selectedCategory === category.categoryContent
-                            ? selectedCategoryColor[category.categoryContent]
+                        selectedCategoryId === category.categoryId
+                            ? selectedCategoryColor[category.categoryId]
                                 ? styles.colored
                                 : styles.selected
                             : ''
                     }`}
                     style={{
                         backgroundColor:
-                            selectedCategoryColor[category.categoryContent] ||
+                            selectedCategoryColor[category.categoryId] ||
                             'transparent',
-                        borderColor: selectedCategoryColor[
-                            category.categoryContent
-                        ]
+                        borderColor: selectedCategoryColor[category.categoryId]
                             ? 'transparent'
-                            : selectedCategory === category.categoryContent
+                            : selectedCategoryId === category.categoryId
                               ? '#000'
                               : '#D3D3D3',
-                        color: selectedCategoryColor[category.categoryContent]
+                        color: selectedCategoryColor[category.categoryId]
                             ? isBrightColor(
-                                  selectedCategoryColor[
-                                      category.categoryContent
-                                  ],
+                                  selectedCategoryColor[category.categoryId],
                               )
                                 ? '#000000'
                                 : '#FFFFFF'
-                            : selectedCategory === category.categoryContent
+                            : selectedCategoryId === category.categoryId
                               ? '#333'
                               : '#898989',
                     }}
-                    onClick={() =>
-                        handleCategoryClick(category.categoryContent)
-                    }
+                    onClick={() => handleCategoryClick(category.categoryId)}
                 >
                     {category.categoryContent}
                 </button>
@@ -145,10 +141,10 @@ export default function CategoryList({
             {modalVisible && (
                 <ColorPickerModal
                     onComplete={handleColorComplete}
-                    onClose={handleCloseModal} // 수정된 onClose 핸들러 사용
+                    onClose={handleCloseModal}
                     onCategoryOnlySelect={handleCategoryOnlySelect}
-                    onColorChange={handleColorChange} // 색상 변경 시 호출
-                    onResetCategory={handleCloseModal} // 카테고리 선택 초기화를 위한 핸들러 추가
+                    onColorChange={handleColorChange}
+                    onResetCategory={handleCloseModal}
                 />
             )}
         </div>

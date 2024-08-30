@@ -41,12 +41,16 @@ export default function CategoryList({
     }
 
     const handleColorComplete = (rgbColor: number[]) => {
-        if (selectedCategoryId) {
+        if (selectedCategoryId !== null) {
             const colorString = `rgb(${rgbColor.join(', ')})`
-            setSelectedCategoryColor(prev => ({
-                ...prev,
-                [selectedCategoryId]: colorString,
-            }))
+            setSelectedCategoryColor(prev => {
+                const newState = {
+                    ...prev,
+                    [selectedCategoryId]: colorString,
+                }
+                console.log('Updated State:', newState) // 업데이트 후 상태 확인
+                return newState
+            })
             onSelectCategoryAndColor(selectedCategoryId, rgbColor)
         }
         setModalVisible(false)
@@ -79,11 +83,7 @@ export default function CategoryList({
         <div className={styles.categoryList}>
             <button
                 className={`${styles.categoryButton} ${
-                    selectedCategoryId === 0
-                        ? selectedCategoryColor[0]
-                            ? styles.colored
-                            : styles.selected
-                        : ''
+                    selectedCategoryId === 0 ? styles.selected : ''
                 }`}
                 style={{
                     backgroundColor: selectedCategoryColor[0] || 'transparent',
@@ -100,7 +100,7 @@ export default function CategoryList({
                           ? '#333'
                           : '#898989',
                 }}
-                onClick={() => handleCategoryClick(0)}
+                onClick={() => handleCategoryClick(0)} // 전체 버튼 클릭 시 categoryId를 0으로 설정
             >
                 전체
             </button>

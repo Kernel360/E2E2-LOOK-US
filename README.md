@@ -71,6 +71,11 @@
 - Deploy
   - AWS EC2
 
+## ERD
+![diagram](https://github.com/user-attachments/assets/c4e677c2-36b1-4692-b8b7-8569e312a0b3)
+
+
+
 ## 📂 Directory Structure
 <details>
   <summary> 📂 파일 구조 보기</summary>

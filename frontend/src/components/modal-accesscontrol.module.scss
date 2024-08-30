@@ -1,0 +1,71 @@
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-container {
+    position: relative;
+    background: #ffffff;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 30px;
+    max-width: 420px; /* 모달 창의 최대 너비를 420px로 확장 */
+    width: 95%; /* 전체 화면 너비의 95%로 설정 */
+    height: 145px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px; /* 글씨 크기를 14px로 줄임 */
+    color: #000000;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.modal-button-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.modal-button {
+    width: 157px; /* 버튼 너비 고정 */
+    height: 43px; /* 버튼 높이 고정 */
+    background: #131616;
+    border-radius: 19.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px; /* 버튼 글씨 크기 */
+    color: #ffffff;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background: #444444;
+    }
+}
+
+.modal-cancel {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px; /* 취소 버튼 글씨 크기 */
+    color: #898989;
+    text-decoration: underline;
+    cursor: pointer;
+}

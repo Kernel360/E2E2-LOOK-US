@@ -1,0 +1,162 @@
+.container {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    height: 932px;
+    background: #ffffff;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.logoWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.arrowLeft {
+    position: absolute;
+    left: 0;
+    cursor: pointer;
+}
+
+.uploadBox,
+.imageBox {
+    position: relative;
+    width: 100%;
+    max-width: 381px;
+    height: 444px;
+    margin: 72px auto 0;
+    background: #eeeeee;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 20px;
+    }
+}
+
+.placeholderText {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 12px;
+    line-height: 15px;
+    color: #898989;
+}
+
+.nextButton,
+.submitButton {
+    width: 155px;
+    height: 46px;
+    background: #050505;
+    border: 1px solid #000000;
+    border-radius: 13px;
+    margin: 20px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    line-height: 24px;
+    text-align: center;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.categoryWrapper {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(120px, 1fr)
+    ); /* 최소 120px 크기의 칸을 가로로 채움 */
+    grid-auto-rows: 40px; /* 각 버튼의 높이를 40px로 설정 */
+    grid-gap: 8px; /* 버튼 간의 간격 */
+    overflow-x: auto; /* 가로 스크롤 가능하게 설정 */
+    padding: 10px;
+    white-space: nowrap;
+    max-width: 100%;
+    background: #f0f0f0;
+    border-radius: 13px;
+
+    &::-webkit-scrollbar {
+        display: none; /* 스크롤바 숨기기 */
+    }
+}
+
+.categoryButton {
+    background: #f0f0f0;
+    border: 2px solid #f0f0f0;
+    border-radius: 13px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    color: #898989;
+    cursor: pointer;
+    box-sizing: border-box;
+    line-height: 40px;
+    height: 100%;
+
+    &.selected {
+        background: #000000;
+        color: #ffffff;
+    }
+}
+
+.inputBox,
+.hashtagWrapper {
+    width: 100%;
+    max-width: 381px;
+    margin: 20px auto;
+    padding: 16px;
+    border: 2px solid #f0f0f0;
+    border-radius: 13px;
+    background: #ffffff;
+}
+
+.inputBox textarea {
+    width: 100%;
+    height: 150px;
+    border: none;
+    resize: none;
+    background: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #262626;
+    outline: none;
+}
+
+.hashtagWrapper {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    input {
+        width: 111px;
+        height: 26px;
+        border: 2px solid #000000;
+        border-radius: 13px;
+        padding: 0 8px;
+        font-size: 12px;
+    }
+
+    .hashtag {
+        flex: 0 0 26%;
+        border: 2px solid #f0f0f0;
+        border-radius: 13px;
+        font-size: 12px;
+        text-align: center;
+        line-height: 26px;
+        color: #898989;
+        cursor: pointer;
+    }
+}

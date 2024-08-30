@@ -16,6 +16,7 @@ import CategoryList from '@/components/CategoryList'
 import Masonry from 'react-masonry-css'
 import galleryStyles from './gallery.module.scss'
 import { getAllPostPreviews, postPreviewContent } from '@/app/_api/fetchStyle'
+import Link from 'next/link'
 
 export default function Gallery() {
     const [styles, setStyles] = useState<postPreviewContent[]>([])
@@ -153,6 +154,26 @@ export default function Gallery() {
                     height={36}
                     priority={true}
                 />
+                <div className={galleryStyles.buttonWrapper}>
+                    <Link href='/posts/new'>
+                        <Image
+                            src='/images/postAddBtn.png'
+                            alt='Post Add Button'
+                            width={36}
+                            height={36}
+                            className={galleryStyles.iconButton}
+                        />
+                    </Link>
+                    <Link href='/mypage'>
+                        <Image
+                            src='/images/myPageBtn.png'
+                            alt='My Page Button'
+                            width={36}
+                            height={36}
+                            className={galleryStyles.iconButton}
+                        />
+                    </Link>
+                </div>
             </div>
             <HeaderSearch onSearch={handleSearch} />
             <CategoryList

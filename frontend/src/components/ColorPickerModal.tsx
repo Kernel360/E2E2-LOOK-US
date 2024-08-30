@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import styles from './ColorPickerModal.module.scss'
 import { fetchPopularColor, PopularColor } from '@/app/_api/category'
+import useDebounce from '@/app/hooks/debounce'
 
 interface ColorPickerModalProps {
     initialColor?: string
     onComplete: (color: number[]) => void
     onClose: () => void
     onCategoryOnlySelect: () => void // 카테고리만 선택할 때 호출되는 함수
+    onColorChange: (color: number[]) => void // New prop to handle color change
     onResetCategory: () => void // 카테고리 선택 초기화 함수 추가
 }
 
@@ -63,11 +65,14 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
     onComplete,
     onClose,
     onCategoryOnlySelect, // 카테고리만 선택 함수 추가
+    onColorChange,
+
     onResetCategory,
 }) => {
     const [selectedColor, setSelectedColor] = useState<string>(initialColor)
     const [sliderColor, setSliderColor] = useState<string>(initialColor)
     const [trendColors, setTrendColors] = useState<string[]>([]) // trendColors 상태로 관리
+    const debouncedColor = useDebounce(selectedColor, 300) // Apply debounce
 
     useEffect(() => {
         const loadPopularColors = async () => {
@@ -84,7 +89,12 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
 
         loadPopularColors()
     }, [])
-
+    // useEffect(() => {
+    //     if (debouncedColor) {
+    //         const rgbColor = parseColorToRgb(debouncedColor)
+    //         onColorChange(rgbColor) // Trigger real-time updates
+    //     }
+    // }, [debouncedColor, onColorChange])
     const handleColorSelect = (color: string) => {
         setSelectedColor(color)
         setSliderColor('')
@@ -106,6 +116,11 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
     const handleClose = () => {
         onResetCategory() // 카테고리 선택 초기화
         onClose() // 모달 닫기
+    }
+    const handleCategoryOnlySelect = () => {
+        onCategoryOnlySelect()
+        setSelectedColor('') // 카테고리만 선택 시 색상 초기화
+        setSliderColor('') // 슬라이더 색상도 초기화
     }
     const sliderHue = sliderColor
         ? parseInt(sliderColor.match(/\d+/)?.[0] || '180')
@@ -156,7 +171,7 @@ const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
                 <div className={styles.buttonsContainer}>
                     <div
                         className={styles.button}
-                        onClick={onCategoryOnlySelect} // 카테고리만 선택
+                        onClick={handleCategoryOnlySelect} // 카테고리만 선택
                     >
                         카테고리만 선택
                     </div>

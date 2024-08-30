@@ -31,6 +31,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -121,12 +122,12 @@ public class PostPublicController {
 		@ApiResponse(responseCode = "200", description = "ok!!"),
 		@ApiResponse(responseCode = "404", description = "Resource not found!!")
 	})
-	@GetMapping("/category/{categoryId}")
+	@GetMapping("/category/{category}")
 	public ResponseEntity<Page<PostDto.PostDtoResponse>> getPostsByCategory(
-		@PathVariable Long categoryId,
+		@PathVariable String category,
 		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
-		Page<PostDto.PostDtoResponse> posts = postService.findAllPostsByCategory(categoryId, pageable);
+		Page<PostDto.PostDtoResponse> posts = postService.findAllPostsByCategory(category, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(posts);
 
 	}

@@ -7,12 +7,14 @@ interface CategoryListProps {
     categories: CategoryEntity[]
     onSelectCategory: (category: string) => void
     onSelectCategoryAndColor: (category: string, color: number[]) => void
+    onColorChange: (color: number[]) => void // New prop to handle color change
 }
 
 export default function CategoryList({
     categories,
     onSelectCategory,
     onSelectCategoryAndColor,
+    onColorChange, // Accept the new prop
 }: CategoryListProps) {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(
         null,
@@ -51,10 +53,10 @@ export default function CategoryList({
         }
         setModalVisible(false)
     }
-
     const handleCategoryOnlySelect = () => {
         if (selectedCategory) {
-            onSelectCategory(selectedCategory)
+            onSelectCategory(selectedCategory) // 카테고리만 선택
+            setSelectedCategoryColor({}) // 색상 초기화
         }
         setModalVisible(false)
     }
@@ -63,7 +65,12 @@ export default function CategoryList({
         setSelectedCategory(null) // 카테고리 선택 해제
         setModalVisible(false) // 모달 닫기
     }
-
+    const handleColorChange = (rgbColor: number[]) => {
+        // 색상 변경 시 실시간으로 업데이트
+        if (selectedCategory) {
+            onColorChange(rgbColor)
+        }
+    }
     return (
         <div className={styles.categoryList}>
             {/* 전체 카테고리 버튼 추가 */}
@@ -140,6 +147,7 @@ export default function CategoryList({
                     onComplete={handleColorComplete}
                     onClose={handleCloseModal} // 수정된 onClose 핸들러 사용
                     onCategoryOnlySelect={handleCategoryOnlySelect}
+                    onColorChange={handleColorChange} // 색상 변경 시 호출
                     onResetCategory={handleCloseModal} // 카테고리 선택 초기화를 위한 핸들러 추가
                 />
             )}

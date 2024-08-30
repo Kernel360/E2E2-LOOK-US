@@ -62,7 +62,7 @@ export async function getAllPostPreviews(request?: postPreviewsAllRequest) {
         hashtags,
         postContent,
     } = request || {}
-
+    console.log('getAllPostPreviews')
     const params = new URLSearchParams()
     params.append('page', String(page))
     params.append('size', String(size))

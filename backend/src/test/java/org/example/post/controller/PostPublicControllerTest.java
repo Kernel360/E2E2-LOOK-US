@@ -117,8 +117,6 @@ public class PostPublicControllerTest {
 		assertEquals(expectedPage, response.getBody());
 	}
 
-
-
 	// API returns 200 OK when valid category and RGB color are provided
 	@Test
 	public void test_valid_category_and_rgb_color() throws JsonProcessingException {
@@ -126,10 +124,11 @@ public class PostPublicControllerTest {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
 		CategoryAndColorSearchCondition condition = new CategoryAndColorSearchCondition();
 		condition.setCategory("Nature");
-		condition.setRgbColor(new int[]{255, 0, 0});
+		condition.setRgbColor(new int[] {255, 0, 0});
 
 		List<PostDto.PostDtoResponse> postList = List.of(
-			new PostDto.PostDtoResponse("user1", 1L, 1L, List.of("#nature"), List.of("Nature"), 10, 100, LocalDateTime.now())
+			new PostDto.PostDtoResponse("user1", 1L, 1L, List.of("#nature"), List.of("Nature"), 10, 100,
+				LocalDateTime.now())
 		);
 		Page<PostDto.PostDtoResponse> page = new PageImpl<>(postList, pageable, postList.size());
 
@@ -139,14 +138,13 @@ public class PostPublicControllerTest {
 		PostPublicController controller = new PostPublicController(postService, imageRedisService);
 
 		// Act
-		ResponseEntity<Page<PostDto.PostDtoResponse>> response = controller.searchByCategoryOrRgbPost(pageable, condition);
+		ResponseEntity<Page<PostDto.PostDtoResponse>> response = controller.searchByCategoryOrRgbPost(pageable,
+			condition);
 
 		// Assert
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertFalse(response.getBody().isEmpty());
 	}
-
-
 
 	// API returns 200 OK with an empty list when no posts match the category and RGB color
 	@Test
@@ -155,7 +153,7 @@ public class PostPublicControllerTest {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
 		CategoryAndColorSearchCondition condition = new CategoryAndColorSearchCondition();
 		condition.setCategory("NonExistentCategory");
-		condition.setRgbColor(new int[]{0, 0, 0});
+		condition.setRgbColor(new int[] {0, 0, 0});
 
 		Page<PostDto.PostDtoResponse> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
 
@@ -165,13 +163,13 @@ public class PostPublicControllerTest {
 		PostPublicController controller = new PostPublicController(postService, imageRedisService);
 
 		// Act
-		ResponseEntity<Page<PostDto.PostDtoResponse>> response = controller.searchByCategoryOrRgbPost(pageable, condition);
+		ResponseEntity<Page<PostDto.PostDtoResponse>> response = controller.searchByCategoryOrRgbPost(pageable,
+			condition);
 
 		// Assert
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue(response.getBody().isEmpty());
 	}
-
 
 	// Retrieves post details successfully when a valid post ID is provided
 	@Test
@@ -181,7 +179,12 @@ public class PostPublicControllerTest {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		PostDto.PostDetailDtoResponse expectedResponse = new PostDto.PostDetailDtoResponse(
-			"nickname", validPostId, 1L, "postContent", List.of("hashtag1"), List.of("category1"), 10, true, 100, LocalDateTime.now(), LocalDateTime.now()
+			"nickname",
+			validPostId,
+			1L,
+			1L,
+			"postContent", List.of("hashtag1"), List.of("category1"), 10, true, 100,
+			LocalDateTime.now(), LocalDateTime.now()
 		);
 
 		when(postService.getPostById(validPostId)).thenReturn(expectedResponse);
@@ -189,12 +192,14 @@ public class PostPublicControllerTest {
 		PostPublicController controller = new PostPublicController(postService, imageRedisService);
 
 		// Act
-		ResponseEntity<PostDto.PostDetailDtoResponse> responseEntity = controller.getPostById(validPostId, request, response);
+		ResponseEntity<PostDto.PostDetailDtoResponse> responseEntity = controller.getPostById(validPostId, request,
+			response);
 
 		// Assert
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(expectedResponse, responseEntity.getBody());
 	}
+
 	// Returns like count for a valid post ID
 	@Test
 	public void test_like_count_valid_post_id() {
@@ -216,7 +221,8 @@ public class PostPublicControllerTest {
 		Long categoryId = 1L;
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
 		List<PostDto.PostDtoResponse> postList = List.of(
-			new PostDto.PostDtoResponse("user1", 1L, 1L, List.of("#tag1"), List.of("category1"), 10, 100, LocalDateTime.now())
+			new PostDto.PostDtoResponse("user1", 1L, 1L, List.of("#tag1"), List.of("category1"), 10, 100,
+				LocalDateTime.now())
 		);
 		Page<PostDto.PostDtoResponse> expectedPage = new PageImpl<>(postList, pageable, postList.size());
 
@@ -231,6 +237,7 @@ public class PostPublicControllerTest {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(expectedPage, response.getBody());
 	}
+
 	// Should return a list of all categories when the endpoint is called
 	@Test
 	public void test_get_category_all_returns_list_of_categories() {
@@ -252,7 +259,6 @@ public class PostPublicControllerTest {
 		assertEquals("Pants", response.getBody().get(1).getCategoryContent());
 	}
 
-
 	// Returns a list of popular colors with status 200
 	@Test
 	public void test_returns_list_of_popular_colors_with_status_200() {
@@ -270,6 +276,5 @@ public class PostPublicControllerTest {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(mockResponse, response.getBody());
 	}
-
 
 }

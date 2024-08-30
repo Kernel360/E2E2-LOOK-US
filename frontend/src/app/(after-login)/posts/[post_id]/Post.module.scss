@@ -8,6 +8,12 @@
     box-sizing: border-box;
 }
 
+.logoContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
 .imageContainer {
     width: 100%;
     height: 444px;
@@ -71,20 +77,6 @@
     padding: 15px;
 }
 
-.content {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 15px;
-    color: #898989;
-}
-
-.categories,
-.hashtags,
-.profileDetails {
-    margin-top: 10px;
-}
-
 .contentTitle,
 .categoryTitle,
 .hashtagTitle {
@@ -124,6 +116,7 @@
     line-height: 15px;
     color: #898989;
 }
+
 .profileDetailsBox {
     display: flex;
     justify-content: space-between;
@@ -131,7 +124,7 @@
     padding: 15px;
     border: 2px solid #f0f0f0;
     border-radius: 13px;
-    margin-bottom: 60vh;
+    margin-bottom: 100px;
 }
 
 .profileDetails {
@@ -139,12 +132,17 @@
     align-items: center;
 }
 
-.profilePic img {
+.profilePic {
+    position: relative;
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    object-fit: cover;
+    overflow: hidden;
     background: #d9d9d9;
+}
+
+.profileImage {
+    object-fit: cover;
 }
 
 .profileInfo {
@@ -163,17 +161,18 @@
     margin-bottom: 5px;
 }
 
+.statsContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
 .stats {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
     font-size: 12px;
     line-height: 15px;
     color: #898989;
-    margin-right: 10px;
-}
-
-.stats:last-of-type {
-    margin-right: 0;
 }
 
 .followButtonContainer {
@@ -194,16 +193,4 @@
     background-color: #050505;
     border: 1px solid #000000;
     cursor: pointer;
-}
-.profilePic {
-    position: relative; // Image 컴포넌트를 감싸는 div는 position이 있어야 함
-    width: 50px; // 너비 설정
-    height: 50px; // 높이 설정
-    border-radius: 50%; // 동그란 모양으로 만들기
-    overflow: hidden; // 이미지를 컨테이너 안에 잘리도록 하기
-    background: #d9d9d9; // 백업 배경색
-}
-
-.profileImage {
-    object-fit: cover; // 이미지를 컨테이너에 맞게 자르기
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,12 +36,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 ;
 
 /**
  * The type Image redis service.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageRedisService {
@@ -307,21 +310,22 @@ public class ImageRedisService {
 			= closestColorZSet.rangeWithScores(COLOR_DIST_CAL_ZSET_KEY, 0, num - 1);
 
 		if (typedTuples == null || typedTuples.isEmpty()) {    // TODO: 수정 필요
-			return null;
+			return Collections.emptyList();
 		}
 
 		return typedTuples.stream()
 			.map(tuple -> {
 				String colorJson = (String)tuple.getValue(); // JSON 문자열 (ZSet value)
 				double distance = tuple.getScore();           // 거리 (ZSet score)
-				ColorDto.ColorUpdateDtoRequest colorRequest = null;
 				try {
-					colorRequest = objectMapper.readValue(colorJson, ColorDto.ColorUpdateDtoRequest.class);
+					ColorDto.ColorUpdateDtoRequest colorRequest = objectMapper.readValue(colorJson, ColorDto.ColorUpdateDtoRequest.class);
+					return new ColorDto.ColorDistanceResponse(colorRequest.name(), distance);
 				} catch (JsonProcessingException e) {
-					throw new RuntimeException(e);
+					log.error("JSON 파싱 에러: {}", colorJson, e);
+					return null; // null 대신 기본값을 반환하거나 처리
 				}
-				return new ColorDto.ColorDistanceResponse(colorRequest.name(), distance);
 			})
+			.filter(Objects::nonNull) // null이 반환된 경우 제거
 			.toList();
 	}
 

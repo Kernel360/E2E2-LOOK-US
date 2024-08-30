@@ -366,9 +366,9 @@ public class PostService {
 
 	@Transactional(readOnly = true)
 	@LogExecution
-	public Page<PostDto.PostDtoResponse> findAllPostsByCategory(String categoryContent, Pageable pageable) {
+	public Page<PostDto.PostDtoResponse> findAllPostsByCategory(Long categoryId, Pageable pageable) {
 		// 카테고리 이름을 통해 해당 카테고리에 속한 게시글들을 조회합니다.
-		List<PostEntity> posts = postRepository.findAllByCategoryContent(categoryContent);
+		List<PostEntity> posts = postRepository.findAllByCategoryId(categoryId);
 
 		// 각 게시글을 DTO로 변환하여 반환할 리스트를 생성합니다.
 		List<PostDto.PostDtoResponse> postDtoResponses = posts.stream()
@@ -394,7 +394,7 @@ public class PostService {
 
 
 	@Transactional(readOnly = true)
-	public Page<PostDto.PostDtoResponse> findAllPostsByCategoryAndRGB(String category, int[] rgbColor, Pageable pageable)
+	public Page<PostDto.PostDtoResponse> findAllPostsByCategoryAndRGB(Long categoryId, int[] rgbColor, Pageable pageable)
 		throws JsonProcessingException {
 
 		// 1. 주어진 색상에 해당하는 이미지 ID들을 조회
@@ -408,10 +408,12 @@ public class PostService {
 		}
 
 		// 3. 카테고리 필터링 적용
+		// 3. 카테고리 필터링 적용 - categoryId를 사용하여 필터링
 		List<PostEntity> filteredPosts = posts.stream()
 			.filter(post -> post.getCategories().stream()
-				.anyMatch(cat -> cat.getCategoryContent().equals(category)))
+				.anyMatch(cat -> cat.getCategoryId().equals(categoryId)))
 			.collect(Collectors.toList());
+
 
 		// 4. 각 게시글을 DTO로 변환하여 반환할 리스트를 생성합니다.
 		List<PostDto.PostDtoResponse> postDtoResponses = filteredPosts.stream()

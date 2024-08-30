@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class CategoryAndColorSearchCondition {
 
-	private String category;
+	private Long categoryId;
 	private int[] rgbColor;
 }

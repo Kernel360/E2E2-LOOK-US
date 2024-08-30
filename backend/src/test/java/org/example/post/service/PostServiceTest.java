@@ -573,6 +573,7 @@ class PostServiceTest {
 	public void test_findAllPostsByCategory_success() {
 		// Arrange
 		Long categoryId = 1L;
+		String category = "category1";
 		Pageable pageable = PageRequest.of(0, 10);
 
 		List<PostEntity> posts = List.of(
@@ -582,10 +583,12 @@ class PostServiceTest {
 		when(posts.get(0).getPostId()).thenReturn(1L);
 		when(posts.get(0).getUser()).thenReturn(mock(UserEntity.class));
 		when(posts.get(0).getUser().getNickname()).thenReturn("nick1");
+		when(posts.get(0).getCategoryContents()).thenReturn(List.of("category1"));
 
 		when(posts.get(1).getPostId()).thenReturn(2L);
 		when(posts.get(1).getUser()).thenReturn(mock(UserEntity.class));
 		when(posts.get(1).getUser().getNickname()).thenReturn("nick2");
+		when(posts.get(1).getCategoryContents()).thenReturn(List.of("category1"));
 
 		List<PostDto.PostDtoResponse> postDtoResponses = posts.stream()
 			.map(postEntity -> new PostDto.PostDtoResponse(
@@ -602,16 +605,16 @@ class PostServiceTest {
 		Page<PostDto.PostDtoResponse> expectedPage = new PageImpl<>(postDtoResponses, pageable,
 			postDtoResponses.size());
 
-		when(postRepository.findAllByCategoryId(categoryId)).thenReturn(posts);
+		when(postRepository.findAllByCategoryContent(category)).thenReturn(posts);
 
 		// Act
-		Page<PostDto.PostDtoResponse> result = postService.findAllPostsByCategory(categoryId, pageable);
+		Page<PostDto.PostDtoResponse> result = postService.findAllPostsByCategory(category, pageable);
 
 		// Assert
 		assertNotNull(result);
 		assertEquals(expectedPage.getTotalElements(), result.getTotalElements());
 		assertEquals(expectedPage.getContent(), result.getContent());
-		verify(postRepository).findAllByCategoryId(categoryId);
+		verify(postRepository).findAllByCategoryContent(category);
 	}
 	@Test
 	public void test_findPostsByImageIds_success() {

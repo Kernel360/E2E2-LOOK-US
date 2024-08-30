@@ -225,13 +225,13 @@ public class PostPublicControllerTest {
 				LocalDateTime.now())
 		);
 		Page<PostDto.PostDtoResponse> expectedPage = new PageImpl<>(postList, pageable, postList.size());
-
-		when(postService.findAllPostsByCategory(categoryId, pageable)).thenReturn(expectedPage);
+		String category = "category1";
+		when(postService.findAllPostsByCategory(category, pageable)).thenReturn(expectedPage);
 
 		PostPublicController controller = new PostPublicController(postService, imageRedisService);
 
 		// Act
-		ResponseEntity<Page<PostDto.PostDtoResponse>> response = controller.getPostsByCategory(categoryId, pageable);
+		ResponseEntity<Page<PostDto.PostDtoResponse>> response = controller.getPostsByCategory(category, pageable);
 
 		// Assert
 		assertEquals(HttpStatus.OK, response.getStatusCode());

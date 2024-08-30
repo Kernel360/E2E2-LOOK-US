@@ -1,21 +1,11 @@
 import React, { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-    Box,
-    Button,
-    Input,
-    Text,
-    VStack,
-    SimpleGrid,
-    Tag,
-    Textarea,
-    HStack,
-    IconButton,
-    Image as ChakraImage,
-} from '@chakra-ui/react'
 import { AddIcon, CloseIcon } from '@chakra-ui/icons'
 import { API_PRIVATE_URL, API_PUBLIC_URL } from '@/app/_common/constants'
 import { createPost } from '@/app/_api/post'
+import styles from './post-create.module.scss'
+import Image from 'next/image'
+import Link from 'next/link'
 
 interface Category {
     categoryId: number
@@ -142,191 +132,173 @@ const UploadOOTD = () => {
         switch (step) {
             case 1: // 이미지 업로드 단계
                 return (
-                    <VStack spacing={4} align='stretch' p={4}>
-                        <Text fontSize='lg' fontWeight='bold'>
-                            오오티디 등록하기
-                        </Text>
-                        <Box
-                            borderWidth='1px'
-                            borderRadius='lg'
-                            overflow='hidden'
-                            position='relative'
-                            width='100%'
-                            height={0}
-                            paddingBottom='125%' // 4:5 비율 유지
-                            bg='gray.100'
-                            display='flex'
-                            justifyContent='center'
-                            alignItems='center'
+                    <div className={styles.container}>
+                        <div className={styles.logoWrapper}>
+                            <div className={styles.arrowLeft}>
+                                <Link href='/posts'>
+                                    <Image
+                                        src='/images/arrow-left.png'
+                                        alt='Back'
+                                        width={35}
+                                        height={35}
+                                    />
+                                </Link>
+                            </div>
+                            <Image
+                                src='/images/LOOKUSlogo.png'
+                                alt='LOOK:US'
+                                width={171}
+                                height={36}
+                            />
+                        </div>
+                        <div
+                            className={styles.uploadBox}
+                            onClick={() =>
+                                document.getElementById('imageInput')?.click()
+                            }
                         >
                             {selectedImage ? (
-                                <ChakraImage
+                                <img
                                     src={URL.createObjectURL(selectedImage)}
-                                    alt='Selected Image'
-                                    objectFit='cover'
-                                    position='absolute'
-                                    top='0'
-                                    left='0'
-                                    width='100%'
-                                    height='100%'
+                                    alt='Selected'
                                 />
                             ) : (
-                                <Text>업로드할 사진을 선택하세요!</Text>
+                                <Image
+                                    src='/images/uploadImg.png'
+                                    alt='Upload Placeholder'
+                                    width={70}
+                                    height={58}
+                                />
                             )}
-                        </Box>
-                        <Input type='file' onChange={handleImageUpload} />
-                        <Button
-                            colorScheme='teal'
+                        </div>
+                        <input
+                            id='imageInput'
+                            type='file'
+                            onChange={handleImageUpload}
+                            style={{ display: 'none' }}
+                        />
+                        <div
+                            className={styles.nextButton}
                             onClick={handleNextStep}
-                            borderRadius='full'
-                            boxShadow='md'
-                            marginTop='20px'
                         >
-                            다음
-                        </Button>
-                    </VStack>
+                            <span>다음으로</span>
+                        </div>
+                    </div>
                 )
 
             case 2: // 카테고리 선택 단계
                 return (
-                    <VStack spacing={4} align='stretch' p={4}>
-                        <Text fontSize='lg' fontWeight='bold'>
-                            카테고리 선택
-                        </Text>
-                        <SimpleGrid columns={3} spacing={4}>
+                    <div className={styles.container}>
+                        <div className={styles.logoWrapper}>
+                            <div className={styles.arrowLeft}>
+                                <Link href='/posts'>
+                                    <Image
+                                        src='/images/arrow-left.png'
+                                        alt='Back'
+                                        width={35}
+                                        height={35}
+                                    />
+                                </Link>
+                            </div>
+                            <Image
+                                src='/images/LOOKUSlogo.png'
+                                alt='LOOK:US'
+                                width={171}
+                                height={36}
+                            />
+                        </div>
+                        <div className={styles.imageBox}>
+                            <img
+                                src={URL.createObjectURL(selectedImage!)}
+                                alt='Selected'
+                            />
+                        </div>
+                        <div className={styles.categoryWrapper}>
                             {categories.map(category => (
-                                <Button
+                                <div
                                     key={category.categoryId}
+                                    className={`${styles.categoryButton} ${selectedCategories.includes(category.categoryContent) ? styles.selected : ''}`}
                                     onClick={() =>
                                         handleCategorySelect(
                                             category.categoryContent,
                                         )
                                     }
-                                    bg={
-                                        selectedCategories.includes(
-                                            category.categoryContent,
-                                        )
-                                            ? 'teal.500'
-                                            : 'gray.200'
-                                    }
-                                    color={
-                                        selectedCategories.includes(
-                                            category.categoryContent,
-                                        )
-                                            ? 'white'
-                                            : 'black'
-                                    }
-                                    borderRadius='full'
-                                    boxShadow='md'
                                 >
                                     {category.categoryContent}
-                                </Button>
+                                </div>
                             ))}
-                        </SimpleGrid>
-                        <Button
-                            colorScheme='teal'
+                        </div>
+                        <div
+                            className={styles.nextButton}
                             onClick={() => setStep(3)}
-                            borderRadius='full'
-                            boxShadow='md'
-                            marginTop='20px'
                         >
-                            다음
-                        </Button>
-                    </VStack>
+                            <span>다음으로</span>
+                        </div>
+                    </div>
                 )
 
             case 3: // 게시글 정보 입력 단계
                 return (
-                    <VStack spacing={4} align='stretch' p={4}>
-                        <Text fontSize='lg' fontWeight='bold'>
-                            게시글 정보 입력
-                        </Text>
-                        <Box
-                            borderWidth='1px'
-                            borderRadius='lg'
-                            overflow='hidden'
-                            position='relative'
-                            width='100%'
-                            paddingBottom='80%' // 이미지 비율 수정
-                            bg='gray.100'
-                            display='flex'
-                            justifyContent='center'
-                            alignItems='center'
-                        >
-                            <ChakraImage
-                                src={URL.createObjectURL(selectedImage!)}
-                                alt='Selected Image'
-                                objectFit='cover'
-                                position='absolute'
-                                top='0'
-                                left='0'
-                                width='100%'
-                                height='100%'
+                    <div className={styles.container}>
+                        <div className={styles.logoWrapper}>
+                            <div className={styles.arrowLeft}>
+                                <Link href='/posts'>
+                                    <Image
+                                        src='/images/arrow-left.png'
+                                        alt='Back'
+                                        width={35}
+                                        height={35}
+                                    />
+                                </Link>
+                            </div>
+                            <Image
+                                src='/images/LOOKUSlogo.png'
+                                alt='LOOK:US'
+                                width={171}
+                                height={36}
                             />
-                        </Box>
-                        <Textarea
-                            placeholder='오오티디에 대한 설명을 입력하세요!'
-                            value={content}
-                            onChange={e => setContent(e.target.value)}
-                            bg='gray.100'
-                            borderRadius='lg'
-                            marginTop='10px'
-                        />
-                        <Text fontSize='lg' fontWeight='bold'>
-                            해시태그 추가
-                        </Text>
-                        <HStack>
-                            <Input
+                        </div>
+                        <div className={styles.imageBox}>
+                            <img
+                                src={URL.createObjectURL(selectedImage!)}
+                                alt='Selected'
+                            />
+                        </div>
+                        <div className={styles.inputBox}>
+                            <textarea
+                                placeholder='포스트를 입력해주세요'
+                                value={content}
+                                onChange={e => setContent(e.target.value)}
+                            />
+                        </div>
+                        <div className={styles.hashtagWrapper}>
+                            <input
                                 placeholder='#해시태그'
                                 value={newHashtag}
                                 onChange={e => setNewHashtag(e.target.value)}
-                                bg='gray.100'
-                                borderRadius='lg'
+                                onKeyPress={e => {
+                                    if (e.key === 'Enter') {
+                                        handleAddHashtag()
+                                    }
+                                }}
                             />
-                            <IconButton
-                                icon={<AddIcon />}
-                                onClick={handleAddHashtag}
-                                colorScheme='teal'
-                                aria-label='hashtag add'
-                                borderRadius='full'
-                                boxShadow='md'
-                            />
-                        </HStack>
-                        <HStack spacing={2} wrap='wrap'>
                             {hashtags.map((tag, index) => (
-                                <Tag
+                                <div
                                     key={index}
-                                    size='lg'
-                                    colorScheme='teal'
-                                    borderRadius='full'
-                                    boxShadow='md'
+                                    className={styles.hashtag}
+                                    onClick={() => handleRemoveHashtag(index)}
                                 >
                                     {tag}
-                                    <IconButton
-                                        icon={<CloseIcon />}
-                                        size='xs'
-                                        ml={2}
-                                        onClick={() =>
-                                            handleRemoveHashtag(index)
-                                        }
-                                        variant='ghost'
-                                        colorScheme='teal'
-                                        aria-label='removehashtag'
-                                        borderRadius='full'
-                                    />
-                                </Tag>
+                                </div>
                             ))}
-                        </HStack>
-                        <Button
-                            colorScheme='teal'
+                        </div>
+                        <div
+                            className={styles.submitButton}
                             onClick={handleSubmit}
-                            borderRadius='full'
-                            boxShadow='md'
-                            marginTop='20px'
                         >
-                            완료
-                        </Button>
-                    </VStack>
+                            <span>작성 완료</span>
+                        </div>
+                    </div>
                 )
 
             default:
@@ -334,11 +306,7 @@ const UploadOOTD = () => {
         }
     }
 
-    return (
-        <VStack spacing={4} align='stretch' p={4}>
-            {renderStep()}
-        </VStack>
-    )
+    return <div className={styles.container}>{renderStep()}</div>
 }
 
 export default UploadOOTD

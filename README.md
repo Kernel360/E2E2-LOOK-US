@@ -381,7 +381,7 @@
 </details>
 
 ## 🔨 Server Architecture
-![image](https://github.com/user-attachments/assets/fd15c304-7cfe-449e-bfd2-f2f9b205318d)
+![image](https://github.com/user-attachments/assets/d2d73ef6-e71c-4132-baad-acff0e530569)
 
 
 ## 👨‍💻 Role & Contribution

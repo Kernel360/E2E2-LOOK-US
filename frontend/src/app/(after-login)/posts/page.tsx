@@ -8,7 +8,6 @@ import {
 } from '@/app/_api/category'
 import StylePreview from '@/components/post-preview'
 import HeaderSearch from '@/components/search-bar'
-import { useIntersectionObserver } from './useIntersectionObserver'
 import { myInfoAllFunction, myInfoAllResponse } from '@/app/_api/myPage'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'

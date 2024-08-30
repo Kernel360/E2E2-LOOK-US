@@ -95,7 +95,11 @@
     gap: 10px;
     flex-wrap: wrap;
 }
-
+.content {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+}
 .category,
 .hashtag {
     padding: 8px 16px;

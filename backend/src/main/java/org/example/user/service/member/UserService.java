@@ -86,25 +86,25 @@ public class UserService {
 
 	@LogExecution
 	public UserDto.UserResponse loginUser(UserDto.UserLoginRequest loginRequest) {
-			UserEntity user = getUserByEmail(loginRequest.email());
+		UserEntity user = getUserByEmail(loginRequest.email());
 
-			if (user != null && bCryptPasswordEncoder.matches(loginRequest.password(), user.getPassword())) {
-				// 로그인 성공 시 SecurityContextHolder에 권한 부여
-				Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
-				Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);
-				SecurityContext context = SecurityContextHolder.getContext();
-
-				context.setAuthentication(authentication);
-
-				System.out.println("context = " + context);
-
-
-
-				return new UserDto.UserResponse(user.getEmail(), user.getRole().name());
-			}
-
-			return null; // 로그인 실패 시 null 반환
+		if (user == null || !bCryptPasswordEncoder.matches(loginRequest.password(), user.getPassword())) {
+			// 로그인 실패 시 예외 발생
+			throw ApiUserException.builder()
+				.category(ApiErrorCategory.RESOURCE_INACCESSIBLE)
+				.subCategory(ApiUserErrorSubCategory.USER_NOT_FOUND)
+				.build();
 		}
+
+		// 로그인 성공 시 SecurityContextHolder에 권한 부여
+		Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
+		Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);
+		SecurityContext context = SecurityContextHolder.getContext();
+		context.setAuthentication(authentication);
+
+		// 성공 시 유저 정보 반환
+		return new UserDto.UserResponse(user.getEmail(), user.getRole().name());
+	}
 
 	@LogExecution
 	@Transactional(readOnly = true)

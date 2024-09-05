@@ -1,18 +1,9 @@
 package org.example.user.controller.member;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.example.config.jwt.TokenProvider;
 import org.example.config.log.LogExecution;
-import org.example.post.domain.entity.PostDailyStats;
-import org.example.post.domain.entity.PostEntity;
-import org.example.post.domain.entity.PostTotalStats;
-import org.example.post.repository.PostRepository;
-import org.example.post.service.PostStatsService;
 import org.example.user.domain.dto.UserDto;
 import org.example.user.domain.entity.member.UserEntity;
 import org.example.user.service.member.UserService;
@@ -29,13 +20,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+/**
+ *  This page is for Admin Page.
+ */
 @Controller
 @RequiredArgsConstructor
 public class UserViewController {
 
 	private final UserService userService;
-	private final PostStatsService postStatsService;
-	private final PostRepository postRepository;
 	private final TokenProvider tokenProvider;
 
 	@GetMapping("/")
@@ -71,64 +63,10 @@ public class UserViewController {
 			jwtCookie.setMaxAge(24 * 60 * 60); // 24시간
 			response.addCookie(jwtCookie);
 
-			// if ("ROLE_ADMIN".equals(userResponse.role())) {
-			// 	return "redirect:/admin/stats";
-			// } else {
-			// 	return "redirect:/home";
-			// }
 			return "redirect:/admin/stats";
 		} else {
 			return "redirect:/login?error=true";
 		}
-	}
-
-	@LogExecution
-	@GetMapping("/admin/stats")
-	public String getPostStats(Model model) {
-		// 데이터 조회
-		List<PostEntity> posts = postRepository.findAll();
-
-		Map<Long, List<String>> labelsByPostId = new HashMap<>();
-		Map<Long, List<Integer>> hitsDataByPostId = new HashMap<>();
-		Map<Long, List<Integer>> likeDataByPostId = new HashMap<>();
-		Map<Long, List<Integer>> todayHitsByPostId = new HashMap<>();
-		Map<Long, List<Integer>> todayLikesByPostId = new HashMap<>();
-
-		for (PostEntity post : posts) {
-			List<PostDailyStats> dailyStats = postStatsService.getDailyStatsByPost(post);
-			List<PostTotalStats> totalStats = postStatsService.getTotalStatsByPost(post);
-
-			List<String> labels = dailyStats.stream()
-				.map(stat -> stat.getRecordedAt().toString())
-				.collect(Collectors.toList());
-
-			List<Integer> todayHitsData = dailyStats.stream()
-				.map(PostDailyStats::getTodayHits)
-				.collect(Collectors.toList());
-
-			List<Integer> todayLikesData = dailyStats.stream()
-				.map(PostDailyStats::getTodayLikes)
-				.collect(Collectors.toList());
-
-			int totalHits = !totalStats.isEmpty() ? totalStats.get(0).getHits() : 0;
-			int totalLikes = !totalStats.isEmpty() ? totalStats.get(0).getLikeCount() : 0;
-
-			labelsByPostId.put(post.getPostId(), labels);
-			todayHitsByPostId.put(post.getPostId(), todayHitsData);
-			todayLikesByPostId.put(post.getPostId(), todayLikesData);
-			hitsDataByPostId.put(post.getPostId(), List.of(totalHits)); // 전체 조회수
-			likeDataByPostId.put(post.getPostId(), List.of(totalLikes)); // 전체 좋아요 수
-		}
-
-		// 모델에 데이터 추가
-		model.addAttribute("posts", posts);
-		model.addAttribute("labelsByPostId", labelsByPostId);
-		model.addAttribute("hitsDataByPostId", hitsDataByPostId);
-		model.addAttribute("likeDataByPostId", likeDataByPostId);
-		model.addAttribute("todayHitsByPostId", todayHitsByPostId);
-		model.addAttribute("todayLikesByPostId", todayLikesByPostId);
-
-		return "adminStats"; // Thymeleaf 템플릿 이름
 	}
 
 	@LogExecution

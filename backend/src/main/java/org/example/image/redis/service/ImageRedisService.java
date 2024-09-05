@@ -221,8 +221,8 @@ public class ImageRedisService {
 
 				selectedColorHashMap.compute
 					(name, (k, v) ->
-						(v == null || calcScoreOfPost(condition) > calcScoreOfPost(v.condition())) ? colorSelectedDto :
-							v
+						(v == null || calcScoreOfPost(condition) > calcScoreOfPost(v.condition()))
+							? colorSelectedDto : v
 					);
 			}
 		}
@@ -239,7 +239,7 @@ public class ImageRedisService {
 
 		ColorDto.ColorSaveDtoRequest storedColor = objectMapper.readValue(storedColorJson,
 			ColorDto.ColorSaveDtoRequest.class);
-		int[] storedColorRGB = {storedColor.r(), storedColor.g(), storedColor.b()};
+		int[] storedColorRGB = {storedColor.originR(), storedColor.originG(), storedColor.originB()};
 		int[] newColorRGB = {colorSelectedDto.r(), colorSelectedDto.g(), colorSelectedDto.b()};
 
 		if (calculateEuclideanDistance(newColorRGB, storedColorRGB) <= STANDARD_DIST) {

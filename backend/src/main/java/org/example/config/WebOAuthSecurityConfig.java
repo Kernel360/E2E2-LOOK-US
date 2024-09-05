@@ -116,21 +116,28 @@ public class WebOAuthSecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.addAllowedOriginPattern("*");
+
+		corsConfiguration.addAllowedOriginPattern("https://www.lookus.shop");
+		corsConfiguration.addAllowedOriginPattern("https://api.lookus.shop");
+		corsConfiguration.addAllowedOriginPattern("http://localhost:8080"); // JUST FOR LOCAL DEV
+		corsConfiguration.addAllowedOriginPattern("http://localhost:3000"); // JUST FOR LOCAL DEV
+
+		corsConfiguration.addAllowedMethod("PATCH");
+		corsConfiguration.addAllowedMethod("GET");
+		corsConfiguration.addAllowedMethod("POST");
+		corsConfiguration.addAllowedMethod("PUT");
+		corsConfiguration.addAllowedMethod("DELETE");
+
+		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.addExposedHeader("Authorization");
 		corsConfiguration.addExposedHeader("refresh_token");
 		corsConfiguration.addExposedHeader("Set-Cookie");
-		corsConfiguration.addAllowedHeader("*");
-		corsConfiguration.addAllowedMethod("*");
-		corsConfiguration.addAllowedOrigin(System.getenv("WEBSITE_DOMAIN"));
-		corsConfiguration.addAllowedOrigin(System.getenv("API_DOMAIN"));
-		corsConfiguration.addAllowedOrigin("http://localhost:8080"); // JUST FOR LOCAL DEV
-		corsConfiguration.addAllowedOrigin("http://localhost:8081"); // JUST FOR LOCAL DEV
-		corsConfiguration.addAllowedOrigin("http://localhost:3000"); // JUST FOR LOCAL DEV
+
 		corsConfiguration.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);
+
 		return source;
 	}
 }

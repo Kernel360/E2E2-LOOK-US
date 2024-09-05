@@ -18,7 +18,6 @@ public class ColorApiClient {
 	@LogExecution
 	public String getColorInfo(String hexColor) {
 		RestTemplate restTemplate = new RestTemplate();
-		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			// Exchange method for direct object mapping
 			ResponseEntity<ColorInfoResponse> response = restTemplate.exchange(

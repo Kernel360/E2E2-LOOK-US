@@ -66,7 +66,8 @@ public class AsyncImageAnalyzePipeline {
 	 *                baeldung.com - threadpool with completablefuture
 	 *             </a>
 	 */
-	private final Executor singleThreadExecutor = Executors.newSingleThreadExecutor(); // 큐 + 싱글 쓰레드
+	// Default folkJoinPool을 사용하는 것으로 변경합니다.
+	// private final Executor singleThreadExecutor = Executors.newSingleThreadExecutor(); // 큐 + 싱글 쓰레드
 	private final Set<Long> onGoingTasks = new HashSet<>(); // 현재 처리 중인 작업을 임시 기록 합니다.
 
 	/**
@@ -76,13 +77,13 @@ public class AsyncImageAnalyzePipeline {
 	// @LogExecution
 	public void analyze(Long imageLocationId) {
 		CompletableFuture.runAsync(
-			() -> onStartTask.accept(imageLocationId), singleThreadExecutor
+			() -> onStartTask.accept(imageLocationId)
 		).thenRunAsync(
-			() -> extractClothAndColorTask.accept(imageAnalyzeManager, imageLocationId), singleThreadExecutor
+			() -> extractClothAndColorTask.accept(imageAnalyzeManager, imageLocationId)
 		).thenRunAsync(
-			() -> colorScoringTask.accept(imageRedisService, imageLocationId), singleThreadExecutor
+			() -> colorScoringTask.accept(imageRedisService, imageLocationId)
 		).whenCompleteAsync(
-			(__, err) -> onCompleteTask.accept(err, imageLocationId), singleThreadExecutor
+			(__, err) -> onCompleteTask.accept(err, imageLocationId)
 		);
 	}
 
@@ -106,9 +107,9 @@ public class AsyncImageAnalyzePipeline {
 		}
 
 		CompletableFuture.runAsync(
-			() -> pendingTask.accept(UPDATE_SCORE_PENDING_WAIT_MS), singleThreadExecutor
+			() -> pendingTask.accept(UPDATE_SCORE_PENDING_WAIT_MS)
 		).thenRunAsync(
-			() -> this.updateScore(imageLocationId, updateScoreType), singleThreadExecutor
+			() -> this.updateScore(imageLocationId, updateScoreType)
 		).orTimeout( /* for safety, throw a TimeoutException in case of a timeout */
 			UPDATE_SCORE_MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS
 		);
@@ -138,8 +139,6 @@ public class AsyncImageAnalyzePipeline {
 
 	private final BiConsumer<ImageAnalyzeManager, Long> extractClothAndColorTask = (analyzeManager, imageLocationId) -> {
 		try {
-			// add to in-task record
-			onGoingTasks.add(imageLocationId);
 			analyzeManager.analyze(imageLocationId);
 			log.debug("(1) Extract cloth info done - image {}", imageLocationId);
 		} catch (IOException e) {
